@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>Vertu 私域质检看板</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+<style>
+:root {
+  --navy:#0A2540; --navy2:#1A3A5C; --ink:#0F172A; --muted:#64748B;
+  --line:#E2E8F0; --bg:#F8FAFC; --white:#FFFFFF;
+  --gold:#B8860B; --green:#059669; --amber:#D97706; --red:#DC2626;
+  --blue:#2563EB;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,"SF Pro Text","PingFang SC","Helvetica Neue",Arial,sans-serif;
+     background:var(--bg);color:var(--ink);font-size:13px;line-height:1.55}
+.container{max-width:1520px;margin:0 auto;padding:24px}
+
+header{background:var(--navy);color:#fff;padding:28px 48px;margin:-24px -24px 24px;
+       border-bottom:4px solid var(--gold);display:flex;align-items:center;gap:24px}
+header h1{font-size:24px;font-weight:600;letter-spacing:-0.02em;flex:1}
+header .sub{color:#94A3B8;font-size:12px;margin-top:4px}
+.date-select{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);
+             color:#fff;padding:8px 14px;border-radius:4px;font-size:13px;cursor:pointer}
+.date-select option{color:var(--ink);background:#fff}
+
+.narrative{background:#fff;border:1px solid var(--line);border-radius:4px;padding:20px 24px;
+           margin-bottom:24px;border-left:4px solid var(--gold)}
+.narrative .label{font-size:10px;color:var(--muted);text-transform:uppercase;
+                  letter-spacing:.1em;margin-bottom:6px}
+.narrative p{font-size:14px;color:var(--ink);line-height:1.7}
+
+.kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:24px}
+.kpi-card{background:#fff;border:1px solid var(--line);border-radius:4px;
+          padding:18px 20px;text-align:center}
+.kpi-card .num{font-size:32px;font-weight:700;color:var(--navy);line-height:1}
+.kpi-card .num.red{color:var(--red)}
+.kpi-card .num.green{color:var(--green)}
+.kpi-card .desc{font-size:11px;color:var(--muted);margin-top:6px;text-transform:uppercase;letter-spacing:.04em}
+.kpi-card .sub{font-size:11px;color:var(--muted);margin-top:2px}
+
+h2.section{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;
+           margin:32px 0 14px;padding-bottom:6px;border-bottom:1px solid var(--line)}
+
+.table-wrap{background:#fff;border:1px solid var(--line);border-radius:4px;overflow:hidden;margin-bottom:24px}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{text-align:left;padding:11px 16px;background:var(--navy);color:#fff;font-weight:500;
+   font-size:10px;text-transform:uppercase;letter-spacing:.04em}
+td{padding:10px 16px;border-bottom:1px solid var(--line)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#F8FAFC}
+.grade-优秀{color:var(--green);font-weight:700}
+.grade-良好{color:var(--blue);font-weight:600}
+.grade-及格{color:var(--amber);font-weight:600}
+.grade-需关注,.grade-待改进{color:var(--red);font-weight:600}
+.grade-NA,.grade-NaN{color:var(--muted)}
+.score-bar{display:flex;align-items:center;gap:8px}
+.score-bar .bar{flex:1;height:6px;background:#E2E8F0;border-radius:3px;overflow:hidden}
+.score-bar .fill{height:100%;border-radius:3px;background:var(--navy)}
+.score-bar .fill.green{background:var(--green)}
+.score-bar .fill.amber{background:var(--amber)}
+.score-bar .fill.red{background:var(--red)}
+
+.alert-high{color:var(--red);font-weight:600}
+.alert-tag{display:inline-block;padding:2px 8px;border-radius:2px;font-size:10px;font-weight:600;margin-right:4px}
+.tag-禁用词{background:#FEE2E2;color:#7F1D1D}
+.tag-集中轰炸{background:#FEF3C7;color:#78350F}
+.tag-选择性回复{background:#EDE9FE;color:#4C1D95}
+.tag-高意向客户冷落{background:#ECFDF5;color:#065F46}
+.tag-批量群发嫌疑{background:#FFF7ED;color:#9A3412}
+.tag-僵尸跟进{background:#F1F5F9;color:#334155}
+
+.grid-2{display:grid;grid-template-columns:3fr 2fr;gap:16px;margin-bottom:24px}
+.chart-box{background:#fff;border:1px solid var(--line);border-radius:4px;padding:20px}
+.chart-box h3{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px}
+.chart{width:100%;height:260px}
+
+.mid-list{display:flex;flex-direction:column;gap:8px;padding:4px 0}
+.mid-item{display:flex;align-items:center;gap:10px;font-size:12px}
+.mid-item .name{flex:1;color:var(--ink)}
+.mid-item .cnt{font-weight:600;color:var(--amber)}
+.mid-item .bar{width:80px;height:5px;background:#E2E8F0;border-radius:3px;overflow:hidden}
+.mid-item .fill{height:100%;background:var(--amber);border-radius:3px}
+
+.empty{padding:24px;text-align:center;color:var(--muted);font-size:12px}
+footer{margin-top:48px;padding-top:16px;border-top:1px solid var(--line);
+       font-size:11px;color:var(--muted);text-align:center}
+.loading{text-align:center;padding:60px;color:var(--muted)}
+
+.tabs{display:flex;gap:0;border-bottom:1px solid var(--line);margin-bottom:24px}
+.tab{padding:10px 20px;font-size:12px;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;
+     margin-bottom:-1px;font-weight:500;transition:all .15s}
+.tab:hover{color:var(--navy)}
+.tab.active{color:var(--navy);border-bottom-color:var(--gold)}
+.tab-content{display:none}
+.tab-content.active{display:block}
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <div style="flex:1">
+    <h1>Vertu 私域质检看板</h1>
+    <div class="sub">CONFIDENTIAL · 仅供内部使用 · 数据来源：SalesEpoch WA聊天记录</div>
+  </div>
+  <select class="date-select" id="dateSelect" onchange="loadDate(this.value)">
+    {% for d in dates %}
+    <option value="{{ d }}">{{ d }}</option>
+    {% endfor %}
+  </select>
+</header>
+
+<div id="narrative" class="narrative" style="display:none">
+  <div class="label">🧠 Hermes 管理摘要</div>
+  <p id="narrativeText"></p>
+</div>
+
+<div class="kpi-row">
+  <div class="kpi-card"><div class="num" id="kpiActive">—</div><div class="desc">活跃坐席</div><div class="sub" id="kpiTotal"></div></div>
+  <div class="kpi-card"><div class="num red" id="kpiAlerts">—</div><div class="desc">高风险预警</div></div>
+  <div class="kpi-card"><div class="num red" id="kpiProblems">—</div><div class="desc">问题案例</div></div>
+  <div class="kpi-card"><div class="num green" id="kpiGold">—</div><div class="desc">金牌案例</div></div>
+  <div class="kpi-card"><div class="num" id="kpiAvgSop">—</div><div class="desc">SOP 均分</div></div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('sop')">📋 SOP 硬指标</div>
+  <div class="tab" onclick="switchTab('alert')">🚨 异常预警</div>
+  <div class="tab" onclick="switchTab('score')">🤖 AI 话术评分</div>
+</div>
+
+<!-- SOP Tab -->
+<div class="tab-content active" id="tab-sop">
+  <div class="grid-2">
+    <div class="chart-box">
+      <h3>活跃坐席 SOP 评分</h3>
+      <div class="chart" id="sopChart"></div>
+    </div>
+    <div class="chart-box">
+      <h3>触达客户数分布（目标50/日）</h3>
+      <div class="chart" id="sendsChart"></div>
+    </div>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr>
+        <th>坐席</th><th>首回时长</th><th>触达数</th>
+        <th>老客触达</th><th>WA动态</th><th>SOP分</th>
+      </tr></thead>
+      <tbody id="sopTable"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Alert Tab -->
+<div class="tab-content" id="tab-alert">
+  <div class="grid-2">
+    <div class="chart-box">
+      <h3>高风险预警分布</h3>
+      <div class="chart" id="alertChart"></div>
+    </div>
+    <div class="chart-box">
+      <h3>🟡 中风险行为汇总</h3>
+      <div class="mid-list" id="midList"></div>
+    </div>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>坐席</th><th>预警类型</th><th>客户</th><th>时间</th></tr></thead>
+      <tbody id="alertTable"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Score Tab -->
+<div class="tab-content" id="tab-score">
+  <div class="grid-2">
+    <div class="chart-box">
+      <h3>综合评分排行</h3>
+      <div class="chart" id="scoreChart"></div>
+    </div>
+    <div class="chart-box">
+      <h3>三维雷达（TOP 5）</h3>
+      <div class="chart" id="radarChart"></div>
+    </div>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr>
+        <th>坐席</th><th>专业度</th><th>品牌调性</th>
+        <th>转化引导</th><th>综合分</th><th>等级</th><th>评分对话</th>
+      </tr></thead>
+      <tbody id="scoreTable"></tbody>
+    </table>
+  </div>
+</div>
+
+<footer>Vertu 私域质检 · 自进化 Agent 框架 V2.1 · <span id="footerDate"></span></footer>
+</div>
+
+<script>
+const GRADE_COLOR = {'优秀':'#059669','良好':'#2563EB','及格':'#D97706','需关注':'#DC2626','待改进':'#DC2626','N/A':'#94A3B8'};
+const GRADE_EMOJI = {'优秀':'🟢','良好':'🔵','及格':'🟡','需关注':'🔴','待改进':'🔴','N/A':'⚪'};
+let charts = {};
+
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach((t,i) => {
+    const names = ['sop','alert','score'];
+    t.classList.toggle('active', names[i] === name);
+  });
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  setTimeout(() => { Object.values(charts).forEach(c => c && c.resize()); }, 50);
+}
+
+function scoreColor(v) {
+  if(v >= 75) return '#059669';
+  if(v >= 60) return '#D97706';
+  return '#DC2626';
+}
+
+function gradeClass(g) { return 'grade-' + (g||'NA').replace('/',''); }
+
+async function loadDate(date) {
+  document.getElementById('footerDate').textContent = date;
+  const r = await fetch(`/api/report/${date}`);
+  const d = await r.json();
+  renderKPI(d);
+  renderNarrative(d);
+  renderSOP(d);
+  renderAlerts(d);
+  renderScores(d);
+}
+
+function renderKPI(d) {
+  document.getElementById('kpiActive').textContent = d.active_seats;
+  document.getElementById('kpiTotal').textContent = `/ ${d.total_seats} 总席`;
+  document.getElementById('kpiAlerts').textContent = d.high_alerts;
+  document.getElementById('kpiProblems').textContent = d.problem_cases;
+  document.getElementById('kpiGold').textContent = d.gold_cases;
+  const active = d.sop_rows.filter(r => r.sends > 0);
+  const avg = active.length ? (active.reduce((s,r) => s+r.sop_score,0)/active.length).toFixed(1) : '—';
+  document.getElementById('kpiAvgSop').textContent = avg;
+}
+
+function renderNarrative(d) {
+  const el = document.getElementById('narrative');
+  if(d.narrative) {
+    document.getElementById('narrativeText').textContent = d.narrative;
+    el.style.display = '';
+  } else {
+    el.style.display = 'none';
+  }
+}
+
+function renderSOP(d) {
+  const active = d.sop_rows.filter(r => r.sends > 0);
+
+  // SOP bar chart
+  charts.sop && charts.sop.dispose();
+  const sopC = echarts.init(document.getElementById('sopChart'));
+  charts.sop = sopC;
+  sopC.setOption({
+    backgroundColor:'#fff',
+    grid:{top:10,bottom:60,left:10,right:10,containLabel:true},
+    xAxis:{type:'category',data:active.map(r=>r.label),
+           axisLabel:{rotate:30,fontSize:11,color:'#64748B'}},
+    yAxis:{type:'value',max:110,axisLabel:{color:'#64748B'}},
+    series:[{type:'bar',data:active.map(r=>({
+      value:r.sop_score,
+      itemStyle:{color:r.sop_score>=75?'#059669':r.sop_score>=50?'#D97706':'#DC2626'}
+    })),label:{show:true,position:'top',fontSize:11}}]
+  });
+
+  // Sends bar chart
+  charts.sends && charts.sends.dispose();
+  const sendsC = echarts.init(document.getElementById('sendsChart'));
+  charts.sends = sendsC;
+  sendsC.setOption({
+    backgroundColor:'#fff',
+    grid:{top:10,bottom:60,left:10,right:10,containLabel:true},
+    xAxis:{type:'category',data:active.map(r=>r.label),
+           axisLabel:{rotate:30,fontSize:11,color:'#64748B'}},
+    yAxis:{type:'value',axisLabel:{color:'#64748B'}},
+    series:[{type:'bar',data:active.map(r=>({
+      value:r.sends,
+      itemStyle:{color:r.sends>=50?'#059669':r.sends>=40?'#2563EB':r.sends>=30?'#D97706':'#DC2626'}
+    })),label:{show:true,position:'top',fontSize:11},
+      markLine:{data:[{yAxis:50,lineStyle:{color:'#B8860B',type:'dashed'},label:{formatter:'目标50'}}]}
+    }]
+  });
+
+  // SOP table
+  const tbody = document.getElementById('sopTable');
+  tbody.innerHTML = d.sop_rows.map(r => {
+    const frStr = r.fr_avg > 0
+      ? `${r.fr_avg}s <small style="color:#94A3B8">(n=${r.fr_n})</small>`
+      : `<span style="color:#94A3B8">N/A${r.fr_skipped>0?' (仅非工作时段)':''}</span>`;
+    const frGrade = r.fr_grade || 'N/A';
+    const sc = r.sop_score;
+    const barColor = sc>=75?'green':sc>=50?'amber':'red';
+    return `<tr>
+      <td><b>${r.label}</b></td>
+      <td><span class="${gradeClass(frGrade)}">${frStr}</span></td>
+      <td>${r.sends} <span class="${gradeClass(r.sends_grade)}">${GRADE_EMOJI[r.sends_grade]||''}</span></td>
+      <td>${r.old_cust} <span class="${gradeClass(r.old_grade)}">${GRADE_EMOJI[r.old_grade]||''}</span></td>
+      <td>${r.wa_reached?'✅':'❌'} ${r.wa_count}</td>
+      <td>
+        <div class="score-bar">
+          <div class="bar"><div class="fill ${barColor}" style="width:${sc}%"></div></div>
+          <b>${sc}</b>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function renderAlerts(d) {
+  // Alert bar chart by seat
+  const byLabel = {};
+  d.alerts.forEach(a => { byLabel[a.label] = (byLabel[a.label]||0)+1; });
+  const labels = Object.keys(byLabel).sort((a,b)=>byLabel[b]-byLabel[a]);
+
+  charts.alert && charts.alert.dispose();
+  const alertC = echarts.init(document.getElementById('alertChart'));
+  charts.alert = alertC;
+  alertC.setOption({
+    backgroundColor:'#fff',
+    grid:{top:10,bottom:60,left:10,right:10,containLabel:true},
+    xAxis:{type:'category',data:labels,axisLabel:{rotate:30,fontSize:11,color:'#64748B'}},
+    yAxis:{type:'value',axisLabel:{color:'#64748B'}},
+    series:[{type:'bar',data:labels.map(l=>byLabel[l]),
+      itemStyle:{color:'#DC2626'},label:{show:true,position:'top',fontSize:11}}]
+  });
+
+  // Mid risk
+  const midMax = d.mid_counts.length ? d.mid_counts[0].count : 1;
+  document.getElementById('midList').innerHTML = d.mid_counts.length
+    ? d.mid_counts.map(m => `
+        <div class="mid-item">
+          <span class="name">${m.label}</span>
+          <div class="bar"><div class="fill" style="width:${m.count/midMax*100}%"></div></div>
+          <span class="cnt">${m.count} 项</span>
+        </div>`).join('')
+    : '<div class="empty">今日无中风险行为</div>';
+
+  // Alert table
+  const tbody = document.getElementById('alertTable');
+  tbody.innerHTML = d.alerts.length
+    ? d.alerts.map(a => `<tr>
+        <td><b>${a.label}</b></td>
+        <td><span class="alert-tag tag-${a.type}">${a.type}</span></td>
+        <td style="color:#64748B">${a.customer}</td>
+        <td style="color:#64748B">${a.time}</td>
+      </tr>`).join('')
+    : '<tr><td colspan="4" class="empty">✅ 今日无高风险预警</td></tr>';
+}
+
+function renderScores(d) {
+  if(!d.score_rows.length) return;
+
+  // Horizontal bar chart
+  charts.scoreBar && charts.scoreBar.dispose();
+  const scoreC = echarts.init(document.getElementById('scoreChart'));
+  charts.scoreBar = scoreC;
+  const sorted = [...d.score_rows].reverse();
+  scoreC.setOption({
+    backgroundColor:'#fff',
+    grid:{top:10,bottom:10,left:10,right:60,containLabel:true},
+    xAxis:{type:'value',max:100,axisLabel:{color:'#64748B'}},
+    yAxis:{type:'category',data:sorted.map(r=>r.label),axisLabel:{fontSize:11,color:'#64748B'}},
+    series:[{type:'bar',data:sorted.map(r=>({
+      value:r.overall,
+      itemStyle:{color:scoreColor(r.overall)}
+    })),label:{show:true,position:'right',fontSize:11}}]
+  });
+
+  // Radar chart (top 5)
+  const top5 = d.score_rows.slice(0,5);
+  charts.radar && charts.radar.dispose();
+  const radarC = echarts.init(document.getElementById('radarChart'));
+  charts.radar = radarC;
+  radarC.setOption({
+    backgroundColor:'#fff',
+    legend:{data:top5.map(r=>r.label),bottom:0,textStyle:{fontSize:10}},
+    radar:{indicator:[{name:'专业度',max:100},{name:'品牌调性',max:100},{name:'转化引导',max:100}],
+           center:['50%','45%'],radius:'60%'},
+    series:[{type:'radar',data:top5.map(r=>({
+      name:r.label,value:[r.pro,r.brand,r.conv]
+    }))}]
+  });
+
+  // Score table
+  document.getElementById('scoreTable').innerHTML = d.score_rows.map(r => `<tr>
+    <td><b>${r.label}</b></td>
+    <td>${r.pro}</td>
+    <td>${r.brand}</td>
+    <td>${r.conv}</td>
+    <td>
+      <div class="score-bar">
+        <div class="bar"><div class="fill" style="width:${r.overall}%;background:${scoreColor(r.overall)}"></div></div>
+        <b style="color:${scoreColor(r.overall)}">${r.overall}</b>
+      </div>
+    </td>
+    <td><span class="${gradeClass(r.grade)}">${GRADE_EMOJI[r.grade]||''} ${r.grade}</span></td>
+    <td style="color:#64748B">${r.n} 段</td>
+  </tr>`).join('');
+}
+
+// Init
+window.addEventListener('resize', () => Object.values(charts).forEach(c => c && c.resize()));
+const initDate = document.getElementById('dateSelect').value;
+if(initDate) loadDate(initDate);
+</script>
+</body>
+</html>

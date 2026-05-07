@@ -1,0 +1,23 @@
+# Secrets
+.env
+
+# Reports data (large, date-specific, not source code)
+reports/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+venv/
+.venv/
+*.egg-info/
+
+# macOS
+.DS_Store
+
+# Logs
+logs/
+*.log
+
+# Old Streamlit dashboard
+dashboard.py
