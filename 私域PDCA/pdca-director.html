@@ -212,18 +212,40 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 </style>
 </head>
 <body>
+<script>
+(function(){
+  const sess = JSON.parse(localStorage.getItem('pdca_session') || 'null');
+  if (!sess || Date.now() - sess.ts > 8 * 3600 * 1000) {
+    const uid = new URLSearchParams(location.search).get('uid');
+    if (!uid) { window.location.href = 'pdca-login.html'; return; }
+  }
+  const WEEKDAYS = ['日','一','二','三','四','五','六'];
+  if (sess) {
+    const av = document.getElementById('hdr-av');
+    const nm = document.getElementById('hdr-name');
+    const mt = document.getElementById('hdr-meta');
+    if (av) { av.textContent = sess.name[0]; }
+    if (nm) nm.innerHTML = `${sess.name} <span class="tag purple">总监</span>`;
+    if (mt) {
+      const d = new Date();
+      mt.textContent = `今日 ${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}（周${WEEKDAYS[d.getDay()]}）`;
+    }
+  }
+})();
+function logout(){ localStorage.removeItem('pdca_session'); window.location.href='pdca-login.html'; }
+</script>
 
 <div class="app-header">
   <div class="header-left">
-    <div class="avatar">总</div>
+    <div class="avatar" id="hdr-av">总</div>
     <div class="header-info">
-      <div class="name">海外私域部 · 总监 <span class="tag purple">部门长</span></div>
-      <div class="meta">3 组 · 14 人 · 年度目标 4000 万 · 2026-05-14</div>
+      <div class="name" id="hdr-name">海外私域部 · 总监 <span class="tag purple">部门长</span></div>
+      <div class="meta" id="hdr-meta">3 组 · 14 人 · 年度目标 4000 万 · 2026-05-14</div>
     </div>
   </div>
   <div style="display:flex;align-items:center;gap:12px">
     <span style="font-size:12px;color:var(--muted)">海外私域部</span>
-    <button class="btn-sm" onclick="showToast('已退出')">退出</button>
+    <button class="btn-sm" onclick="logout()">退出</button>
   </div>
 </div>
 

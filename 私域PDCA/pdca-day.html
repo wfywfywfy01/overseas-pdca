@@ -216,19 +216,50 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 </style>
 </head>
 <body>
+<script>
+// Session guard — redirect to login if no valid session
+(function(){
+  const TODAY_STR = new Date().toLocaleDateString('zh-CN',{year:'numeric',month:'2-digit',day:'2-digit'}).replace(/\//g,'-');
+  const WEEKDAYS  = ['日','一','二','三','四','五','六'];
+  const sess = JSON.parse(localStorage.getItem('pdca_session') || 'null');
+  if (!sess || Date.now() - sess.ts > 8 * 3600 * 1000) {
+    // No session — check URL param fallback
+    const uid = new URLSearchParams(location.search).get('uid');
+    if (!uid) { window.location.href = 'pdca-login.html'; return; }
+    // Allow URL-param access without login (dev mode)
+  }
+  // Populate header from session
+  if (sess) {
+    const av   = document.getElementById('hdr-av');
+    const name = document.getElementById('hdr-name');
+    const meta = document.getElementById('hdr-meta');
+    if (av)   av.textContent  = sess.name[0];
+    if (name) name.innerHTML  = `${sess.name} <span class="tag">${sess.team || '海外私域'}</span>`;
+    if (meta) {
+      const d = new Date();
+      meta.textContent = `今日 ${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}（周${WEEKDAYS[d.getDay()]}）`;
+    }
+  }
+})();
+
+function logout() {
+  localStorage.removeItem('pdca_session');
+  window.location.href = 'pdca-login.html';
+}
+</script>
 
 <!-- HEADER -->
 <div class="app-header">
   <div class="header-left">
-    <div class="avatar">郑</div>
+    <div class="avatar" id="hdr-av">郑</div>
     <div class="header-info">
-      <div class="name">郑丽苹 <span class="tag">何川组</span> <span class="tag green">D90+</span> <span class="tag gold">300W</span></div>
-      <div class="meta">入职 421 天 · 今日 2026-05-14（周四）</div>
+      <div class="name" id="hdr-name">郑丽苹 <span class="tag">何川组</span></div>
+      <div class="meta" id="hdr-meta">今日 2026-05-14（周四）</div>
     </div>
   </div>
   <div class="header-right">
     <span style="font-size:12px">海外私域部</span>
-    <button class="btn-sm" onclick="showToast('已退出')">退出</button>
+    <button class="btn-sm" onclick="logout()">退出</button>
   </div>
 </div>
 
@@ -1057,9 +1088,9 @@ function showToast(msg) {
 }
 
 // ===== CONFIG =====
-// uid 通过 URL 参数传入，例如 pdca-day.html?uid=12865
-// DATA_SRC: 本地静态 JSON（由 fetch_pdca_data.py 生成）；上线后可改为 API 路径
-const CURRENT_USER_ID = parseInt(new URLSearchParams(location.search).get('uid') || 12865);
+// uid 优先从 session 读，其次 URL 参数，最后默认值
+const _sess = JSON.parse(localStorage.getItem('pdca_session') || 'null');
+const CURRENT_USER_ID = _sess?.uid || parseInt(new URLSearchParams(location.search).get('uid') || 12865);
 const DATA_SRC = new URLSearchParams(location.search).get('data') || 'pdca_data.json';
 
 let _DATA = null;

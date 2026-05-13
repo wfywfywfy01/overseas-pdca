@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>海外私域 PDCA · 登录</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#f4f4f0;--card:#fff;--border:#e5e7eb;--border2:#d1d5db;
+  --text:#111827;--muted:#6b7280;
+  --blue:#2563eb;--blue-bg:#eff6ff;--blue-border:#bfdbfe;
+  --red:#dc2626;--red-bg:#fef2f2;
+  --green:#16a34a;--green-bg:#f0fdf4;
+  --radius:10px;--shadow:0 4px 24px rgba(0,0,0,.08);
+}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Segoe UI',sans-serif;font-size:14px;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px}
+
+.logo-area{text-align:center;margin-bottom:40px}
+.logo{width:52px;height:52px;background:#111827;border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:22px;font-weight:800;color:#fff;letter-spacing:-.5px}
+.logo-title{font-size:20px;font-weight:700;letter-spacing:-.02em}
+.logo-sub{font-size:13px;color:var(--muted);margin-top:4px}
+
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);width:100%;max-width:400px;padding:32px}
+
+.field{margin-bottom:18px}
+.field label{display:block;font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
+.field input{width:100%;padding:10px 13px;border:1px solid var(--border2);border-radius:8px;font-size:14px;font-family:inherit;background:#fff;color:var(--text);outline:none;transition:border .15s}
+.field input:focus{border-color:var(--blue)}
+.field input::placeholder{color:var(--muted)}
+
+.btn{width:100%;padding:12px;background:#111827;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:opacity .15s;margin-top:8px}
+.btn:hover{opacity:.87}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn.loading::after{content:'…'}
+
+.error{background:var(--red-bg);color:var(--red);border:1px solid #fecaca;border-radius:8px;padding:10px 13px;font-size:13px;margin-bottom:16px;display:none}
+.error.show{display:block}
+
+.divider{display:flex;align-items:center;gap:10px;margin:20px 0;color:var(--muted);font-size:12px}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* Quick-pick */
+.quick-title{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px}
+.user-list{display:flex;flex-direction:column;gap:6px;max-height:260px;overflow-y:auto}
+.user-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--border);border-radius:8px;cursor:pointer;transition:all .15s}
+.user-item:hover{border-color:#111827;background:var(--bg)}
+.user-av{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0}
+.av-staff{background:#111827}
+.av-mgr{background:#2563eb}
+.av-dir{background:#7c3aed}
+.user-info{flex:1;min-width:0}
+.user-name{font-size:14px;font-weight:600}
+.user-role{font-size:11px;color:var(--muted)}
+.role-badge{font-size:10px;padding:2px 7px;border-radius:10px;font-weight:600;flex-shrink:0}
+.badge-dir{background:#f5f3ff;color:#7c3aed}
+.badge-mgr{background:var(--blue-bg);color:var(--blue)}
+.badge-staff{background:#f4f4f0;color:var(--muted)}
+
+.footer{margin-top:24px;text-align:center;font-size:12px;color:var(--muted)}
+</style>
+</head>
+<body>
+
+<div class="logo-area">
+  <div class="logo">P</div>
+  <div class="logo-title">海外私域 PDCA</div>
+  <div class="logo-sub">Operations Console · Vertu</div>
+</div>
+
+<div class="card">
+  <div id="error-msg" class="error"></div>
+
+  <!-- Odoo 账号登录 -->
+  <div id="login-form">
+    <div class="field">
+      <label>账号</label>
+      <input id="inp-login" type="text" placeholder="手机号 / 邮箱" autocomplete="username">
+    </div>
+    <div class="field">
+      <label>密码</label>
+      <input id="inp-pass" type="password" placeholder="Odoo 登录密码" autocomplete="current-password">
+    </div>
+    <button class="btn" id="btn-login" onclick="doLogin()">登录</button>
+  </div>
+
+  <div class="divider">或直接选择</div>
+
+  <!-- 快速选人 -->
+  <div class="quick-title">选择你的账号</div>
+  <div class="user-list" id="user-list"></div>
+</div>
+
+<div class="footer">数据来自 Odoo · 仅限内部使用</div>
+
+<script>
+// ===== 用户角色映射 =====
+// 从 Odoo HR 模块获取的结构
+const USERS = [
+  {uid:12825, name:'谭启林', role:'director', team:'海外私域', login:'谭启林的Odoo账号'},
+  {uid:12537, name:'何川',   role:'manager',  team:'何川组'},
+  {uid:13222, name:'李波',   role:'manager',  team:'李波组'},
+  {uid:12865, name:'陈莉',   role:'staff',    team:'何川组'},
+  {uid:12849, name:'郑丽苹', role:'staff',    team:'何川组'},
+  {uid:12862, name:'陈玉霞', role:'staff',    team:'何川组'},
+  {uid:12549, name:'刘佳鑫', role:'staff',    team:'何川组'},
+  {uid:13431, name:'毛涵',   role:'staff',    team:'何川组'},
+  {uid:14313, name:'张心言', role:'staff',    team:'何川组'},
+  {uid:12828, name:'贾梦圆', role:'staff',    team:'何川组'},
+  {uid:13159, name:'高辰',   role:'staff',    team:'何川组'},
+  {uid:12821, name:'许淋玲', role:'staff',    team:'何川组'},
+  {uid:13151, name:'陈晓霜', role:'staff',    team:'何川组'},
+];
+
+// 角色 → 页面
+const ROLE_PAGE = {
+  director: 'pdca-director.html',
+  manager:  'pdca-manager.html',
+  staff:    'pdca-day.html',
+};
+
+// ===== 渲染快速选人列表 =====
+function renderUserList() {
+  const el = document.getElementById('user-list');
+  el.innerHTML = USERS.map(u => {
+    const avCls  = u.role === 'director' ? 'av-dir' : u.role === 'manager' ? 'av-mgr' : 'av-staff';
+    const bdgCls = u.role === 'director' ? 'badge-dir' : u.role === 'manager' ? 'badge-mgr' : 'badge-staff';
+    const roleLabel = u.role === 'director' ? '总监' : u.role === 'manager' ? '主管' : '员工';
+    return `<div class="user-item" onclick="quickSelect(${u.uid})">
+      <div class="user-av ${avCls}">${u.name[0]}</div>
+      <div class="user-info">
+        <div class="user-name">${u.name}</div>
+        <div class="user-role">${u.team}</div>
+      </div>
+      <span class="role-badge ${bdgCls}">${roleLabel}</span>
+    </div>`;
+  }).join('');
+}
+
+// ===== 快速选人登录 =====
+function quickSelect(uid) {
+  const user = USERS.find(u => u.uid === uid);
+  if (!user) return;
+  saveSession(user);
+  redirect(user);
+}
+
+// ===== Odoo JSON-RPC 登录 =====
+const ODOO_URL = 'https://admin.vertu.cn';
+const ODOO_DB  = 'odoo17';
+
+async function doLogin() {
+  const login = document.getElementById('inp-login').value.trim();
+  const pass  = document.getElementById('inp-pass').value;
+  if (!login || !pass) { showError('请填写账号和密码'); return; }
+
+  const btn = document.getElementById('btn-login');
+  btn.disabled = true;
+  btn.classList.add('loading');
+  btn.textContent = '登录中';
+  hideError();
+
+  try {
+    const resp = await fetch(`${ODOO_URL}/web/session/authenticate`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      credentials: 'include',
+      body: JSON.stringify({
+        jsonrpc: '2.0', method: 'call', id: 1,
+        params: {db: ODOO_DB, login, password: pass}
+      })
+    });
+    const data = await resp.json();
+    if (data.result && data.result.uid) {
+      const uid = data.result.uid;
+      const name = data.result.name || login;
+      // Match to known users, or default to staff
+      const known = USERS.find(u => u.uid === uid);
+      const user  = known || {uid, name, role:'staff', team:'海外私域'};
+      user.name = name; // use Odoo display name
+      saveSession(user);
+      redirect(user);
+    } else {
+      const msg = data.error?.data?.message || '账号或密码错误';
+      showError(msg);
+    }
+  } catch(e) {
+    // CORS or network error — suggest quick-pick
+    showError('无法直连 Odoo（' + e.message + '）。请用下方"直接选择"登录。');
+  } finally {
+    btn.disabled = false;
+    btn.classList.remove('loading');
+    btn.textContent = '登录';
+  }
+}
+
+// ===== Session =====
+function saveSession(user) {
+  localStorage.setItem('pdca_session', JSON.stringify({
+    uid:  user.uid,
+    name: user.name,
+    role: user.role,
+    team: user.team,
+    ts:   Date.now(),
+  }));
+}
+
+function redirect(user) {
+  const page = ROLE_PAGE[user.role] || 'pdca-day.html';
+  const params = new URLSearchParams();
+  params.set('uid', user.uid);
+  if (user.role === 'manager') params.set('team', user.uid); // manager's own uid = team key
+  window.location.href = page + '?' + params.toString();
+}
+
+// ===== UI helpers =====
+function showError(msg) {
+  const el = document.getElementById('error-msg');
+  el.textContent = msg;
+  el.classList.add('show');
+}
+function hideError() {
+  document.getElementById('error-msg').classList.remove('show');
+}
+
+// Enter key on password field
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('inp-pass').addEventListener('keydown', e => {
+    if (e.key === 'Enter') doLogin();
+  });
+  document.getElementById('inp-login').addEventListener('keydown', e => {
+    if (e.key === 'Enter') document.getElementById('inp-pass').focus();
+  });
+  renderUserList();
+
+  // Auto-redirect if already logged in (session valid for 8h)
+  const sess = localStorage.getItem('pdca_session');
+  if (sess) {
+    try {
+      const s = JSON.parse(sess);
+      if (Date.now() - s.ts < 8 * 3600 * 1000) {
+        redirect(s);
+      }
+    } catch(e) {}
+  }
+});
+</script>
+</body>
+</html>
