@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>海外私域 PDCA · 总监视图</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#fafaf8;--bg2:#f4f4f0;--card:#ffffff;
+  --border:#e5e7eb;--border2:#d1d5db;
+  --text:#111827;--muted:#6b7280;--muted2:#9ca3af;
+  --green:#16a34a;--green-bg:#f0fdf4;--green-border:#bbf7d0;
+  --red:#dc2626;--red-bg:#fef2f2;--red-border:#fecaca;
+  --orange:#ea580c;--orange-bg:#fff7ed;--orange-border:#fed7aa;
+  --blue:#2563eb;--blue-bg:#eff6ff;--blue-border:#bfdbfe;
+  --purple:#7c3aed;--purple-bg:#f5f3ff;--purple-border:#ddd6fe;
+  --gold:#b45309;--gold-bg:#fffbeb;--gold-border:#fde68a;
+  --radius:8px;--shadow:0 1px 3px rgba(0,0,0,.08);--shadow2:0 4px 16px rgba(0,0,0,.1);
+}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Segoe UI',sans-serif;font-size:14px;line-height:1.5}
+
+.app-header{height:56px;background:var(--card);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 24px;position:sticky;top:0;z-index:100}
+.header-left{display:flex;align-items:center;gap:12px}
+.avatar{width:34px;height:34px;border-radius:50%;background:#7c3aed;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;flex-shrink:0}
+.header-info .name{font-size:14px;font-weight:600}
+.header-info .meta{font-size:12px;color:var(--muted)}
+.tag{display:inline-flex;align-items:center;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:500;background:var(--bg2);color:var(--muted);border:1px solid var(--border)}
+.tag.green{background:var(--green-bg);color:var(--green);border-color:var(--green-border)}
+.tag.red{background:var(--red-bg);color:var(--red);border-color:var(--red-border)}
+.tag.orange{background:var(--orange-bg);color:var(--orange);border-color:var(--orange-border)}
+.tag.blue{background:var(--blue-bg);color:var(--blue);border-color:var(--blue-border)}
+.tag.purple{background:var(--purple-bg);color:var(--purple);border-color:var(--purple-border)}
+.btn-sm{padding:6px 12px;border-radius:var(--radius);border:1px solid var(--border2);background:var(--card);font-size:12px;cursor:pointer;font-weight:500;color:var(--text)}
+.btn-sm:hover{background:var(--bg2)}
+.btn-sm.dark{background:#111827;color:#fff;border-color:#111827}
+
+.time-nav{display:flex;align-items:center;gap:6px;padding:10px 24px;background:var(--bg2);border-bottom:1px solid var(--border)}
+.time-nav-label{font-size:12px;color:var(--muted);font-weight:500;margin-right:6px;white-space:nowrap}
+.time-tab{padding:5px 20px;border-radius:16px;border:1px solid var(--border2);background:var(--card);font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;transition:all .15s}
+.time-tab.active{background:#7c3aed;color:#fff;border-color:#7c3aed}
+.time-tab:hover:not(.active){border-color:#7c3aed;color:#7c3aed}
+.time-panel{display:none}
+.time-panel.active{display:block}
+
+.main-layout{display:grid;grid-template-columns:1fr 300px;min-height:calc(100vh - 96px)}
+.left-col{padding:24px;display:flex;flex-direction:column;gap:20px;border-right:1px solid var(--border)}
+.right-col{padding:20px;display:flex;flex-direction:column;gap:16px;background:var(--bg)}
+
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow)}
+.card-sm{padding:16px}
+.card-title{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:14px}
+.section-label{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.step-badge{width:22px;height:22px;border-radius:50%;background:#7c3aed;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.step-badge.warn{background:var(--orange)}
+.step-badge.dark{background:#111827}
+.step-name{font-size:15px;font-weight:700}
+.step-sub{font-size:12px;color:var(--muted);font-weight:400;margin-left:4px}
+
+/* KPI STRIP */
+.kpi-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.kpi-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;position:relative;overflow:hidden}
+.kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--border2)}
+.kpi-card.ok::before{background:var(--green)}
+.kpi-card.warn::before{background:var(--orange)}
+.kpi-card.behind::before{background:var(--red)}
+.kpi-card.neutral::before{background:#7c3aed}
+.kc-label{font-size:11px;color:var(--muted);font-weight:500;margin-bottom:6px}
+.kc-value{font-size:22px;font-weight:700;letter-spacing:-.02em}
+.kc-sub{font-size:11px;color:var(--muted);margin-top:3px}
+.kc-prog{height:3px;background:var(--bg2);border-radius:2px;margin-top:8px;overflow:hidden}
+.kc-fill{height:100%;border-radius:2px;transition:width .4s}
+
+/* GROUP CARDS (3列) */
+.group-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.group-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px;cursor:pointer;transition:all .15s;position:relative;overflow:hidden}
+.group-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--border2)}
+.group-card.ok::before{background:var(--green)}
+.group-card.warn::before{background:var(--orange)}
+.group-card.behind::before{background:var(--red)}
+.group-card:hover{box-shadow:var(--shadow2)}
+.gc-title{font-size:15px;font-weight:700;margin-bottom:2px}
+.gc-sub{font-size:12px;color:var(--muted);margin-bottom:14px}
+.gc-kpi{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.gc-kpi-item .label{font-size:11px;color:var(--muted)}
+.gc-kpi-item .val{font-size:16px;font-weight:700}
+.gc-prog-track{height:5px;background:var(--bg2);border-radius:3px;overflow:hidden;margin-bottom:8px}
+.gc-prog-fill{height:100%;border-radius:3px;transition:width .4s}
+
+/* CROSS TABLE */
+.cross-table{width:100%;border-collapse:collapse}
+.cross-table th{font-size:11px;color:var(--muted);padding:8px 12px;text-align:right;border-bottom:1px solid var(--border);font-weight:500;background:var(--bg2)}
+.cross-table th:first-child{text-align:left}
+.cross-table td{padding:9px 12px;border-bottom:1px solid var(--border);font-size:13px;text-align:right;vertical-align:middle}
+.cross-table td:first-child{text-align:left;font-weight:500}
+.cross-table tr:last-child td{border-bottom:none}
+.cross-table tr:hover td{background:var(--bg)}
+
+/* ANOMALY */
+.anomaly-list{display:flex;flex-direction:column;gap:8px}
+.anomaly-item{padding:12px 14px;border:1px solid var(--orange-border);background:var(--orange-bg);border-radius:var(--radius)}
+.anomaly-item.critical{border-color:var(--red-border);background:var(--red-bg)}
+.an-title{font-size:13px;font-weight:600;color:var(--orange)}
+.anomaly-item.critical .an-title{color:var(--red)}
+.an-desc{font-size:12px;color:var(--muted);margin-top:3px;line-height:1.5}
+
+/* PROGRESS ROWS */
+.prog-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.prog-row:last-child{margin-bottom:0}
+.prog-label{width:80px;font-size:13px;color:var(--text);flex-shrink:0}
+.prog-track{flex:1;height:7px;background:var(--bg2);border-radius:4px;overflow:hidden}
+.prog-fill{height:100%;border-radius:4px;background:#7c3aed;transition:width .4s}
+.prog-fill.ok{background:var(--green)}
+.prog-fill.warn{background:var(--orange)}
+.prog-fill.bad{background:var(--red)}
+.prog-num{width:80px;text-align:right;font-size:12px;color:var(--muted)}
+
+/* QUARTER GRID */
+.quarter-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.quarter-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;position:relative;overflow:hidden}
+.quarter-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--border2)}
+.quarter-card.q-done::before{background:var(--orange)}
+.quarter-card.q-current::before{background:var(--purple)}
+.qc-label{font-size:11px;color:var(--muted);font-weight:600;letter-spacing:.04em;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
+.qc-badge{display:inline-flex;padding:1px 6px;border-radius:4px;font-size:10px;font-weight:600}
+.qc-plan{font-size:20px;font-weight:700;letter-spacing:-.02em}
+.qc-actual{font-size:12px;margin-top:4px}
+.qc-prog{height:4px;background:var(--bg2);border-radius:2px;margin-top:10px;overflow:hidden}
+.qc-fill{height:100%;border-radius:2px;transition:width .4s}
+.qc-sub{font-size:11px;color:var(--muted);margin-top:5px}
+
+/* PHENOMENON CARDS (2×2) */
+.pheno-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.pheno-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;cursor:pointer;transition:all .15s}
+.pheno-card:hover{box-shadow:var(--shadow)}
+.pheno-card.warn{border-color:var(--orange-border)}
+.pheno-card.alert{border-color:var(--red-border)}
+.pheno-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}
+.pheno-title{font-size:12px;font-weight:700}
+.pheno-kpi{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.pk-label{font-size:11px;color:var(--muted)}
+.pk-val{font-size:18px;font-weight:700;margin-top:2px}
+.pheno-note{margin-top:10px;font-size:11px;padding-top:8px;border-top:1px solid var(--border);line-height:1.5}
+
+/* SOURCE BARS */
+.source-row{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.source-row:last-child{margin-bottom:0}
+.source-label{width:100px;font-size:13px;flex-shrink:0}
+.source-bar-wrap{flex:1;display:flex;flex-direction:column;gap:4px}
+.source-track{height:8px;background:var(--bg2);border-radius:4px;overflow:hidden}
+.source-fill-zz{height:100%;background:var(--blue);border-radius:4px 0 0 4px;display:inline-block;transition:width .4s}
+.source-fill-zl{height:100%;background:var(--purple);border-radius:0 4px 4px 0;display:inline-block;transition:width .4s}
+.source-nums{font-size:11px;color:var(--muted);display:flex;justify-content:space-between}
+
+/* PROFIT TABLE */
+.profit-grid{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.profit-cell{padding:16px;border-right:1px solid var(--border)}
+.profit-cell:last-child{border-right:none;background:var(--bg)}
+.profit-label{font-size:11px;color:var(--muted);margin-bottom:6px}
+.profit-val{font-size:22px;font-weight:700}
+.profit-sub{font-size:12px;margin-top:6px}
+
+/* MEMORY */
+.memory-list{display:flex;flex-direction:column;gap:8px}
+.memory-item{padding:11px;border:1px solid var(--border);border-radius:var(--radius);background:var(--card)}
+.mi-tag{font-size:10px;font-weight:600;padding:2px 6px;border-radius:4px;background:#111827;color:#fff;margin-right:6px}
+.mi-tag.skill{background:var(--blue);color:#fff}
+.mi-content{font-size:13px;margin-top:4px}
+.mi-meta{font-size:11px;color:var(--muted2);margin-top:3px}
+
+/* HERMES */
+.hermes-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px}
+.hermes-header{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.hermes-icon{width:28px;height:28px;border-radius:50%;background:#7c3aed;color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+.hermes-title{font-size:13px;font-weight:600}
+.hermes-body{font-size:12px;color:var(--muted);line-height:1.8;background:var(--bg);border-radius:var(--radius);padding:12px;margin-bottom:12px}
+.hermes-body b{color:var(--text)}
+.hermes-actions{display:flex;flex-direction:column;gap:6px}
+.hermes-btn{padding:7px 12px;border-radius:var(--radius);border:1px solid var(--border2);background:var(--card);font-size:12px;cursor:pointer;text-align:left;transition:background .15s}
+.hermes-btn:hover{background:var(--bg2)}
+.hermes-btn.primary{background:#7c3aed;color:#fff;border-color:#7c3aed}
+
+.rank-list{display:flex;flex-direction:column;gap:5px}
+.rank-item{display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--bg);border-radius:var(--radius)}
+.rank-num{width:20px;font-size:13px;font-weight:700;color:var(--muted);text-align:center}
+.rank-num.top{color:#7c3aed}
+.rank-name{flex:1;font-size:13px}
+.rank-val{font-size:13px;font-weight:600}
+
+.tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:14px}
+.tab{padding:7px 16px;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s}
+.tab.active{color:#7c3aed;border-color:#7c3aed}
+.tab-content{display:none}
+.tab-content.active{display:block}
+
+.data-table{width:100%;border-collapse:collapse}
+.data-table th{font-size:11px;color:var(--muted);font-weight:500;text-align:left;padding:7px 12px;border-bottom:1px solid var(--border);text-transform:uppercase;letter-spacing:.03em}
+.data-table td{padding:9px 12px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:middle}
+.data-table tr:last-child td{border-bottom:none}
+.data-table tr:hover td{background:var(--bg)}
+
+.month-table{width:100%;border-collapse:collapse}
+.month-table th{font-size:11px;color:var(--muted);padding:7px 12px;text-align:left;border-bottom:1px solid var(--border);font-weight:500}
+.month-table td{padding:9px 12px;font-size:13px;border-bottom:1px solid var(--border);vertical-align:middle}
+.month-table tr.m-subtotal td{background:var(--bg2);font-weight:600;font-size:12px}
+.month-table tr.m-current td{background:var(--purple-bg)}
+.month-table tr.m-future td{color:var(--muted)}
+.month-table tr:last-child td{border-bottom:none}
+
+.toast{position:fixed;bottom:24px;right:24px;background:#111827;color:#fff;padding:11px 18px;border-radius:var(--radius);font-size:13px;box-shadow:var(--shadow2);z-index:999;opacity:0;transform:translateY(8px);transition:all .25s;pointer-events:none}
+.toast.show{opacity:1;transform:translateY(0)}
+</style>
+</head>
+<body>
+
+<div class="app-header">
+  <div class="header-left">
+    <div class="avatar">总</div>
+    <div class="header-info">
+      <div class="name">海外私域部 · 总监 <span class="tag purple">部门长</span></div>
+      <div class="meta">3 组 · 14 人 · 年度目标 4000 万 · 2026-05-14</div>
+    </div>
+  </div>
+  <div style="display:flex;align-items:center;gap:12px">
+    <span style="font-size:12px;color:var(--muted)">海外私域部</span>
+    <button class="btn-sm" onclick="showToast('已退出')">退出</button>
+  </div>
+</div>
+
+<div class="time-nav">
+  <span class="time-nav-label">时间维度</span>
+  <button class="time-tab active" onclick="switchTime('day',this)">日视图</button>
+  <button class="time-tab" onclick="switchTime('month',this)">月视图</button>
+  <button class="time-tab" onclick="switchTime('year',this)">年视图</button>
+  <span style="margin-left:auto;font-size:12px;color:var(--muted2)">计划向下拆：年 → 季 → 月 → 日 · 执行向上累</span>
+</div>
+
+<!-- ========== 日视图 ========== -->
+<div id="panel-day" class="time-panel active">
+  <div class="main-layout">
+    <div class="left-col">
+
+      <!-- 今日部门 KPI -->
+      <div>
+        <div class="section-label">
+          <div class="step-badge">今</div>
+          <div class="step-name">今日部门快照<span class="step-sub">2026-05-14</span></div>
+        </div>
+        <div class="kpi-strip">
+          <div class="kpi-card neutral">
+            <div class="kc-label">今日部门目标</div>
+            <div class="kc-value">9.8<span style="font-size:13px;font-weight:400;color:var(--muted)">万</span></div>
+            <div class="kc-sub">月均日拆解</div>
+            <div class="kc-prog"><div class="kc-fill" style="width:100%;background:#7c3aed"></div></div>
+          </div>
+          <div class="kpi-card warn">
+            <div class="kc-label">今日实际</div>
+            <div class="kc-value">4.2<span style="font-size:13px;font-weight:400;color:var(--muted)">万</span></div>
+            <div class="kc-sub">42.9% · 需追 5.6 万</div>
+            <div class="kc-prog"><div class="kc-fill" style="width:42.9%;background:var(--orange)"></div></div>
+          </div>
+          <div class="kpi-card ok">
+            <div class="kc-label">今日触达总人次</div>
+            <div class="kc-value">482<span style="font-size:13px;font-weight:400;color:var(--muted)">人</span></div>
+            <div class="kc-sub">日均基线 430 ✓</div>
+            <div class="kc-prog"><div class="kc-fill" style="width:100%;background:var(--green)"></div></div>
+          </div>
+          <div class="kpi-card behind">
+            <div class="kc-label">异常预警</div>
+            <div class="kc-value">3<span style="font-size:13px;font-weight:400;color:var(--muted)">项</span></div>
+            <div class="kc-sub">需总监介入 1 项</div>
+            <div class="kc-prog"><div class="kc-fill" style="width:100%;background:var(--red)"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 三组今日状态 -->
+      <div>
+        <div class="section-label">
+          <div class="step-badge">组</div>
+          <div class="step-name">各组今日状态<span class="step-sub">点击查看组内详情</span></div>
+        </div>
+        <div class="group-grid">
+          <div class="group-card warn" onclick="showToast('何川组详情 - 主管视图可查看')">
+            <div class="gc-title">何川组</div>
+            <div class="gc-sub">主管：何川 · 5 人</div>
+            <div class="gc-kpi">
+              <div class="gc-kpi-item"><div class="label">今日业绩</div><div class="val" style="color:var(--orange)">2.67万</div></div>
+              <div class="gc-kpi-item"><div class="label">触达人次</div><div class="val">198</div></div>
+              <div class="gc-kpi-item"><div class="label">日报均分</div><div class="val" style="color:var(--green)">83</div></div>
+              <div class="gc-kpi-item"><div class="label">异常成员</div><div class="val" style="color:var(--red)">1人</div></div>
+            </div>
+            <div class="gc-prog-track"><div class="gc-prog-fill" style="width:54%;background:var(--orange)"></div></div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap"><span class="tag orange">毛涵异常</span><span class="tag">停滞订单</span></div>
+          </div>
+          <div class="group-card ok" onclick="showToast('夏欢组详情 - 主管视图可查看')">
+            <div class="gc-title">夏欢组</div>
+            <div class="gc-sub">主管：夏欢 · 6 人</div>
+            <div class="gc-kpi">
+              <div class="gc-kpi-item"><div class="label">今日业绩</div><div class="val" style="color:var(--green)">1.8万</div></div>
+              <div class="gc-kpi-item"><div class="label">触达人次</div><div class="val">216</div></div>
+              <div class="gc-kpi-item"><div class="label">日报均分</div><div class="val" style="color:var(--orange)">74</div></div>
+              <div class="gc-kpi-item"><div class="label">异常成员</div><div class="val" style="color:var(--orange)">1人</div></div>
+            </div>
+            <div class="gc-prog-track"><div class="gc-prog-fill" style="width:72%;background:var(--green)"></div></div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap"><span class="tag orange">刘彦麟预警</span><span class="tag green">业绩达标</span></div>
+          </div>
+          <div class="group-card behind" onclick="showToast('向俞金组详情 - 主管视图可查看')">
+            <div class="gc-title">向俞金组</div>
+            <div class="gc-sub">主管：向俞金 · 3 人</div>
+            <div class="gc-kpi">
+              <div class="gc-kpi-item"><div class="label">今日业绩</div><div class="val" style="color:var(--red)">0万</div></div>
+              <div class="gc-kpi-item"><div class="label">触达人次</div><div class="val" style="color:var(--red)">68</div></div>
+              <div class="gc-kpi-item"><div class="label">日报均分</div><div class="val" style="color:var(--orange)">76</div></div>
+              <div class="gc-kpi-item"><div class="label">异常成员</div><div class="val" style="color:var(--red)">2人</div></div>
+            </div>
+            <div class="gc-prog-track"><div class="gc-prog-fill" style="width:22%;background:var(--red)"></div></div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap"><span class="tag red">今日严重落后</span><span class="tag orange">陈晓霜下滑</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 跨组今日对比 -->
+      <div>
+        <div class="section-label">
+          <div class="step-badge dark">≈</div>
+          <div class="step-name">跨组今日对比</div>
+        </div>
+        <div class="card card-sm" style="padding:0;overflow:hidden">
+          <table class="cross-table">
+            <thead>
+              <tr><th>指标</th><th>何川组</th><th>夏欢组</th><th>向俞金组</th><th>部门均值</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>今日业绩</td><td style="color:var(--orange)">2.67万</td><td style="color:var(--green)">1.80万</td><td style="color:var(--red)">0万</td><td>1.49万</td></tr>
+              <tr><td>三方私信量</td><td style="color:var(--green)">192条</td><td style="color:var(--green)">210条</td><td style="color:var(--red)">80条</td><td>160条</td></tr>
+              <tr><td>触达客户数</td><td>198人</td><td style="color:var(--green)">216人</td><td style="color:var(--red)">68人</td><td>160人</td></tr>
+              <tr><td>社媒发帖</td><td>38条</td><td style="color:var(--green)">49条</td><td style="color:var(--red)">18条</td><td>35条</td></tr>
+              <tr><td>日报均分</td><td style="color:var(--green)">83</td><td>74</td><td>76</td><td>77.7</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 部门异常 -->
+      <div>
+        <div class="section-label">
+          <div class="step-badge warn">!</div>
+          <div class="step-name">今日部门异常<span class="step-sub">按优先级排序</span></div>
+        </div>
+        <div class="anomaly-list">
+          <div class="anomaly-item critical">
+            <div class="an-title">🔴 向俞金组 · 今日全组业绩为零</div>
+            <div class="an-desc">截至下午 14:00 全组 0 成单，触达严重低于基线（68/目标230），需总监直接联系向俞金介入</div>
+          </div>
+          <div class="anomaly-item critical">
+            <div class="an-title">🔴 现象4 · 老客触达已超人工上限</div>
+            <div class="an-desc">日人均触达 21人（上限 20），增长空间受限，自动化升级方案需本周决策</div>
+          </div>
+          <div class="anomaly-item">
+            <div class="an-title">🟠 何川组 · 毛涵连续 4 天低分</div>
+            <div class="an-desc">日报评分连续 &lt;70，私信量低于标准 40%，何川已安排约谈，请关注明日数据</div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /left -->
+
+    <div class="right-col">
+
+      <!-- 三组今日进度 -->
+      <div class="card card-sm">
+        <div class="card-title">今日各组业绩</div>
+        <div class="prog-row">
+          <div class="prog-label">何川组</div>
+          <div class="prog-track"><div class="prog-fill warn" style="width:54%"></div></div>
+          <div class="prog-num">2.67万</div>
+        </div>
+        <div class="prog-row">
+          <div class="prog-label">夏欢组</div>
+          <div class="prog-track"><div class="prog-fill ok" style="width:72%"></div></div>
+          <div class="prog-num">1.80万</div>
+        </div>
+        <div class="prog-row">
+          <div class="prog-label">向俞金组</div>
+          <div class="prog-track"><div class="prog-fill bad" style="width:3%"></div></div>
+          <div class="prog-num" style="color:var(--red)">0万</div>
+        </div>
+      </div>
+
+      <!-- Hermes 部门日级 -->
+      <div class="hermes-card">
+        <div class="hermes-header">
+          <div class="hermes-icon">H</div>
+          <div class="hermes-title">Hermes · 今日部门建议</div>
+        </div>
+        <div class="hermes-body">
+          向俞金组今日触达量仅 68人（基线 230人），业绩为零，已触发<b>红色预警</b>。<br><br>
+          建议：① 总监今日直接联系向俞金核实原因 ② 若属人员问题需48h内提出方案 ③ 夏欢组今日良好可作为参考标杆
+        </div>
+        <div class="hermes-actions">
+          <button class="hermes-btn primary" onclick="showToast('已记录处理意见')">记录处理意见</button>
+          <button class="hermes-btn" onclick="showToast('已转发给主管')">转发主管</button>
+        </div>
+      </div>
+
+      <!-- 部门日报提交状态 -->
+      <div class="card card-sm">
+        <div class="card-title">今日日报提交状态</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px">
+            <span>已提交</span><span style="font-weight:700;color:var(--green)">9/14</span>
+          </div>
+          <div style="height:6px;background:var(--bg2);border-radius:3px;overflow:hidden">
+            <div style="width:64%;height:100%;background:var(--green);border-radius:3px"></div>
+          </div>
+          <div style="font-size:12px;color:var(--muted)">截止 18:00 · 未提交：毛涵、刘彦麟、陈晓霜、向俞金、黄思婷</div>
+          <div style="display:flex;justify-content:space-between;font-size:12px">
+            <span style="color:var(--muted)">平均评分（已提交）</span>
+            <span style="font-weight:600">79 分</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ========== 月视图 ========== -->
+<div id="panel-month" class="time-panel">
+  <div class="main-layout">
+    <div class="left-col">
+
+      <!-- 月度 KPI -->
+      <div>
+        <div class="section-label">
+          <div class="step-badge">月</div>
+          <div class="step-name">5月部门目标<span class="step-sub">2026-05-01 ~ 05-31</span></div>
+        </div>
+        <div class="kpi-strip">
+          <div class="kpi-card neutral">
+            <div class="kc-label">月度目标</div>
+            <div class="kc-value">305<span style="font-size:13px;font-weight:400;color:var(--muted)">万</span></div>
+            <div class="kc-sub">守正220 + 增量85</div>
+            <div class="kc-prog"><div class="kc-fill" style="width:100%;background:#7c3aed"></div></div>
+          </div>
+          <div class="kpi-card warn">
+            <div class="kc-label">已完成</div>
+            <div class="kc-value">98.6<span style="font-size:13px;font-weight:400;color:var(--muted)">万</span></div>
+            <div class="kc-sub">32.3% · 剩余 206 万</div>
+            <div class="kc-prog"><div class="kc-fill" style="width:32.3%;background:var(--orange)"></div></div>
+          </div>
+          <div class="kpi-card behind">
+            <div class="kc-label">剩余天数</div>
+            <div class="kc-value">17<span style="font-size:13px;font-weight:400;color:var(--muted)">天</span></div>
+            <div class="kc-sub">需日均 12.1 万</div>
+            <div class="kc-prog"><div class="kc-fill" style="width:55%;background:var(--red)"></div></div>
+          </div>
+          <div class="kpi-card ok">
+            <div class="kc-label">利润率</div>
+            <div class="kc-value">21.9<span style="font-size:13px;font-weight:400;color:var(--muted)">%</span></div>
+            <div class="kc-sub">目标 20.29% ✓ 超出</div>
+            <div class="kc-prog"><div class="kc-fill" style="width:100%;background:var(--green)"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 各组月度进度 -->
+      <div>
+        <div class="section-label">
+          <div class="step-badge">组</div>
+          <div class="step-name">各组月度进度</div>
+        </div>
+        <div class="group-grid">
+          <div class="group-card warn">
+            <div class="gc-title">何川组</div>
+            <div class="gc-sub">主管：何川 · 5人 · 年度1595万</div>
+            <div class="gc-kpi">
+              <div class="gc-kpi-item"><div class="label">月目标</div><div class="val">122万</div></div>
+              <div class="gc-kpi-item"><div class="label">已完成</div><div class="val" style="color:var(--orange)">42.3万</div></div>
+            </div>
+            <div class="gc-prog-track"><div class="gc-prog-fill" style="width:34.7%;background:var(--orange)"></div></div>
+            <div style="font-size:12px;color:var(--muted)">34.7% · 预计月末 ~94万</div>
+          </div>
+          <div class="group-card ok">
+            <div class="gc-title">夏欢组</div>
+            <div class="gc-sub">主管：夏欢 · 6人 · 年度1595万</div>
+            <div class="gc-kpi">
+              <div class="gc-kpi-item"><div class="label">月目标</div><div class="val">122万</div></div>
+              <div class="gc-kpi-item"><div class="label">已完成</div><div class="val" style="color:var(--green)">38.5万</div></div>
+            </div>
+            <div class="gc-prog-track"><div class="gc-prog-fill" style="width:31.6%;background:var(--blue)"></div></div>
+            <div style="font-size:12px;color:var(--muted)">31.6% · 节奏基本正常</div>
+          </div>
+          <div class="group-card behind">
+            <div class="gc-title">向俞金组</div>
+            <div class="gc-sub">主管：向俞金 · 3人 · 年度810万</div>
+            <div class="gc-kpi">
+              <div class="gc-kpi-item"><div class="label">月目标</div><div class="val">61万</div></div>
+              <div class="gc-kpi-item"><div class="label">已完成</div><div class="val" style="color:var(--red)">17.8万</div></div>
+            </div>
+            <div class="gc-prog-track"><div class="gc-prog-fill" style="width:29%;background:var(--red)"></div></div>
+            <div style="font-size:12px;color:var(--red)">29.2% · 垫底 · 需重点介入</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 来源结构 -->
+      <div>
+        <div class="section-label">
+          <div class="step-badge dark">$</div>
+          <div class="step-name">部门业绩来源<span class="step-sub">守正 vs 增量</span></div>
+        </div>
+        <div class="card card-sm">
+          <div style="font-size:12px;color:var(--muted);margin-bottom:16px">
+            本月已完成 <b style="color:var(--text)">98.6万</b> / 目标 305万 ·
+            <span style="color:var(--blue)">■ 守正</span>
+            <span style="color:var(--purple);margin-left:6px">■ 增量</span>
+          </div>
+          <div class="source-row">
+            <div class="source-label">官网当月询盘</div>
+            <div class="source-bar-wrap">
+              <div class="source-track"><div style="display:flex;height:100%">
+                <div class="source-fill-zz" style="width:50%"></div>
+                <div class="source-fill-zl" style="width:20%"></div>
+              </div></div>
+              <div class="source-nums"><span>守正 15.8万 + 增量 6.4万</span><span style="font-weight:600">27.2万 (28%)</span></div>
+            </div>
+          </div>
+          <div class="source-row">
+            <div class="source-label">历史月线索</div>
+            <div class="source-bar-wrap">
+              <div class="source-track"><div style="display:flex;height:100%">
+                <div class="source-fill-zz" style="width:62%"></div>
+                <div class="source-fill-zl" style="width:18%"></div>
+              </div></div>
+              <div class="source-nums"><span>守正 22.1万 + 增量 9.3万</span><span style="font-weight:600">31.4万 (32%)</span></div>
+            </div>
+          </div>
+          <div class="source-row">
+            <div class="source-label">自拓流量</div>
+            <div class="source-bar-wrap">
+              <div class="source-track"><div style="display:flex;height:100%">
+                <div class="source-fill-zz" style="width:30%"></div>
+                <div class="source-fill-zl" style="width:12%"></div>
+              </div></div>
+              <div class="source-nums"><span>守正 8.0万 + 增量 3.3万</span><span style="font-weight:600">11.3万 (11%)</span></div>
+            </div>
+          </div>
+          <div class="source-row">
+            <div class="source-label">老客户复购</div>
+            <div class="source-bar-wrap">
+              <div class="source-track"><div style="display:flex;height:100%">
+                <div class="source-fill-zz" style="width:55%"></div>
+                <div class="source-fill-zl" style="width:16%"></div>
+              </div></div>
+              <div class="source-nums"><span>守正 20.2万 + 增量 8.5万</span><span style="font-weight:600">28.7万 (29%)</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 跨组对比 -->
+      <div>
+        <div class="section-label">
+          <div class="step-badge dark">≈</div>
+          <div class="step-name">跨组月度对比</div>
+        </div>
+        <div class="card card-sm" style="padding:0;overflow:hidden">
+          <table class="cross-table">
+            <thead>
+              <tr><th>指标</th><th>何川组</th><th>夏欢组</th><th>向俞金组</th><th>部门均值</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>5月业绩进度</td><td style="color:var(--orange)">42.3万 34.7%</td><td>38.5万 31.6%</td><td style="color:var(--red)">17.8万 29.2%</td><td>32.3%</td></tr>
+              <tr><td>日均私信（人）</td><td style="color:var(--green)">38.4条</td><td>35.1条</td><td style="color:var(--red)">28.7条</td><td>34.1条</td></tr>
+              <tr><td>日均触达客户</td><td style="color:var(--green)">48.2人</td><td>44.5人</td><td style="color:var(--red)">37.8人</td><td>43.5人</td></tr>
+              <tr><td>社媒发帖/人/日</td><td>7.2条</td><td style="color:var(--green)">8.1条</td><td style="color:var(--red)">5.4条</td><td>6.9条</td></tr>
+              <tr><td>日报均分</td><td style="color:var(--green)">83</td><td>74</td><td>76</td><td>77.7</td></tr>
+              <tr><td>官网询盘转化率</td><td style="color:var(--green)">9.8%</td><td>9.1%</td><td style="color:var(--red)">8.9%</td><td>9.2% <span class="tag orange" style="font-size:10px">基线9.5%</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div><!-- /left -->
+
+    <div class="right-col">
+
+      <!-- 月度完成率 -->
+      <div class="card card-sm">
+        <div class="card-title">部门月度完成率</div>
+        <div style="text-align:center;padding:10px 0">
+          <div style="position:relative;width:100px;height:100px;margin:0 auto">
+            <svg viewBox="0 0 36 36" style="width:100%;height:100%;transform:rotate(-90deg)">
+              <circle cx="18" cy="18" r="15.9" fill="none" stroke="var(--bg2)" stroke-width="3"/>
+              <circle cx="18" cy="18" r="15.9" fill="none" stroke="var(--orange)" stroke-width="3"
+                stroke-dasharray="32.3 67.7" stroke-linecap="round"/>
+            </svg>
+            <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
+              <div style="font-size:20px;font-weight:700">32.3%</div>
+              <div style="font-size:10px;color:var(--muted)">完成率</div>
+            </div>
+          </div>
+          <div style="margin-top:10px;font-size:12px;color:var(--muted)">98.6万 / 305万</div>
+        </div>
+      </div>
+
+      <!-- Hermes 月度 -->
+      <div class="hermes-card">
+        <div class="hermes-header">
+          <div class="hermes-icon">H</div>
+          <div class="hermes-title">Hermes · 月度分析</div>
+        </div>
+        <div class="hermes-body">
+          部门前 14 天完成 98.6万，按节奏月末预计 <b>~213万</b>，距目标 305万缺口 <b>92万</b>。<br><br>
+          最大变量：向俞金组本月预计仅完成 38万（目标61万）。建议总监本周与向俞金进行月度复盘，重新制定后半月打法。
+        </div>
+        <div class="hermes-actions">
+          <button class="hermes-btn primary" onclick="showToast('已安排复盘会')">安排复盘会</button>
+          <button class="hermes-btn" onclick="showToast('已记录')">记录</button>
+        </div>
+      </div>
+
+      <!-- 利润健康 -->
+      <div class="card card-sm">
+        <div class="card-title">5月利润健康度</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="display:flex;justify-content:space-between;font-size:13px">
+            <span style="color:var(--muted)">销售收入</span><span style="font-weight:600">98.6万</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:13px">
+            <span style="color:var(--muted)">产品成本</span><span style="font-weight:600">51.3万 <span style="color:var(--green);font-size:11px">(52%) ✓</span></span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:13px">
+            <span style="color:var(--muted)">费用合计</span><span style="font-weight:600">25.7万 <span style="color:var(--orange);font-size:11px">(26%) ⚠</span></span>
+          </div>
+          <div style="border-top:1px solid var(--border);padding-top:8px;display:flex;justify-content:space-between;font-size:14px">
+            <span style="font-weight:600">税前利润</span>
+            <span style="font-weight:700;color:var(--green)">21.6万 <span style="font-size:12px">(21.9%)</span></span>
+          </div>
+          <div style="font-size:11px;color:var(--muted)">目标利润率 20.29% · 超出 <span style="color:var(--green)">+1.6% ⭐</span></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ========== 年视图 ========== -->
+<div id="panel-year" class="time-panel">
+  <div class="main-layout">
+    <div class="left-col">
+
+      <!-- 年度总览 -->
+      <div>
+        <div class="section-label">
+          <div class="step-badge">年</div>
+          <div class="step-name">2026 年度目标<span class="step-sub">年初计划 → 季度拆解</span></div>
+        </div>
+        <div class="card card-sm" style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px">
+          <div>
+            <div style="font-size:12px;color:var(--muted);margin-bottom:6px">年度目标</div>
+            <div style="font-size:28px;font-weight:700">4000<span style="font-size:14px;font-weight:400;color:var(--muted)">万</span></div>
+            <div style="font-size:12px;color:var(--muted);margin-top:4px">守正2800 + 增量1200</div>
+          </div>
+          <div>
+            <div style="font-size:12px;color:var(--muted);margin-bottom:6px">YTD 完成</div>
+            <div style="font-size:28px;font-weight:700;color:var(--orange)">393<span style="font-size:14px;font-weight:400;color:var(--muted)">万</span></div>
+            <div style="font-size:12px;color:var(--muted);margin-top:4px">缺口 3607万</div>
+          </div>
+          <div>
+            <div style="font-size:12px;color:var(--muted);margin-bottom:6px">年度进度</div>
+            <div style="font-size:28px;font-weight:700;color:var(--red)">9.8%</div>
+            <div style="font-size:12px;color:var(--red);margin-top:4px">预期应达 37%</div>
+          </div>
+          <div>
+            <div style="font-size:12px;color:var(--muted);margin-bottom:6px">年度利润目标</div>
+            <div style="font-size:28px;font-weight:700">811<span style="font-size:14px;font-weight:400;color:var(--muted)">万</span></div>
+            <div style="font-size:12px;color:var(--green);margin-top:4px">当前利润率 21.9% ✓</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 季度拆解 -->
+      <div>
+        <div class="section-label">
+          <div class="step-badge">Q</div>
+          <div class="step-name">季度拆解<span class="step-sub">4000万 → 4 季</span></div>
+        </div>
+        <div class="quarter-grid">
+          <div class="quarter-card q-done">
+            <div class="qc-label">Q1 · 1–3月 <span class="qc-badge" style="background:var(--orange-bg);color:var(--orange)">已结束</span></div>
+            <div class="qc-plan">1000<span style="font-size:13px;font-weight:400;color:var(--muted)">万</span></div>
+            <div class="qc-actual" style="color:var(--orange)">实际 295万 (29.5%)</div>
+            <div class="qc-prog"><div class="qc-fill" style="width:29.5%;background:var(--orange)"></div></div>
+            <div class="qc-sub">差距 705万 · 严重落后</div>
+          </div>
+          <div class="quarter-card q-current">
+            <div class="qc-label">Q2 · 4–6月 <span class="qc-badge" style="background:var(--purple-bg);color:var(--purple)">进行中</span></div>
+            <div class="qc-plan">1050<span style="font-size:13px;font-weight:400;color:var(--muted)">万</span></div>
+            <div class="qc-actual" style="color:var(--purple)">已完成 98万 (9.3%)</div>
+            <div class="qc-prog"><div class="qc-fill" style="width:9.3%;background:var(--purple)"></div></div>
+            <div class="qc-sub">含 4月 + 5月进行中</div>
+          </div>
+          <div class="quarter-card">
+            <div class="qc-label">Q3 · 7–9月 <span class="qc-badge" style="background:var(--bg2);color:var(--muted)">待开始</span></div>
+            <div class="qc-plan">1100<span style="font-size:13px;font-weight:400;color:var(--muted)">万</span></div>
+            <div class="qc-actual" style="color:var(--muted2)">未开始</div>
+            <div class="qc-prog"><div class="qc-fill" style="width:0%"></div></div>
+            <div class="qc-sub">H2 全力冲刺</div>
+          </div>
+          <div class="quarter-card">
+            <div class="qc-label">Q4 · 10–12月 <span class="qc-badge" style="background:var(--bg2);color:var(--muted)">待开始</span></div>
+            <div class="qc-plan">850<span style="font-size:13px;font-weight:400;color:var(--muted)">万</span></div>
+            <div class="qc-actual" style="color:var(--muted2)">未开始</div>
+            <div class="qc-prog"><div class="qc-fill" style="width:0%"></div></div>
+            <div class="qc-sub">双11 · 双12 大促</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 四大现象监控 -->
+      <div>
+        <div class="section-label">
+          <div class="step-badge dark">P</div>
+          <div class="step-name">四大业绩现象监控<span class="step-sub">年度结构性风险追踪</span></div>
+        </div>
+        <div class="pheno-grid">
+          <div class="pheno-card" onclick="showToast('现象1详情')">
+            <div class="pheno-head">
+              <div class="pheno-title">现象 1 · 官网 UV / 业绩转化</div>
+              <span class="tag green">正常 ✓</span>
+            </div>
+            <div class="pheno-kpi">
+              <div><div class="pk-label">本月 UV</div><div class="pk-val">85万</div></div>
+              <div><div class="pk-label">实际业绩</div><div class="pk-val" style="color:var(--green)">78万</div></div>
+              <div><div class="pk-label">预期业绩</div><div class="pk-val">73万</div></div>
+              <div><div class="pk-label">偏差</div><div class="pk-val" style="color:var(--green)">+6.8%</div></div>
+            </div>
+            <div class="pheno-note" style="color:var(--muted)">UV 300万时按 0.3 转化率业绩增量 = 72万</div>
+          </div>
+          <div class="pheno-card" onclick="showToast('现象2详情')">
+            <div class="pheno-head">
+              <div class="pheno-title">现象 2 · 历史月业绩增长</div>
+              <span class="tag" style="background:#fefce8;color:#713f12;border-color:#fde68a">超预期 ⭐</span>
+            </div>
+            <div class="pheno-kpi">
+              <div><div class="pk-label">本月历史月</div><div class="pk-val">98万</div></div>
+              <div><div class="pk-label">较上月</div><div class="pk-val" style="color:var(--green)">+8万</div></div>
+              <div><div class="pk-label">季度增量</div><div class="pk-val">18万</div></div>
+              <div><div class="pk-label">月均增长</div><div class="pk-val">+6万</div></div>
+            </div>
+            <div class="pheno-note" style="color:var(--orange)">卡点：WA 触达上限，需增加 WA 账号</div>
+          </div>
+          <div class="pheno-card warn" onclick="showToast('现象3详情')">
+            <div class="pheno-head">
+              <div class="pheno-title">现象 3 · 自拓万粉账号增长</div>
+              <span class="tag orange">需加速 ⚠</span>
+            </div>
+            <div class="pheno-kpi">
+              <div><div class="pk-label">当前万粉账号</div><div class="pk-val" style="color:var(--orange)">8个</div></div>
+              <div><div class="pk-label">年度目标</div><div class="pk-val">10个</div></div>
+              <div><div class="pk-label">本月自拓业绩</div><div class="pk-val">38万</div></div>
+              <div><div class="pk-label">较25年</div><div class="pk-val" style="color:var(--green)">+13万</div></div>
+            </div>
+            <div class="pheno-note" style="color:var(--orange)">按当前节奏 12月仅达 9个，缺 2个，需立即启动孵化</div>
+          </div>
+          <div class="pheno-card alert" onclick="showToast('现象4详情')">
+            <div class="pheno-head">
+              <div class="pheno-title">现象 4 · 老客触达上限</div>
+              <span class="tag red">需自动化 ⚠</span>
+            </div>
+            <div class="pheno-kpi">
+              <div><div class="pk-label">日人均触达</div><div class="pk-val" style="color:var(--red)">21人</div></div>
+              <div><div class="pk-label">人工上限</div><div class="pk-val">20人</div></div>
+              <div><div class="pk-label">本月老客业绩</div><div class="pk-val">85万</div></div>
+              <div><div class="pk-label">增长空间</div><div class="pk-val" style="color:var(--muted)">受限</div></div>
+            </div>
+            <div class="pheno-note" style="color:var(--red)">已超人工上限，必须引入自动化触达 + 智能回复</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 月度累计表 -->
+      <div>
+        <div class="section-label">
+          <div class="step-badge dark">M</div>
+          <div class="step-name">部门月度累计<span class="step-sub">年 → 季 → 月 逐层累积</span></div>
+        </div>
+        <div class="card card-sm" style="padding:0;overflow:hidden">
+          <table class="month-table">
+            <thead>
+              <tr><th>月份</th><th>季度</th><th>计划</th><th>实际</th><th>完成率</th><th>状态</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>1月</td><td style="color:var(--muted)">Q1</td><td>250万</td><td>105万</td><td style="color:var(--red)">42%</td><td><span class="tag red">严重落后</span></td></tr>
+              <tr><td>2月</td><td style="color:var(--muted)">Q1</td><td>350万</td><td>91万</td><td style="color:var(--red)">26%</td><td><span class="tag red">春节影响</span></td></tr>
+              <tr><td>3月</td><td style="color:var(--muted)">Q1</td><td>400万</td><td>99万</td><td style="color:var(--red)">24.8%</td><td><span class="tag red">落后</span></td></tr>
+              <tr class="m-subtotal"><td colspan="2">Q1 小计</td><td>1000万</td><td>295万</td><td style="color:var(--orange)">29.5%</td><td><span class="tag orange">未达标</span></td></tr>
+              <tr><td>4月</td><td style="color:var(--muted)">Q2</td><td>350万</td><td>21万</td><td style="color:var(--red)">6%</td><td><span class="tag red">落后</span></td></tr>
+              <tr class="m-current"><td><b>5月</b></td><td style="color:var(--purple)">Q2</td><td>305万</td><td><b>98.6万</b> <span style="font-size:11px;color:var(--purple)">进行中</span></td><td style="color:var(--purple)">32.3%</td><td><span class="tag purple">进行中</span></td></tr>
+              <tr class="m-future"><td>6月</td><td style="color:var(--muted)">Q2</td><td>395万</td><td>—</td><td>—</td><td><span class="tag">待开始</span></td></tr>
+              <tr class="m-subtotal"><td colspan="2">Q2 小计</td><td>1050万</td><td>119.6万+</td><td style="color:var(--purple)">11.4%+</td><td><span class="tag purple">进行中</span></td></tr>
+              <tr class="m-future"><td>7–9月</td><td style="color:var(--muted)">Q3</td><td>1100万</td><td>—</td><td>—</td><td><span class="tag">待开始</span></td></tr>
+              <tr class="m-future"><td>10–12月</td><td style="color:var(--muted)">Q4</td><td>850万</td><td>—</td><td>—</td><td><span class="tag">待开始</span></td></tr>
+              <tr style="background:var(--bg);font-weight:700"><td colspan="2">全年合计</td><td>4000万</td><td>393万+</td><td style="color:var(--red)">9.8%</td><td><span class="tag red">需大幅加速</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div><!-- /left -->
+
+    <div class="right-col">
+
+      <!-- 年度进度 -->
+      <div class="card card-sm">
+        <div class="card-title">部门年度完成率</div>
+        <div style="text-align:center;padding:10px 0">
+          <div style="position:relative;width:110px;height:110px;margin:0 auto">
+            <svg viewBox="0 0 36 36" style="width:100%;height:100%;transform:rotate(-90deg)">
+              <circle cx="18" cy="18" r="15.9" fill="none" stroke="var(--bg2)" stroke-width="3"/>
+              <circle cx="18" cy="18" r="15.9" fill="none" stroke="var(--red)" stroke-width="3"
+                stroke-dasharray="9.8 90.2" stroke-linecap="round"/>
+            </svg>
+            <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
+              <div style="font-size:22px;font-weight:700;color:var(--red)">9.8%</div>
+              <div style="font-size:10px;color:var(--muted)">实际完成</div>
+            </div>
+          </div>
+          <div style="margin-top:8px;font-size:12px;color:var(--muted)">393万 / 4000万</div>
+          <div style="margin-top:4px;font-size:11px;padding:3px 10px;background:var(--red-bg);color:var(--red);border-radius:12px;display:inline-block">落后 27.2%</div>
+        </div>
+        <div style="border-top:1px solid var(--border);padding-top:10px;margin-top:4px;display:flex;flex-direction:column;gap:6px">
+          <div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--muted)">Q1 完成率</span><span style="color:var(--orange);font-weight:600">29.5%</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--muted)">Q2 完成率</span><span style="color:var(--purple);font-weight:600">11.4%+</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--muted)">预计全年</span><span style="color:var(--red);font-weight:600">~1050万</span></div>
+        </div>
+      </div>
+
+      <!-- Hermes 年度 -->
+      <div class="hermes-card">
+        <div class="hermes-header">
+          <div class="hermes-icon">H</div>
+          <div class="hermes-title">Hermes · 年度战略建议</div>
+        </div>
+        <div class="hermes-body">
+          按当前节奏全年预计 <b style="color:var(--red)">~1050万</b>，距目标 4000万差距达 <b>2950万</b>。<br><br>
+          核心问题：Q1 完成率仅 29.5%，远低于行业均值。<br>建议：① 现象4自动化升级需本月决策 ② 现象3孵化立即启动 ③ 重新评估向俞金组人员配置
+        </div>
+        <div class="hermes-actions">
+          <button class="hermes-btn primary" onclick="showToast('已写入年度战略')">写入年度战略</button>
+          <button class="hermes-btn" onclick="showToast('已安排战略会')">安排战略会</button>
+          <button class="hermes-btn" onclick="showToast('已记录')">记录</button>
+        </div>
+      </div>
+
+      <!-- 记忆&Skill -->
+      <div class="card card-sm">
+        <div class="card-title">部门记忆 & Skill</div>
+        <div class="tabs" style="margin-bottom:10px">
+          <div class="tab active" onclick="switchTab('m','mem',this)">记忆</div>
+          <div class="tab" onclick="switchTab('m','skill',this)">Skill</div>
+        </div>
+        <div id="m-mem" class="tab-content active">
+          <div class="memory-list">
+            <div class="memory-item">
+              <span class="mi-tag">记忆</span>
+              <div class="mi-content">S类客户在周三/周四响应率最高（58% vs 周一/二 31%）</div>
+              <div class="mi-meta">东南亚组 · 2026-04-28 · 夏欢确认</div>
+            </div>
+            <div class="memory-item">
+              <span class="mi-tag">记忆</span>
+              <div class="mi-content">新客首次沟通 24h 内必须跟进，超时流失率 +40%</div>
+              <div class="mi-meta">全部门 · 2026-03-15</div>
+            </div>
+          </div>
+        </div>
+        <div id="m-skill" class="tab-content">
+          <div class="memory-list">
+            <div class="memory-item">
+              <span class="mi-tag skill">Skill</span>
+              <div class="mi-content">关键词搜索法：WA 批量触达潜在客户，提升私信量 38%</div>
+              <div class="mi-meta">来源：陈玉霞 · 使用 42次</div>
+            </div>
+            <div class="memory-item">
+              <span class="mi-tag skill">Skill</span>
+              <div class="mi-content">弃单追回 SOP：15min 触达 + 48h 跟进 + 折扣钩子，追回率 23%</div>
+              <div class="mi-meta">来源：全部门 · 使用 87次</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+function switchTime(dim, el) {
+  document.querySelectorAll('.time-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.time-panel').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('panel-'+dim).classList.add('active');
+}
+
+function switchTab(g, id, el) {
+  const p = el.closest('.card,.card-sm');
+  if(p){
+    p.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    p.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  }
+  el.classList.add('active');
+  document.getElementById(g+'-'+id).classList.add('active');
+}
+
+function showToast(msg){
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),2500);
+}
+</script>
+</body>
+</html>
