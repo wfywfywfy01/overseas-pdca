@@ -1,0 +1,1356 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>海外私域 PDCA 操作台</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#fafaf8;--bg2:#f4f4f0;--card:#ffffff;
+  --border:#e5e7eb;--border2:#d1d5db;
+  --text:#111827;--muted:#6b7280;--muted2:#9ca3af;
+  --green:#16a34a;--green-bg:#f0fdf4;--green-border:#bbf7d0;
+  --red:#dc2626;--red-bg:#fef2f2;--red-border:#fecaca;
+  --orange:#ea580c;--orange-bg:#fff7ed;--orange-border:#fed7aa;
+  --blue:#2563eb;--blue-bg:#eff6ff;--blue-border:#bfdbfe;
+  --purple:#7c3aed;--purple-bg:#f5f3ff;--purple-border:#ddd6fe;
+  --gold:#b45309;--gold-bg:#fffbeb;--gold-border:#fde68a;
+  --silver:#4b5563;--silver-bg:#f9fafb;--silver-border:#e5e7eb;
+  --radius:8px;--shadow:0 1px 3px rgba(0,0,0,.08);--shadow2:0 4px 16px rgba(0,0,0,.1);
+}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Segoe UI',sans-serif;font-size:14px;line-height:1.5}
+.page{display:none}
+.page.active{display:block}
+
+/* LOGIN */
+#login-page{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#fafaf8 0%,#f0ede8 100%)}
+.login-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:48px 40px;width:420px;box-shadow:var(--shadow2)}
+.login-logo{text-align:center;margin-bottom:32px}
+.login-logo .brand{font-size:22px;font-weight:700;letter-spacing:.05em;color:var(--text)}
+.login-logo .sub{font-size:13px;color:var(--muted);margin-top:4px}
+.form-group{margin-bottom:16px}
+.form-group label{display:block;font-size:13px;font-weight:500;color:var(--text);margin-bottom:6px}
+.form-group input,.form-group select{width:100%;padding:10px 12px;border:1px solid var(--border2);border-radius:var(--radius);font-size:14px;background:var(--bg);color:var(--text);outline:none;transition:border .15s}
+.form-group input:focus,.form-group select:focus{border-color:#111827}
+.btn-primary{width:100%;padding:11px;background:#111827;color:#fff;border:none;border-radius:var(--radius);font-size:14px;font-weight:500;cursor:pointer;transition:opacity .15s;margin-top:8px}
+.btn-primary:hover{opacity:.85}
+.demo-hint{margin-top:20px;padding:14px;background:var(--bg2);border-radius:var(--radius);font-size:12px;color:var(--muted)}
+.demo-hint b{color:var(--text)}
+.login-err{color:var(--red);font-size:13px;margin-top:8px;display:none}
+
+/* HEADER */
+.app-header{height:56px;background:var(--card);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 24px;position:sticky;top:0;z-index:100}
+.header-left{display:flex;align-items:center;gap:12px}
+.avatar{width:34px;height:34px;border-radius:50%;background:#111827;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;flex-shrink:0}
+.header-info .name{font-size:14px;font-weight:600}
+.header-info .meta{font-size:12px;color:var(--muted)}
+.header-right{display:flex;align-items:center;gap:12px;font-size:13px;color:var(--muted)}
+.tag{display:inline-flex;align-items:center;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:500;background:var(--bg2);color:var(--muted);border:1px solid var(--border)}
+.tag.green{background:var(--green-bg);color:var(--green);border-color:var(--green-border)}
+.tag.red{background:var(--red-bg);color:var(--red);border-color:var(--red-border)}
+.tag.orange{background:var(--orange-bg);color:var(--orange);border-color:var(--orange-border)}
+.tag.blue{background:var(--blue-bg);color:var(--blue);border-color:var(--blue-border)}
+.tag.purple{background:var(--purple-bg);color:var(--purple);border-color:var(--purple-border)}
+.tag.gold{background:var(--gold-bg);color:var(--gold);border-color:var(--gold-border);font-weight:600}
+.tag.silver{background:var(--silver-bg);color:var(--silver);border-color:var(--silver-border);font-weight:600}
+.tag.level150{background:var(--blue-bg);color:var(--blue);border-color:var(--blue-border);font-weight:600}
+.btn-logout{padding:6px 14px;border:1px solid var(--border2);border-radius:var(--radius);background:var(--card);cursor:pointer;font-size:13px;color:var(--muted)}
+.btn-logout:hover{background:var(--bg2)}
+
+/* PDCA BAR */
+.pdca-bar{background:var(--card);border-bottom:1px solid var(--border);padding:12px 24px;display:flex;align-items:center;gap:0}
+.pdca-step{display:flex;align-items:center;gap:6px;padding:6px 16px;position:relative}
+.pdca-step .dot{width:24px;height:24px;border-radius:50%;border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--muted2);background:var(--bg)}
+.pdca-step.done .dot{background:#111827;border-color:#111827;color:#fff}
+.pdca-step.active .dot{background:#fff;border-color:#111827;color:#111827}
+.pdca-step .label{font-size:12px;font-weight:500;color:var(--muted)}
+.pdca-step.done .label{color:var(--green)}
+.pdca-step.active .label{color:#111827;font-weight:600}
+.pdca-arrow{color:var(--muted2);font-size:12px;margin:0 2px}
+
+/* LAYOUT */
+.main-layout{display:grid;gap:0;min-height:calc(100vh - 100px)}
+.two-col{grid-template-columns:1fr 300px}
+.one-col{grid-template-columns:1fr}
+.left-col{padding:24px;display:flex;flex-direction:column;gap:16px;border-right:1px solid var(--border)}
+.right-col{padding:20px;display:flex;flex-direction:column;gap:16px;background:var(--bg)}
+
+/* CARDS */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow)}
+.card-sm{padding:16px}
+.card-title{font-size:13px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:14px}
+.section-label{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.section-label .step-badge{width:22px;height:22px;border-radius:50%;background:#111827;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.section-label .step-name{font-size:15px;font-weight:700}
+.section-label .step-sub{font-size:12px;color:var(--muted);margin-left:4px}
+
+/* PLAN CARDS */
+.plan-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.plan-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;position:relative;overflow:hidden}
+.plan-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:#111827}
+.plan-card .pc-label{font-size:11px;color:var(--muted);font-weight:500}
+.plan-card .pc-value{font-size:24px;font-weight:700;margin:6px 0 4px;letter-spacing:-.02em}
+.plan-card .pc-sub{font-size:12px;color:var(--muted)}
+.plan-card .pc-prog{height:4px;background:var(--bg2);border-radius:2px;margin-top:10px;overflow:hidden}
+.plan-card .pc-prog-fill{height:100%;background:#111827;border-radius:2px;transition:width .4s}
+.plan-card .pc-pct{font-size:11px;color:var(--muted);margin-top:4px}
+
+/* PROGRESS BARS */
+.prog-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.prog-row .prog-label{width:90px;font-size:13px;color:var(--text);flex-shrink:0}
+.prog-row.indent .prog-label{width:86px;padding-left:12px;font-size:12px;color:var(--muted)}
+.prog-track{flex:1;height:8px;background:var(--bg2);border-radius:4px;overflow:hidden}
+.prog-fill{height:100%;border-radius:4px;background:#111827;transition:width .4s}
+.prog-fill.green{background:var(--green)}
+.prog-fill.red{background:var(--red)}
+.prog-fill.orange{background:var(--orange)}
+.prog-row .prog-num{width:70px;text-align:right;font-size:12px;color:var(--muted)}
+.prog-row .prog-check{font-size:12px;width:16px;flex-shrink:0}
+
+/* SOP TIMELINE */
+.sop-timeline{display:flex;flex-direction:column;gap:6px}
+.sop-item{display:flex;align-items:flex-start;gap:12px;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius);background:var(--card);cursor:pointer;transition:all .15s}
+.sop-item:hover{border-color:#111827;box-shadow:var(--shadow)}
+.sop-item.done{background:var(--green-bg);border-color:var(--green-border)}
+.sop-item.doing{background:#fffbeb;border-color:#fde68a}
+.sop-time{font-size:11px;color:var(--muted);width:80px;flex-shrink:0;padding-top:1px}
+.sop-content .sop-module{font-size:12px;font-weight:600;color:var(--text)}
+.sop-content .sop-desc{font-size:12px;color:var(--muted);margin-top:1px}
+.sop-status{margin-left:auto;flex-shrink:0}
+.status-chip{padding:2px 8px;border-radius:12px;font-size:11px;font-weight:500;cursor:pointer;border:1px solid var(--border2);background:var(--bg);color:var(--muted)}
+.status-chip.doing{background:#fffbeb;color:#92400e;border-color:#fde68a}
+.status-chip.done{background:var(--green-bg);color:var(--green);border-color:var(--green-border)}
+
+/* TABS */
+.tabs{display:flex;gap:2px;border-bottom:1px solid var(--border);margin-bottom:16px}
+.tab{padding:8px 16px;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px}
+.tab.active{color:#111827;border-color:#111827}
+.tab-content{display:none}
+.tab-content.active{display:block}
+
+/* TABLE */
+.data-table{width:100%;border-collapse:collapse}
+.data-table th{font-size:11px;color:var(--muted);font-weight:500;text-align:left;padding:8px 12px;border-bottom:1px solid var(--border);text-transform:uppercase;letter-spacing:.03em}
+.data-table td{padding:10px 12px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:middle}
+.data-table tr:last-child td{border-bottom:none}
+.data-table tr:hover td{background:var(--bg)}
+
+/* EMPLOYEE CARDS */
+.emp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px}
+.emp-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;cursor:pointer;transition:all .15s}
+.emp-card:hover{box-shadow:var(--shadow2);border-color:#111827}
+.emp-card.warn{border-color:var(--orange-border)}
+.emp-card-head{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.emp-card-head .av{width:32px;height:32px;border-radius:50%;background:#111827;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0}
+.emp-card-head .nm{font-size:13px;font-weight:600}
+.emp-card-head .stg{font-size:10px;color:var(--muted)}
+.emp-score{font-size:22px;font-weight:700;margin:4px 0}
+.emp-score-label{font-size:11px;color:var(--muted)}
+.mini-bars{margin-top:8px;display:flex;flex-direction:column;gap:4px}
+.mini-bar{display:flex;align-items:center;gap:6px}
+.mini-bar-label{font-size:11px;color:var(--muted);width:50px}
+.mini-bar-track{flex:1;height:4px;background:var(--bg2);border-radius:2px;overflow:hidden}
+.mini-bar-fill{height:100%;border-radius:2px;background:#111827}
+.mini-bar-fill.ok{background:var(--green)}
+.mini-bar-fill.ng{background:var(--red)}
+.badge{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:var(--red);color:#fff;font-size:10px;font-weight:700}
+
+/* GROUP CARDS */
+.group-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.group-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;cursor:pointer;transition:all .15s}
+.group-card:hover{box-shadow:var(--shadow2)}
+.group-card-title{font-size:15px;font-weight:700;margin-bottom:4px}
+.group-card-manager{font-size:12px;color:var(--muted);margin-bottom:16px}
+.group-stat{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.group-stat-label{font-size:12px;color:var(--muted)}
+.group-stat-value{font-size:13px;font-weight:600}
+
+/* HERMES */
+.hermes-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px}
+.hermes-header{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.hermes-icon{width:28px;height:28px;border-radius:50%;background:#111827;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px}
+.hermes-title{font-size:13px;font-weight:600}
+.hermes-body{font-size:13px;color:var(--muted);line-height:1.7;background:var(--bg);border-radius:var(--radius);padding:12px;margin-bottom:12px}
+.hermes-actions{display:flex;flex-direction:column;gap:6px}
+.hermes-btn{padding:7px 12px;border-radius:var(--radius);border:1px solid var(--border2);background:var(--card);font-size:12px;cursor:pointer;text-align:left;transition:background .15s}
+.hermes-btn:hover{background:var(--bg2)}
+.hermes-btn.primary{background:#111827;color:#fff;border-color:#111827}
+.hermes-btn.primary:hover{opacity:.85}
+
+/* RANKING */
+.rank-list{display:flex;flex-direction:column;gap:6px}
+.rank-item{display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--bg);border-radius:var(--radius)}
+.rank-num{width:20px;font-size:13px;font-weight:700;color:var(--muted)}
+.rank-num.top{color:#111827}
+.rank-name{flex:1;font-size:13px}
+.rank-val{font-size:13px;font-weight:600}
+.rank-item.me{background:#fffbeb;border:1px solid #fde68a}
+
+/* ANOMALY */
+.anomaly-list{display:flex;flex-direction:column;gap:8px}
+.anomaly-item{padding:12px;border:1px solid var(--orange-border);background:var(--orange-bg);border-radius:var(--radius)}
+.anomaly-item .an-title{font-size:13px;font-weight:600;color:var(--orange)}
+.anomaly-item .an-desc{font-size:12px;color:var(--muted);margin-top:2px}
+.anomaly-item.critical{border-color:var(--red-border);background:var(--red-bg)}
+.anomaly-item.critical .an-title{color:var(--red)}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:500;display:none;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:var(--card);border-radius:12px;padding:28px;width:600px;max-width:90vw;max-height:80vh;overflow-y:auto;box-shadow:var(--shadow2)}
+.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.modal-title{font-size:17px;font-weight:700}
+.modal-close{cursor:pointer;font-size:20px;color:var(--muted);line-height:1}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:#111827;color:#fff;padding:12px 20px;border-radius:var(--radius);font-size:13px;box-shadow:var(--shadow2);z-index:999;opacity:0;transform:translateY(8px);transition:all .25s;pointer-events:none}
+.toast.show{opacity:1;transform:translateY(0)}
+
+/* SCORE CARD */
+.score-card{background:var(--bg);border-radius:var(--radius);padding:16px;margin-top:12px}
+.score-big{font-size:36px;font-weight:700;margin-bottom:4px}
+.score-label{font-size:13px;color:var(--muted)}
+.score-breakdown{margin-top:12px;display:flex;flex-direction:column;gap:6px}
+.score-row{display:flex;justify-content:space-between;font-size:13px}
+.score-row .sr-label{color:var(--muted)}
+.score-row .sr-val{font-weight:600}
+
+/* CROSS TABLE */
+.cross-table-wrap{overflow-x:auto}
+.cross-table{width:100%;border-collapse:collapse;white-space:nowrap}
+.cross-table th,.cross-table td{padding:10px 14px;border-bottom:1px solid var(--border);font-size:13px;text-align:right}
+.cross-table th{font-size:11px;color:var(--muted);font-weight:500;text-align:right;background:var(--bg2)}
+.cross-table th:first-child,.cross-table td:first-child{text-align:left;font-weight:600}
+
+/* MEMORY CENTER */
+.memory-list{display:flex;flex-direction:column;gap:8px}
+.memory-item{padding:12px;border:1px solid var(--border);border-radius:var(--radius);background:var(--card)}
+.memory-item .mi-tag{font-size:10px;font-weight:600;padding:2px 6px;border-radius:4px;background:#111827;color:#fff;margin-right:6px}
+.memory-item .mi-tag.skill{background:var(--blue);color:#fff}
+.memory-item .mi-content{font-size:13px;color:var(--text);margin-top:4px}
+.memory-item .mi-meta{font-size:11px;color:var(--muted2);margin-top:4px}
+
+/* DAILY REPORT */
+.report-textarea{width:100%;min-height:140px;padding:12px;border:1px solid var(--border2);border-radius:var(--radius);font-size:13px;font-family:inherit;resize:vertical;background:var(--bg);color:var(--text);outline:none;transition:border .15s}
+.report-textarea:focus{border-color:#111827}
+.loading-dots{display:inline-flex;gap:4px;align-items:center}
+.loading-dots span{width:6px;height:6px;border-radius:50%;background:var(--muted);animation:dot-pulse 1.2s infinite}
+.loading-dots span:nth-child(2){animation-delay:.2s}
+.loading-dots span:nth-child(3){animation-delay:.4s}
+@keyframes dot-pulse{0%,80%,100%{transform:scale(.6);opacity:.4}40%{transform:scale(1);opacity:1}}
+
+.btn-sm{padding:6px 12px;border-radius:var(--radius);border:1px solid var(--border2);background:var(--card);font-size:12px;cursor:pointer;font-weight:500}
+.btn-sm:hover{background:var(--bg2)}
+.btn-sm.dark{background:#111827;color:#fff;border-color:#111827}
+.btn-sm.dark:hover{opacity:.85}
+
+.dept-okr{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px}
+.dept-okr-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px}
+.dokr-label{font-size:12px;color:var(--muted);margin-bottom:6px}
+.dokr-value{font-size:28px;font-weight:700;letter-spacing:-.02em}
+.dokr-sub{font-size:12px;color:var(--muted);margin-top:4px}
+.dokr-prog{height:6px;background:var(--bg2);border-radius:3px;margin-top:10px;overflow:hidden}
+.dokr-fill{height:100%;background:#111827;border-radius:3px}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-page" class="page active">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="brand">VERTU · 海外私域</div>
+      <div class="sub">PDCA 操作台 · 内部原型 v0.1</div>
+    </div>
+    <div class="form-group">
+      <label>用户名</label>
+      <input id="login-user" type="text" placeholder="输入用户名" />
+    </div>
+    <div class="form-group">
+      <label>密码</label>
+      <input id="login-pass" type="password" placeholder="输入密码" />
+    </div>
+    <div class="form-group">
+      <label>角色（Demo 切换）</label>
+      <select id="login-role">
+        <option value="">— 自动识别 —</option>
+        <option value="staff">员工</option>
+        <option value="manager">主管</option>
+        <option value="director">总监</option>
+      </select>
+    </div>
+    <div class="login-err" id="login-err">用户名或密码错误</div>
+    <button class="btn-primary" onclick="doLogin()">登 录</button>
+    <div class="demo-hint">
+      <b>Demo 账号：</b><br>
+      员工：zhanglipin / staff123（郑丽苹，何川组）<br>
+      主管：hechuan / manager123（何川，何川组长）<br>
+      总监：director / director123
+    </div>
+    <div style="margin-top:12px;display:flex;gap:6px">
+      <button class="btn-sm" style="flex:1" onclick="quickLogin('zhanglipin','staff123')">快速登录：员工</button>
+      <button class="btn-sm" style="flex:1" onclick="quickLogin('hechuan','manager123')">快速登录：主管</button>
+      <button class="btn-sm" style="flex:1" onclick="quickLogin('director','director123')">快速登录：总监</button>
+    </div>
+  </div>
+</div>
+
+<!-- STAFF PAGE -->
+<div id="staff-page" class="page">
+  <div class="app-header">
+    <div class="header-left">
+      <div class="avatar">郑</div>
+      <div class="header-info">
+        <div class="name">郑丽苹 <span class="tag">何川组</span> <span class="tag green">D90+</span> <span class="tag gold">300W</span></div>
+        <div class="meta">入职 420 天 · 今日 2026-05-13</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <span>海外私域部</span>
+      <button class="btn-logout" onclick="logout()">退出</button>
+    </div>
+  </div>
+  <div class="pdca-bar">
+    <div class="pdca-step done">
+      <div class="dot">✓</div>
+      <div class="label">P · 计划</div>
+    </div>
+    <div class="pdca-arrow">→</div>
+    <div class="pdca-step active">
+      <div class="dot">D</div>
+      <div class="label">D · 执行</div>
+    </div>
+    <div class="pdca-arrow">→</div>
+    <div class="pdca-step">
+      <div class="dot">C</div>
+      <div class="label">C · 检查</div>
+    </div>
+    <div class="pdca-arrow">→</div>
+    <div class="pdca-step">
+      <div class="dot">A</div>
+      <div class="label">A · 改进</div>
+    </div>
+  </div>
+
+  <div class="main-layout two-col" style="display:grid">
+    <div class="left-col">
+      <!-- PLAN -->
+      <div>
+        <div class="section-label"><div class="step-badge">P</div><div class="step-name">Plan <span class="step-sub">我的目标</span></div></div>
+        <div class="plan-grid">
+          <div class="plan-card">
+            <div class="pc-label">年度目标</div>
+            <div class="pc-value">347<span style="font-size:14px;font-weight:400;color:var(--muted)">万</span></div>
+            <div class="pc-sub">已完成 62.4 万 · 缺口 284.6 万</div>
+            <div class="pc-prog"><div class="pc-prog-fill" style="width:18%"></div></div>
+            <div class="pc-pct">18%</div>
+          </div>
+          <div class="plan-card">
+            <div class="pc-label">当月目标 <span style="font-size:10px;color:var(--muted)">5月</span></div>
+            <div class="pc-value">25<span style="font-size:14px;font-weight:400;color:var(--muted)">万</span></div>
+            <div class="pc-sub">已完成 8.4 万 · 剩余 13 天 / 需日均 1.28 万</div>
+            <div class="pc-prog"><div class="pc-prog-fill" style="width:34%"></div></div>
+            <div class="pc-pct">33.6%</div>
+          </div>
+          <div class="plan-card">
+            <div class="pc-label">本周目标</div>
+            <div class="pc-value">6.25<span style="font-size:14px;font-weight:400;color:var(--muted)">万</span></div>
+            <div class="pc-sub">已完成 2.8 万 · 缺口 3.45 万</div>
+            <div class="pc-prog"><div class="pc-prog-fill" style="width:45%"></div></div>
+            <div class="pc-pct">44.8%</div>
+          </div>
+          <div class="plan-card">
+            <div class="pc-label">今日目标</div>
+            <div class="pc-value">1.19<span style="font-size:14px;font-weight:400;color:var(--muted)">万</span></div>
+            <div class="pc-sub">已完成 0.48 万</div>
+            <div class="pc-prog"><div class="pc-prog-fill" style="width:40%"></div></div>
+            <div class="pc-pct">40%</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- REVENUE STRUCTURE -->
+      <div>
+        <div class="section-label"><div class="step-badge">$</div><div class="step-name">业绩结构 <span class="step-sub">本月来源分析</span></div></div>
+        <div class="card card-sm">
+          <div style="font-size:12px;color:var(--muted);margin-bottom:14px">本月已完成 <b style="color:var(--text)">8.4 万</b> / 目标 25 万</div>
+          <div class="prog-row">
+            <div class="prog-label" style="width:100px">官网当月询盘</div>
+            <div class="prog-track"><div class="prog-fill" style="width:72%;background:var(--blue)"></div></div>
+            <div class="prog-num">2.1万 <span style="font-size:10px;color:var(--muted)">(25%)</span></div>
+          </div>
+          <div class="prog-row">
+            <div class="prog-label" style="width:100px">官网历史月线索</div>
+            <div class="prog-track"><div class="prog-fill" style="width:85%;background:var(--blue)"></div></div>
+            <div class="prog-num">2.8万 <span style="font-size:10px;color:var(--muted)">(33%)</span></div>
+          </div>
+          <div class="prog-row">
+            <div class="prog-label" style="width:100px">自拓流量</div>
+            <div class="prog-track"><div class="prog-fill" style="width:40%;background:var(--purple)"></div></div>
+            <div class="prog-num">1.2万 <span style="font-size:10px;color:var(--muted)">(14%)</span></div>
+          </div>
+          <div class="prog-row">
+            <div class="prog-label" style="width:100px">老客户</div>
+            <div class="prog-track"><div class="prog-fill" style="width:75%;background:var(--blue)"></div></div>
+            <div class="prog-num">2.3万 <span style="font-size:10px;color:var(--muted)">(27%)</span></div>
+          </div>
+          <div style="margin-top:8px;font-size:11px;color:var(--muted);display:flex;gap:12px">
+            <span><span style="display:inline-block;width:10px;height:10px;background:var(--blue);border-radius:2px;margin-right:4px"></span>守正</span>
+            <span><span style="display:inline-block;width:10px;height:10px;background:var(--purple);border-radius:2px;margin-right:4px"></span>增量</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- DO -->
+      <div>
+        <div class="section-label"><div class="step-badge">D</div><div class="step-name">Do <span class="step-sub">今日工作流</span></div></div>
+        <div class="sop-timeline" id="sop-list">
+          <!-- generated by JS -->
+        </div>
+      </div>
+
+      <!-- CHECK -->
+      <div>
+        <div class="section-label"><div class="step-badge">C</div><div class="step-name">Check <span class="step-sub">今日完成度</span></div></div>
+        <div class="card card-sm">
+          <div id="check-bars"></div>
+        </div>
+      </div>
+
+      <!-- ACT -->
+      <div>
+        <div class="section-label"><div class="step-badge">A</div><div class="step-name">Act <span class="step-sub">我的订单与客户</span></div></div>
+        <div class="card card-sm">
+          <div class="tabs">
+            <div class="tab active" onclick="switchTab('act','orders',this)">订单</div>
+            <div class="tab" onclick="switchTab('act','customers',this)">客户</div>
+            <div class="tab" onclick="switchTab('act','intent',this)">意向客户</div>
+            <div class="tab" onclick="switchTab('act','report',this)">日报</div>
+          </div>
+          <div id="act-orders" class="tab-content active">
+            <table class="data-table">
+              <thead><tr><th>订单号</th><th>客户</th><th>金额</th><th>状态</th><th>最后更新</th></tr></thead>
+              <tbody>
+                <tr><td>#VT-2026-0391</td><td>Sarah L. (美国)</td><td>$3,200</td><td><span class="tag orange">待处理</span></td><td>今日 09:12</td></tr>
+                <tr><td>#VT-2026-0388</td><td>Mohammed A. (沙特)</td><td>$5,600</td><td><span class="tag blue">待发货</span></td><td>昨日</td></tr>
+                <tr><td>#VT-2026-0371</td><td>David K. (英国)</td><td>$4,800</td><td><span class="tag">发货中</span></td><td>05-09</td></tr>
+                <tr><td>#VT-2026-0342</td><td>Elena V. (俄罗斯)</td><td>$7,200</td><td><span class="tag green">已签收</span></td><td>05-07</td></tr>
+                <tr><td>#VT-2026-0318</td><td>John T. (澳大利亚)</td><td>$2,900</td><td><span class="tag red">退款中</span></td><td>05-04</td></tr>
+                <tr><td>#VT-2026-0302</td><td>Amir R. (伊朗)</td><td>$6,100</td><td><span class="tag red">问题订单</span></td><td>05-02</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div id="act-customers" class="tab-content">
+            <table class="data-table">
+              <thead><tr><th>客户名</th><th>国家</th><th>分层</th><th>上次跟进</th><th>金额</th></tr></thead>
+              <tbody>
+                <tr><td>Sarah L.</td><td>美国</td><td><span class="tag red">S类</span></td><td>今日</td><td>$3,200</td></tr>
+                <tr><td>Mohammed A.</td><td>沙特</td><td><span class="tag red">S类</span></td><td>昨日</td><td>$5,600</td></tr>
+                <tr><td>Grace W.</td><td>新加坡</td><td><span class="tag orange">AB类</span></td><td>05-10</td><td>$1,200</td></tr>
+                <tr><td>Lim K.</td><td>马来西亚</td><td><span class="tag orange">AB类</span></td><td>05-09</td><td>$800</td></tr>
+                <tr><td>Tan H.</td><td>泰国</td><td><span class="tag">老客户</span></td><td>05-08</td><td>$4,100</td></tr>
+                <tr><td>Nina P.</td><td>印尼</td><td><span class="tag">老客户</span></td><td>05-07</td><td>$2,700</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div id="act-intent" class="tab-content">
+            <table class="data-table">
+              <thead><tr><th>客户</th><th>预估金额</th><th>意向信号</th><th>最近沟通</th></tr></thead>
+              <tbody>
+                <tr><td>Sarah L. (美国)</td><td style="font-weight:600">$3,200</td><td>明确询价，要求报价单</td><td>今日 09:20</td></tr>
+                <tr><td>Mohammed A. (沙特)</td><td style="font-weight:600">$5,600</td><td>确认颜色款式，询问配送时间</td><td>昨日 16:30</td></tr>
+                <tr><td>Kumar S. (印度)</td><td style="font-weight:600">$2,800</td><td>询问支持分期付款</td><td>05-10 11:15</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div id="act-report" class="tab-content">
+            <div style="margin-bottom:10px;font-size:13px;color:var(--muted)">今日日报 · 填写后提交，AI 将在 5 秒内给出评分</div>
+            <textarea class="report-textarea" id="report-text" placeholder="【业绩情况】今日成交 X 单，金额 X 元。&#10;【触达情况】三方私信 X 条，触达客户 X 人（S类X+AB类X+老客X+自拓X）。&#10;【跟进情况】重点跟进客户 A（当前问题：），进展：&#10;【社媒动作】ins X条，TK X条，YT X条，WA动态 X条。&#10;【明日计划】"></textarea>
+            <div style="margin-top:10px;display:flex;gap:8px">
+              <button class="btn-sm dark" onclick="submitReport()">提交日报</button>
+              <button class="btn-sm" onclick="saveDraft()">保存草稿</button>
+            </div>
+            <div id="report-loading" style="display:none;margin-top:16px;color:var(--muted);font-size:13px">
+              AI 评审中 <div class="loading-dots"><span></span><span></span><span></span></div>
+            </div>
+            <div id="report-score" style="display:none">
+              <div class="score-card">
+                <div class="score-big">82<span style="font-size:18px;font-weight:400;color:var(--muted)">/100</span></div>
+                <div class="score-label">合格 · 今日日报得分</div>
+                <div class="score-breakdown">
+                  <div class="score-row"><span class="sr-label">必填 4 项</span><span class="sr-val" style="color:var(--green)">20/20</span></div>
+                  <div class="score-row"><span class="sr-label">量化指标</span><span class="sr-val" style="color:var(--orange)">22/30</span></div>
+                  <div class="score-row"><span class="sr-label">字数达标</span><span class="sr-val" style="color:var(--green)">10/10</span></div>
+                  <div class="score-row"><span class="sr-label">跟进质量</span><span class="sr-val" style="color:var(--orange)">16/20</span></div>
+                  <div class="score-row"><span class="sr-label">写作质量</span><span class="sr-val" style="color:var(--muted)">14/20</span></div>
+                </div>
+                <div style="margin-top:12px;font-size:12px;color:var(--muted);border-top:1px solid var(--border);padding-top:10px">
+                  <b style="color:var(--text)">AI 建议：</b><br>
+                  · 量化指标：未提及邮件触达数量<br>
+                  · 跟进质量：第二条跟进缺少结果描述
+                </div>
+                <div style="margin-top:10px;display:flex;gap:8px">
+                  <button class="btn-sm">查看完整反馈</button>
+                  <button class="btn-sm dark" onclick="resetReport()">修改日报重评</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT COL -->
+    <div class="right-col">
+      <!-- RANKING -->
+      <div class="card card-sm">
+        <div class="tabs" style="margin-bottom:12px">
+          <div class="tab active" onclick="switchTab('rank','reach',this)">触达排行</div>
+          <div class="tab" onclick="switchTab('rank','perf',this)">业绩排行</div>
+        </div>
+        <div id="rank-reach" class="tab-content active">
+          <div class="rank-list">
+            <div class="rank-item"><span class="rank-num top">1</span><span class="rank-name">陈玉霞</span><span class="rank-val">58</span></div>
+            <div class="rank-item"><span class="rank-num top">2</span><span class="rank-name">肖映</span><span class="rank-val">52</span></div>
+            <div class="rank-item me"><span class="rank-num">3</span><span class="rank-name">张心言（我）</span><span class="rank-val">47</span></div>
+            <div class="rank-item"><span class="rank-num">4</span><span class="rank-name">许淋玲</span><span class="rank-val">44</span></div>
+            <div class="rank-item"><span class="rank-num">5</span><span class="rank-name">陈晓霜</span><span class="rank-val">39</span></div>
+          </div>
+        </div>
+        <div id="rank-perf" class="tab-content">
+          <div class="rank-list">
+            <div class="rank-item"><span class="rank-num top">1</span><span class="rank-name">肖映</span><span class="rank-val">6.0万</span></div>
+            <div class="rank-item"><span class="rank-num top">2</span><span class="rank-name">陈玉霞</span><span class="rank-val">5.98万</span></div>
+            <div class="rank-item"><span class="rank-num">3</span><span class="rank-name">许淋玲</span><span class="rank-val">3.91万</span></div>
+            <div class="rank-item me"><span class="rank-num">4</span><span class="rank-name">张心言（我）</span><span class="rank-val">3.48万</span></div>
+            <div class="rank-item"><span class="rank-num">5</span><span class="rank-name">陈晓霜</span><span class="rank-val">2.97万</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- HERMES -->
+      <div class="hermes-card">
+        <div class="hermes-header">
+          <div class="hermes-icon">H</div>
+          <div class="hermes-title">Hermes AI · 个人建议</div>
+        </div>
+        <div class="hermes-body">
+          你本周私信达成率 78%，主要卡在 13:15–14:15 时段。<br><br>
+          建议参考陈玉霞 05-08 日报，她用关键词搜索法 1 小时完成 52 条私信。
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn-sm" onclick="toast('已打开参考案例')">查看案例</button>
+          <button class="btn-sm" onclick="toast('已标记为已读')">标记已读</button>
+        </div>
+      </div>
+
+      <!-- TODAY SCORE -->
+      <div class="card card-sm">
+        <div class="card-title">昨日日报评分</div>
+        <div style="display:flex;align-items:baseline;gap:6px">
+          <div style="font-size:28px;font-weight:700">78</div>
+          <div style="font-size:13px;color:var(--muted)">/100 · 合格</div>
+        </div>
+        <div style="margin-top:8px;font-size:12px;color:var(--muted)">较前日 +4 分 · 连续 3 天达标</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MANAGER PAGE -->
+<div id="manager-page" class="page">
+  <div class="app-header">
+    <div class="header-left">
+      <div class="avatar" style="background:#2563eb">何</div>
+      <div class="header-info">
+        <div class="name">何川 <span class="tag blue">组长</span> <span class="tag">何川组</span></div>
+        <div class="meta">今日 2026-05-13 · 共 5 名员工 · 年度目标 1595 万</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <span>海外私域部</span>
+      <button class="btn-logout" onclick="logout()">退出</button>
+    </div>
+  </div>
+  <div class="pdca-bar">
+    <div class="pdca-step done"><div class="dot">✓</div><div class="label">P · 计划</div></div>
+    <div class="pdca-arrow">→</div>
+    <div class="pdca-step done"><div class="dot">✓</div><div class="label">D · 执行</div></div>
+    <div class="pdca-arrow">→</div>
+    <div class="pdca-step active"><div class="dot">C</div><div class="label">C · 检查</div></div>
+    <div class="pdca-arrow">→</div>
+    <div class="pdca-step"><div class="dot">A</div><div class="label">A · 改进</div></div>
+  </div>
+
+  <div class="main-layout two-col" style="display:grid">
+    <div class="left-col">
+      <!-- GROUP OKR -->
+      <div>
+        <div class="section-label"><div class="step-badge">P</div><div class="step-name">本组 OKR</div></div>
+        <div class="card card-sm">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px">
+            <div>
+              <div style="font-size:13px;color:var(--muted);margin-bottom:4px">何川组 · 5月目标 · 年度1595万</div>
+              <div style="font-size:28px;font-weight:700">122<span style="font-size:14px;font-weight:400;color:var(--muted)"> 万</span></div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-size:22px;font-weight:700;color:var(--green)">42.3<span style="font-size:12px;font-weight:400;color:var(--muted)"> 万</span></div>
+              <div style="font-size:12px;color:var(--muted)">已完成 34.7% · 剩余 13 天</div>
+            </div>
+          </div>
+          <div style="height:8px;background:var(--bg2);border-radius:4px;overflow:hidden;margin-bottom:16px">
+            <div style="width:34.7%;height:100%;background:#111827;border-radius:4px"></div>
+          </div>
+          <div id="mgr-member-bars"></div>
+        </div>
+      </div>
+
+      <!-- EMPLOYEE MATRIX -->
+      <div>
+        <div class="section-label"><div class="step-badge">C</div><div class="step-name">员工看板 <span class="step-sub">点击查看详情</span></div></div>
+        <div class="emp-grid" id="emp-grid-mgr"></div>
+      </div>
+
+      <!-- MANAGER SOP -->
+      <div>
+        <div class="section-label"><div class="step-badge">D</div><div class="step-name">主管 SOP 节奏</div></div>
+        <div class="sop-timeline" id="mgr-sop-list"></div>
+      </div>
+
+      <!-- ANOMALY -->
+      <div>
+        <div class="section-label"><div class="step-badge">!</div><div class="step-name">异常与待办</div></div>
+        <div class="anomaly-list">
+          <div class="anomaly-item critical">
+            <div class="an-title">停滞订单 · 向俞金 #VT-2026-0302</div>
+            <div class="an-desc">问题订单超 10 天未处理，客户催款，需立即介入</div>
+          </div>
+          <div class="anomaly-item">
+            <div class="an-title">连续低分预警 · 刘彦麟</div>
+            <div class="an-desc">连续 4 天日报评分 < 70，私信量持续低于标准 40%</div>
+          </div>
+          <div class="anomaly-item">
+            <div class="an-title">跨部门协同 · 物流延迟</div>
+            <div class="an-desc">3 个发货中订单超预计到达日期，需与物流核实</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT -->
+    <div class="right-col">
+      <div class="hermes-card">
+        <div class="hermes-header">
+          <div class="hermes-icon">H</div>
+          <div class="hermes-title">Hermes AI · 组级建议</div>
+        </div>
+        <div class="hermes-body">
+          本周何川组发现：S 类客户在周三/周四响应率最高（58% vs 周一/二的 31%）。<br><br>
+          建议：将 S 类优先触达安排在每周三/四上午 10:00–12:00。预计私信转化率 +18%。
+        </div>
+        <div class="hermes-actions">
+          <button class="hermes-btn primary" onclick="toast('已写入组记忆')">✓ 写入组记忆</button>
+          <button class="hermes-btn" onclick="toast('正在抽象为 Skill...')">⚙ 抽象为 Skill</button>
+          <button class="hermes-btn" onclick="toast('可编辑后保存')">✏ 修改后保存</button>
+          <button class="hermes-btn" onclick="toast('已拒绝')">✗ 拒绝</button>
+        </div>
+      </div>
+
+      <!-- GROUP RANKING -->
+      <div class="card card-sm">
+        <div class="card-title">本组排行（本月）</div>
+        <div class="rank-list">
+          <div class="rank-item"><span class="rank-num top">1</span><span class="rank-name">陈莉 <span class="tag gold" style="font-size:10px">300W</span></span><span class="rank-val">9.2万</span></div>
+          <div class="rank-item"><span class="rank-num top">2</span><span class="rank-name">郑丽苹 <span class="tag gold" style="font-size:10px">300W</span></span><span class="rank-val">8.4万</span></div>
+          <div class="rank-item"><span class="rank-num">3</span><span class="rank-name">陈玉霞 <span class="tag gold" style="font-size:10px">300W</span></span><span class="rank-val">7.8万</span></div>
+          <div class="rank-item"><span class="rank-num">4</span><span class="rank-name">刘佳鑫 <span class="tag silver" style="font-size:10px">200W</span></span><span class="rank-val">7.6万</span></div>
+          <div class="rank-item"><span class="rank-num">5</span><span class="rank-name" style="color:var(--orange)">毛涵 <span class="tag silver" style="font-size:10px">200W</span></span><span class="rank-val" style="color:var(--orange)">4.8万</span></div>
+        </div>
+      </div>
+
+      <!-- PLAYBOOK -->
+      <div class="card card-sm">
+        <div class="card-title">待审核案例</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="padding:10px;border:1px solid var(--border);border-radius:var(--radius)">
+            <div style="font-size:13px;font-weight:600">陈玉霞 · 05-08 日报</div>
+            <div style="font-size:12px;color:var(--muted);margin:4px 0">关键词搜索法私信 52 条 · 评分 96 分</div>
+            <button class="btn-sm dark" style="font-size:11px;padding:4px 10px" onclick="toast('已收录为金牌案例')">收录为金牌案例</button>
+          </div>
+          <div style="padding:10px;border:1px solid var(--border);border-radius:var(--radius)">
+            <div style="font-size:13px;font-weight:600">张心言 · 05-06 日报</div>
+            <div style="font-size:12px;color:var(--muted);margin:4px 0">S类客户成交话术 · 评分 91 分</div>
+            <button class="btn-sm dark" style="font-size:11px;padding:4px 10px" onclick="toast('已收录为金牌案例')">收录为金牌案例</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DIRECTOR PAGE -->
+<div id="director-page" class="page">
+  <div class="app-header">
+    <div class="header-left">
+      <div class="avatar" style="background:#7c3aed">总</div>
+      <div class="header-info">
+        <div class="name">海外私域部 · 总监 <span class="tag purple">部门长</span></div>
+        <div class="meta">3 个小组 · 14 名员工 · 年度目标 4000 万 · 2026-05-13</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <button class="btn-logout" onclick="logout()">退出</button>
+    </div>
+  </div>
+
+  <div class="left-col" style="max-width:100%;border-right:none">
+    <!-- DEPT OKR -->
+    <div>
+      <div class="section-label"><div class="step-badge">P</div><div class="step-name">部门 OKR 总览</div></div>
+      <div class="dept-okr">
+        <div class="dept-okr-card">
+          <div class="dokr-label">5月部门目标 <span style="font-size:10px;padding:2px 6px;background:var(--blue-bg);color:var(--blue);border-radius:3px">守正220</span> <span style="font-size:10px;padding:2px 6px;background:var(--purple-bg);color:var(--purple);border-radius:3px">增量85</span></div>
+          <div class="dokr-value">305<span style="font-size:14px;font-weight:400;color:var(--muted)">万</span></div>
+          <div class="dokr-sub">已完成 98.6 万 · 缺口 206.4 万</div>
+          <div class="dokr-prog"><div class="dokr-fill" style="width:32.3%"></div></div>
+          <div style="font-size:11px;color:var(--muted);margin-top:4px">32.3% · 剩余 13 工作日</div>
+        </div>
+        <div class="dept-okr-card">
+          <div class="dokr-label">年度全景 <span style="font-size:10px;padding:2px 6px;background:var(--blue-bg);color:var(--blue);border-radius:3px">守正2800</span> <span style="font-size:10px;padding:2px 6px;background:var(--purple-bg);color:var(--purple);border-radius:3px">增量1200</span></div>
+          <div class="dokr-value">4000<span style="font-size:14px;font-weight:400;color:var(--muted)">万</span></div>
+          <div class="dokr-sub">已完成 196.8 万 · 年度进度 4.9%</div>
+          <div class="dokr-prog"><div class="dokr-fill" style="width:4.9%"></div></div>
+          <div style="font-size:11px;color:var(--muted);margin-top:4px">全年利润目标 811 万 · 利润率 20.29%</div>
+        </div>
+        <div class="dept-okr-card">
+          <div class="dokr-label">各组5月进度</div>
+          <div style="margin-top:10px;display:flex;flex-direction:column;gap:8px">
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span>何川组（1595万/年）</span><span style="font-weight:600">42.3/122万</span></div>
+              <div style="height:6px;background:var(--bg2);border-radius:3px;overflow:hidden"><div style="width:34.7%;height:100%;background:var(--blue);border-radius:3px"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span>夏欢组（1595万/年）</span><span style="font-weight:600">38.5/122万</span></div>
+              <div style="height:6px;background:var(--bg2);border-radius:3px;overflow:hidden"><div style="width:31.6%;height:100%;background:var(--blue);border-radius:3px"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span>向俞金组（810万/年）</span><span style="font-weight:600">17.8/61万</span></div>
+              <div style="height:6px;background:var(--bg2);border-radius:3px;overflow:hidden"><div style="width:29%;height:100%;background:var(--orange);border-radius:3px"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- GROUP CARDS -->
+    <div>
+      <div class="section-label"><div class="step-badge">C</div><div class="step-name">各小组概览</div></div>
+      <div class="group-grid">
+        <div class="group-card" onclick="toast('进入何川组详情')">
+          <div class="group-card-title">何川组</div>
+          <div class="group-card-manager">主管：何川 · 5 名员工 · 年度 1595 万</div>
+          <div class="group-stat"><span class="group-stat-label">5月进度</span><span class="group-stat-value">42.3 / 122 万</span></div>
+          <div style="height:6px;background:var(--bg2);border-radius:3px;overflow:hidden;margin-bottom:12px"><div style="width:34.7%;height:100%;background:var(--blue);border-radius:3px"></div></div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <span class="tag">平均评分 83</span>
+            <span class="tag orange">异常 1 <span style="font-size:10px">(毛涵)</span></span>
+            <span class="tag gold">300W ×3</span>
+          </div>
+        </div>
+        <div class="group-card" onclick="toast('进入夏欢组详情')">
+          <div class="group-card-title">夏欢组</div>
+          <div class="group-card-manager">主管：夏欢 · 6 名员工 · 年度 1595 万</div>
+          <div class="group-stat"><span class="group-stat-label">5月进度</span><span class="group-stat-value">38.5 / 122 万</span></div>
+          <div style="height:6px;background:var(--bg2);border-radius:3px;overflow:hidden;margin-bottom:12px"><div style="width:31.6%;height:100%;background:var(--blue);border-radius:3px"></div></div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <span class="tag">平均评分 74</span>
+            <span class="tag red">异常 2 <span style="font-size:10px">(刘彦麟)</span></span>
+            <span class="tag gold">300W ×1</span>
+          </div>
+        </div>
+        <div class="group-card" onclick="toast('进入向俞金组详情')">
+          <div class="group-card-title">向俞金组</div>
+          <div class="group-card-manager">主管：向俞金 · 3 名成员 · 年度 810 万</div>
+          <div class="group-stat"><span class="group-stat-label">5月进度</span><span class="group-stat-value">17.8 / 61 万</span></div>
+          <div style="height:6px;background:var(--bg2);border-radius:3px;overflow:hidden;margin-bottom:12px"><div style="width:29%;height:100%;background:var(--orange);border-radius:3px"></div></div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <span class="tag">平均评分 76</span>
+            <span class="tag orange">进度落后</span>
+            <span class="tag level150">150W ×1</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CROSS COMPARE -->
+    <div>
+      <div class="section-label"><div class="step-badge">≈</div><div class="step-name">跨组对比看板</div></div>
+      <div class="card card-sm">
+        <div class="cross-table-wrap">
+          <table class="cross-table">
+            <thead>
+              <tr>
+                <th>指标</th>
+                <th>何川组</th>
+                <th>夏欢组</th>
+                <th>向俞金组</th>
+                <th>部门均值</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>5月业绩进度</td><td style="color:var(--green)">42.3万 <span class="tag green" style="font-size:10px">34.7%</span></td><td>38.5万 <span class="tag" style="font-size:10px">31.6%</span></td><td style="color:var(--orange)">17.8万 <span class="tag orange" style="font-size:10px">29.2%</span></td><td>32.3%</td></tr>
+              <tr><td>日均三方私信</td><td style="color:var(--green)">38.4条</td><td>35.1条</td><td style="color:var(--red)">28.7条</td><td>34.1条</td></tr>
+              <tr><td>日均触达客户</td><td style="color:var(--green)">48.2人</td><td>44.5人</td><td style="color:var(--red)">37.8人</td><td>43.5人</td></tr>
+              <tr><td>社媒发帖（ins+tk+yt）</td><td>7.2条/人/日</td><td style="color:var(--green)">8.1条/人/日</td><td style="color:var(--red)">5.4条/人/日</td><td>6.9条/人/日</td></tr>
+              <tr><td>平均日报评分</td><td style="color:var(--green)">83分</td><td>74分</td><td>76分</td><td>77.7分</td></tr>
+              <tr><td>官网询盘转化率</td><td style="color:var(--green)">9.8%</td><td>9.1%</td><td style="color:var(--red)">8.9%</td><td>9.2%<span class="tag orange" style="font-size:10px;margin-left:4px">基线9.5%</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- REVENUE SOURCE MONITORING -->
+    <div>
+      <div class="section-label"><div class="step-badge">$</div><div class="step-name">业绩来源结构监控 <span class="step-sub">守正 vs 增量</span></div></div>
+      <div class="card card-sm">
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px">
+          <div>
+            <div style="font-size:12px;font-weight:600;margin-bottom:8px">官网当月询盘</div>
+            <div style="font-size:20px;font-weight:700">27.2<span style="font-size:12px;font-weight:400;color:var(--muted)">万</span></div>
+            <div style="font-size:11px;color:var(--muted);margin:4px 0">目标 92万/月 · 守正65+增量27</div>
+            <div style="display:flex;gap:4px;margin-top:6px">
+              <div style="flex:1;height:4px;background:var(--blue);border-radius:2px;opacity:.8" title="守正部分"></div>
+              <div style="flex:.4;height:4px;background:var(--purple);border-radius:2px;opacity:.8" title="增量部分"></div>
+              <div style="flex:1.2;height:4px;background:var(--bg2);border-radius:2px"></div>
+            </div>
+            <div style="margin-top:4px;font-size:11px"><span class="tag green">守正 ✓</span> <span class="tag orange">增量 ⚠</span></div>
+          </div>
+          <div>
+            <div style="font-size:12px;font-weight:600;margin-bottom:8px">官网历史月线索</div>
+            <div style="font-size:20px;font-weight:700">31.4<span style="font-size:12px;font-weight:400;color:var(--muted)">万</span></div>
+            <div style="font-size:11px;color:var(--muted);margin:4px 0">目标 100万/月 · 守正70+增量30</div>
+            <div style="display:flex;gap:4px;margin-top:6px">
+              <div style="flex:1;height:4px;background:var(--blue);border-radius:2px;opacity:.8"></div>
+              <div style="flex:.6;height:4px;background:var(--purple);border-radius:2px;opacity:.8"></div>
+              <div style="flex:.8;height:4px;background:var(--bg2);border-radius:2px"></div>
+            </div>
+            <div style="margin-top:4px;font-size:11px"><span class="tag green">守正 ✓</span> <span class="tag green">增量 ✓</span></div>
+          </div>
+          <div>
+            <div style="font-size:12px;font-weight:600;margin-bottom:8px">自拓流量</div>
+            <div style="font-size:20px;font-weight:700">11.3<span style="font-size:12px;font-weight:400;color:var(--muted)">万</span></div>
+            <div style="font-size:11px;color:var(--muted);margin:4px 0">目标 47万/月 · 守正29+增量18</div>
+            <div style="display:flex;gap:4px;margin-top:6px">
+              <div style="flex:.7;height:4px;background:var(--blue);border-radius:2px;opacity:.8"></div>
+              <div style="flex:.4;height:4px;background:var(--purple);border-radius:2px;opacity:.8"></div>
+              <div style="flex:1.5;height:4px;background:var(--bg2);border-radius:2px"></div>
+            </div>
+            <div style="margin-top:4px;font-size:11px"><span class="tag green">守正 ✓</span> <span class="tag red">增量 ✗</span></div>
+          </div>
+          <div>
+            <div style="font-size:12px;font-weight:600;margin-bottom:8px">老客户</div>
+            <div style="font-size:20px;font-weight:700">28.7<span style="font-size:12px;font-weight:400;color:var(--muted)">万</span></div>
+            <div style="font-size:11px;color:var(--muted);margin:4px 0">目标 93万/月 · 守正70+增量23</div>
+            <div style="display:flex;gap:4px;margin-top:6px">
+              <div style="flex:.9;height:4px;background:var(--blue);border-radius:2px;opacity:.8"></div>
+              <div style="flex:.4;height:4px;background:var(--purple);border-radius:2px;opacity:.8"></div>
+              <div style="flex:1.2;height:4px;background:var(--bg2);border-radius:2px"></div>
+            </div>
+            <div style="margin-top:4px;font-size:11px"><span class="tag green">守正 ✓</span> <span class="tag orange">增量 ⚠</span></div>
+          </div>
+        </div>
+        <div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border);font-size:11px;color:var(--muted);display:flex;gap:16px">
+          <span><span style="display:inline-block;width:10px;height:6px;background:var(--blue);border-radius:2px;margin-right:4px;opacity:.8"></span>守正业绩</span>
+          <span><span style="display:inline-block;width:10px;height:6px;background:var(--purple);border-radius:2px;margin-right:4px;opacity:.8"></span>增量业绩</span>
+          <span style="margin-left:auto">5月已完成 98.6/305 万（32.3%）</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4 PHENOMENA MONITORING -->
+    <div>
+      <div class="section-label"><div class="step-badge">P</div><div class="step-name">业绩结构现象监控 <span class="step-sub">4个关键现象实时追踪</span></div></div>
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px">
+        <!-- P1 -->
+        <div class="card card-sm" style="cursor:pointer" onclick="toast('查看官网UV/业绩趋势详情')">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+            <div style="font-size:12px;font-weight:700">现象 1 · 官网 UV/业绩转化</div>
+            <span class="tag green">正常 ✓</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div><div style="font-size:11px;color:var(--muted)">本月官网 UV</div><div style="font-size:18px;font-weight:700">85 <span style="font-size:11px;font-weight:400">万</span></div></div>
+            <div><div style="font-size:11px;color:var(--muted)">预期业绩</div><div style="font-size:18px;font-weight:700">73 <span style="font-size:11px;font-weight:400">万</span></div></div>
+            <div><div style="font-size:11px;color:var(--muted)">实际业绩</div><div style="font-size:18px;font-weight:700;color:var(--green)">78 <span style="font-size:11px;font-weight:400">万</span></div></div>
+            <div><div style="font-size:11px;color:var(--muted)">偏差</div><div style="font-size:18px;font-weight:700;color:var(--green)">+6.8%</div></div>
+          </div>
+          <div style="margin-top:8px;font-size:11px;color:var(--muted)">UV 300万时，按0.3转化率业绩增量 = 72万</div>
+        </div>
+        <!-- P2 -->
+        <div class="card card-sm" style="cursor:pointer" onclick="toast('查看历史月业绩趋势')">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+            <div style="font-size:12px;font-weight:700">现象 2 · 历史月业绩瓶颈</div>
+            <span class="tag" style="background:#fefce8;color:#713f12;border-color:#fde68a">超出预期 ⭐</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div><div style="font-size:11px;color:var(--muted)">本月历史月业绩</div><div style="font-size:18px;font-weight:700">98 <span style="font-size:11px;font-weight:400">万</span></div></div>
+            <div><div style="font-size:11px;color:var(--muted)">较上月</div><div style="font-size:18px;font-weight:700;color:var(--green)">+8 <span style="font-size:11px;font-weight:400">万</span></div></div>
+            <div><div style="font-size:11px;color:var(--muted)">季度增量</div><div style="font-size:18px;font-weight:700">18 <span style="font-size:11px;font-weight:400">万</span></div></div>
+            <div><div style="font-size:11px;color:var(--muted)">月均增长</div><div style="font-size:18px;font-weight:700">+6 <span style="font-size:11px;font-weight:400">万</span></div></div>
+          </div>
+          <div style="margin-top:8px;font-size:11px;color:var(--muted)">卡点：WA 触达上限，需增加 WA 账号</div>
+        </div>
+        <!-- P3 -->
+        <div class="card card-sm" style="cursor:pointer;border-color:var(--orange-border)" onclick="toast('查看自拓增长详情')">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+            <div style="font-size:12px;font-weight:700">现象 3 · 自拓万粉账号增长</div>
+            <span class="tag orange">需加速 ⚠</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div><div style="font-size:11px;color:var(--muted)">当前万粉账号</div><div style="font-size:18px;font-weight:700;color:var(--orange)">8 <span style="font-size:11px;font-weight:400">个</span></div></div>
+            <div><div style="font-size:11px;color:var(--muted)">26年目标</div><div style="font-size:18px;font-weight:700">10 <span style="font-size:11px;font-weight:400">个</span></div></div>
+            <div><div style="font-size:11px;color:var(--muted)">本月自拓业绩</div><div style="font-size:18px;font-weight:700">38 <span style="font-size:11px;font-weight:400">万</span></div></div>
+            <div><div style="font-size:11px;color:var(--muted)">较25年</div><div style="font-size:18px;font-weight:700;color:var(--green)">+13 <span style="font-size:11px;font-weight:400">万</span></div></div>
+          </div>
+          <div style="margin-top:8px;font-size:11px;color:var(--orange)">按当前节奏12月仅能达9个，缺2个，需立即启动孵化</div>
+        </div>
+        <!-- P4 -->
+        <div class="card card-sm" style="cursor:pointer;border-color:var(--red-border)" onclick="toast('查看老客户触达详情')">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+            <div style="font-size:12px;font-weight:700">现象 4 · 老客户触达上限</div>
+            <span class="tag red">需自动化 ⚠</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div><div style="font-size:11px;color:var(--muted)">日人均触达</div><div style="font-size:18px;font-weight:700;color:var(--red)">21 <span style="font-size:11px;font-weight:400">个</span></div></div>
+            <div><div style="font-size:11px;color:var(--muted)">人工上限</div><div style="font-size:18px;font-weight:700">20 <span style="font-size:11px;font-weight:400">个</span></div></div>
+            <div><div style="font-size:11px;color:var(--muted)">本月老客业绩</div><div style="font-size:18px;font-weight:700">85 <span style="font-size:11px;font-weight:400">万</span></div></div>
+            <div><div style="font-size:11px;color:var(--muted)">增长空间</div><div style="font-size:18px;font-weight:700;color:var(--muted)">受限</div></div>
+          </div>
+          <div style="margin-top:8px;font-size:11px;color:var(--red)">已达人工上限，必须引入自动化触达+智能个性化回复</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONVERSION RATE MONITORING -->
+    <div>
+      <div class="section-label"><div class="step-badge">%</div><div class="step-name">转化率监控 <span class="step-sub">实际 vs 基线</span></div></div>
+      <div class="card card-sm">
+        <table class="data-table">
+          <thead><tr><th>转化来源</th><th>基线</th><th>本月实际</th><th>偏差</th><th>状态</th></tr></thead>
+          <tbody>
+            <tr><td>官网当月询盘 → 成交</td><td>9.5%</td><td>9.2%</td><td style="color:var(--orange)">-0.3%</td><td><span class="tag orange">⚠ 微降</span></td></tr>
+            <tr><td>官网历史月线索 → 成交</td><td>3.0%</td><td style="color:var(--green)">3.4%</td><td style="color:var(--green)">+0.4%</td><td><span class="tag green">✓ 正常</span></td></tr>
+            <tr><td>自拓流量 → WA私信</td><td>0.00231%</td><td style="color:var(--green)">0.0025%</td><td style="color:var(--green)">+0.0002%</td><td><span class="tag green">✓ 正常</span></td></tr>
+            <tr><td>自拓 WA线索 → 成交</td><td>2.29%</td><td style="color:var(--orange)">2.1%</td><td style="color:var(--orange)">-0.19%</td><td><span class="tag orange">⚠ 微降</span></td></tr>
+            <tr><td>老客户触达 → 成交</td><td>0.20%</td><td style="color:var(--green)">0.19%</td><td style="color:var(--muted)">-0.01%</td><td><span class="tag green">✓ 正常</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- DEPT ANOMALY + HERMES side by side -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div>
+        <div class="section-label"><div class="step-badge">!</div><div class="step-name">部门级异常</div></div>
+        <div class="anomaly-list">
+          <div class="anomaly-item critical">
+            <div class="an-title">现象3 · 自拓万粉账号进度落后</div>
+            <div class="an-desc">当前8个，目标10个，按进度12月只达9个，需立即启动孵化</div>
+          </div>
+          <div class="anomaly-item critical">
+            <div class="an-title">现象4 · 老客户触达已超人工上限</div>
+            <div class="an-desc">日人均触达21人（上限20），增长空间受限，需自动化升级</div>
+          </div>
+          <div class="anomaly-item">
+            <div class="an-title">向俞金组 · 5月进度垫底（29%）</div>
+            <div class="an-desc">黄思婷（150W新员工）拖累，陈晓霜成交率下滑，需重点介入</div>
+          </div>
+          <div class="anomaly-item">
+            <div class="an-title">夏欢组 · 刘彦麟连续预警</div>
+            <div class="an-desc">连续4天日报 &lt;70分，私信量低于标准40%，需夏欢直接介入</div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="section-label"><div class="step-badge">H</div><div class="step-name">Hermes AI · 部门建议</div></div>
+        <div class="hermes-card">
+          <div class="hermes-header">
+            <div class="hermes-icon">H</div>
+            <div class="hermes-title">部门级改进建议</div>
+          </div>
+          <div class="hermes-body" style="font-size:12px">
+            <b style="color:var(--orange)">【现象3触发】</b> 自拓万粉账号当前 8 个，距 26 年目标 10 个还差 2 个。按当前节奏 12 月只能完成 9 个。<br><br>
+            建议：① 立即在向俞金组启动新增 2 个账号孵化（该组自拓占比最低） ② 与内容中心对接转私合作 ③ 预期月均业绩 +6 万
+          </div>
+          <div class="hermes-actions">
+            <button class="hermes-btn primary" onclick="toast('已写入部门记忆')">✓ 写入部门记忆</button>
+            <button class="hermes-btn" onclick="toast('正在抽象为部门 Skill...')">⚙ 抽象为 Skill</button>
+            <button class="hermes-btn" onclick="toast('已拒绝')">✗ 拒绝</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MEMORY CENTER -->
+    <div>
+      <div class="section-label"><div class="step-badge">M</div><div class="step-name">记忆与 Skill 中心</div></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div class="card card-sm">
+          <div class="card-title">部门记忆</div>
+          <div class="memory-list">
+            <div class="memory-item">
+              <span class="mi-tag">记忆</span>
+              <div class="mi-content">S 类客户在周三/周四响应率最高，建议集中触达</div>
+              <div class="mi-meta">东南亚组 · 2026-04-28 · 夏欢确认</div>
+            </div>
+            <div class="memory-item">
+              <span class="mi-tag">记忆</span>
+              <div class="mi-content">新客户首次沟通 24h 内必须跟进，超时流失率 +40%</div>
+              <div class="mi-meta">全部门 · 2026-03-15 · 谭启林确认</div>
+            </div>
+            <div class="memory-item">
+              <span class="mi-tag">记忆</span>
+              <div class="mi-content">俄语区客户倾向在 UTC+3 晚 8-10 点回复，建议错峰跟进</div>
+              <div class="mi-meta">欧美俄语组 · 2026-04-10 · 陈晓霜确认</div>
+            </div>
+          </div>
+        </div>
+        <div class="card card-sm">
+          <div class="card-title">Skill 库</div>
+          <div class="memory-list">
+            <div class="memory-item">
+              <span class="mi-tag skill">Skill</span>
+              <div class="mi-content">关键词搜索法：在 WA 私信中用产品关键词批量触达潜在客户</div>
+              <div class="mi-meta">来源：陈玉霞 · 使用次数 42 · 平均提升私信量 38%</div>
+            </div>
+            <div class="memory-item">
+              <span class="mi-tag skill">Skill</span>
+              <div class="mi-content">弃单追回 SOP：15min 内触达 + 48h 跟进节奏 + 折扣钩子</div>
+              <div class="mi-meta">来源：全部门 · 使用次数 87 · 追回率 23%</div>
+            </div>
+            <div class="memory-item">
+              <span class="mi-tag skill">Skill</span>
+              <div class="mi-content">S类客户分层转化话术模板（英/俄/马来三语版）</div>
+              <div class="mi-meta">来源：谭启林 · 使用次数 156 · 平均转化率 +12%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- PROFIT HEALTH -->
+    <div>
+      <div class="section-label"><div class="step-badge">¥</div><div class="step-name">利润健康度 <span class="step-sub">5月截至今日</span></div></div>
+      <div class="card card-sm">
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden">
+          <div style="padding:16px;border-right:1px solid var(--border)">
+            <div style="font-size:11px;color:var(--muted);margin-bottom:6px">销售收入</div>
+            <div style="font-size:22px;font-weight:700">98.6<span style="font-size:12px;font-weight:400;color:var(--muted)">万</span></div>
+            <div style="height:4px;background:var(--bg2);border-radius:2px;margin-top:8px;overflow:hidden"><div style="width:32%;height:100%;background:#111827;border-radius:2px"></div></div>
+            <div style="font-size:11px;color:var(--muted);margin-top:4px">目标 305万 · 32%</div>
+          </div>
+          <div style="padding:16px;border-right:1px solid var(--border)">
+            <div style="font-size:11px;color:var(--muted);margin-bottom:6px">产品成本</div>
+            <div style="font-size:22px;font-weight:700">51.3<span style="font-size:12px;font-weight:400;color:var(--muted)">万</span></div>
+            <div style="margin-top:8px;font-size:12px;font-weight:600;color:var(--green)">成本率 52%</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:2px">目标成本率 52%  ✓</div>
+          </div>
+          <div style="padding:16px;border-right:1px solid var(--border)">
+            <div style="font-size:11px;color:var(--muted);margin-bottom:6px">费用合计</div>
+            <div style="font-size:22px;font-weight:700">25.7<span style="font-size:12px;font-weight:400;color:var(--muted)">万</span></div>
+            <div style="margin-top:8px;font-size:12px;font-weight:600;color:var(--orange)">费用率 26%</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:2px">目标费用率 25%  ⚠</div>
+          </div>
+          <div style="padding:16px;background:var(--bg)">
+            <div style="font-size:11px;color:var(--muted);margin-bottom:6px">税前利润</div>
+            <div style="font-size:22px;font-weight:700;color:var(--green)">21.6<span style="font-size:12px;font-weight:400;color:var(--muted)">万</span></div>
+            <div style="margin-top:8px;font-size:12px;font-weight:600;color:var(--green)">利润率 21.9%</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:2px">目标 20.29%  <span style="color:var(--green)">+1.6% ⭐</span></div>
+          </div>
+        </div>
+        <div style="margin-top:10px;font-size:12px;color:var(--muted)">全年利润目标 811 万 · 预计全年利润 ~835 万（按当前利润率）</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- EMPLOYEE DETAIL MODAL -->
+<div class="modal-overlay" id="emp-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-emp-name">员工详情</div>
+      <div class="modal-close" onclick="closeModal('emp-modal')">×</div>
+    </div>
+    <div id="modal-emp-body"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ====== DATA ======
+const ACCOUNTS = {
+  'staff': {pass:'staff123', role:'staff'},
+  'zhanglipin': {pass:'staff123', role:'staff'},
+  'manager': {pass:'manager123', role:'manager'},
+  'hechuan': {pass:'manager123', role:'manager'},
+  'director': {pass:'director123', role:'director'}
+};
+
+const SOP_ITEMS = [
+  {time:'09:00–09:10', module:'公司早会', desc:'同步今日重点，接收总监/主管指令', status:'done'},
+  {time:'09:10–09:30', module:'数据复盘', desc:'查看昨日业绩、日报评分、异常提醒', status:'done'},
+  {time:'09:30–10:00', module:'动态发送', desc:'发布 ins/TK/YT 内容，更新 WA 动态', status:'done'},
+  {time:'10:00–11:00', module:'三方私信', desc:'关键词搜索触达，目标 15 条', status:'doing'},
+  {time:'11:00–12:00', module:'S类客户跟进', desc:'优先响应 S 类客户，推进成交', status:'todo'},
+  {time:'13:15–14:15', module:'三方私信（午后）', desc:'持续触达，累计目标 40 条', status:'todo'},
+  {time:'14:15–15:00', module:'AB类跟进', desc:'跟进 AB 类客户，挖掘转化机会', status:'todo'},
+  {time:'15:00–16:00', module:'老客户触达', desc:'添加老客户，日均目标 20 人', status:'todo'},
+  {time:'16:00–17:00', module:'邮件营销', desc:'批量发送邮件，目标 200 封', status:'todo'},
+  {time:'17:00–17:30', module:'弃单追回', desc:'15 分钟内跟进弃单客户', status:'todo'},
+  {time:'17:30–18:00', module:'日报填写', desc:'填写今日日报，AI 打分复盘', status:'todo'},
+];
+
+const MGR_SOP = [
+  {time:'09:00–10:00', module:'基础数据核查', desc:'汇总各成员昨日数据，标记异常', status:'done'},
+  {time:'10:00–10:30', module:'团队晨会', desc:'今日主推款、话术重心录入', status:'done'},
+  {time:'10:30–12:30', module:'执行过程管控', desc:'实时跟进进度、弃单介入、S类客户支持', status:'doing'},
+  {time:'14:00–16:00', module:'话术质检', desc:'每人抽查 5–10 组聊天记录', status:'todo'},
+  {time:'16:00–17:00', module:'业务协同', desc:'跨部门卡点处理（物流/设计/财务）', status:'todo'},
+  {time:'17:00–18:00', module:'增长动作复盘', desc:'当日完成情况、明日计划', status:'todo'},
+];
+
+const EMPLOYEES = [
+  {id:'HC01', name:'郑丽苹', stage:'D90+', level:'300W', score:88, warn:false, bars:{私信:91, 触达:94, 社媒:100}, monthly_done:8.4, monthly_target:25},
+  {id:'HC02', name:'陈玉霞', stage:'D90+', level:'300W', score:91, warn:false, bars:{私信:95, 触达:96, 社媒:100}, monthly_done:7.8, monthly_target:22},
+  {id:'HC03', name:'毛涵',   stage:'D90+', level:'200W', score:71, warn:true,  bars:{私信:62, 触达:70, 社媒:67}, monthly_done:4.8, monthly_target:20},
+  {id:'HC04', name:'陈莉',   stage:'D90+', level:'300W', score:85, warn:false, bars:{私信:88, 触达:90, 社媒:100}, monthly_done:9.2, monthly_target:25},
+  {id:'HC05', name:'刘佳鑫', stage:'D90+', level:'200W', score:82, warn:false, bars:{私信:83, 触达:86, 社媒:100}, monthly_done:7.6, monthly_target:22},
+];
+
+const CHECK_ITEMS = [
+  {label:'三方私信', cur:32, max:40},
+  {label:'ins 发帖', cur:3, max:3},
+  {label:'tk 发帖', cur:2, max:3},
+  {label:'yt 发帖', cur:3, max:3},
+  {label:'触达总数', cur:42, max:50},
+  {label:'└ S 类', cur:10, max:10, indent:true},
+  {label:'└ AB 类', cur:8, max:10, indent:true},
+  {label:'└ 老客户', cur:18, max:20, indent:true},
+  {label:'└ 自拓', cur:6, max:10, indent:true},
+  {label:'老客添加', cur:9, max:10},
+  {label:'邮件触达', cur:170, max:200},
+  {label:'WA 动态', cur:3, max:3},
+];
+
+// ====== INIT ======
+function renderSOPList(items, containerId) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  el.innerHTML = items.map((s, i) => `
+    <div class="sop-item ${s.status}" id="sop-${containerId}-${i}" onclick="cycleSOP('${containerId}',${i})">
+      <div class="sop-time">${s.time}</div>
+      <div class="sop-content">
+        <div class="sop-module">${s.module}</div>
+        <div class="sop-desc">${s.desc}</div>
+      </div>
+      <div class="sop-status">
+        <span class="status-chip ${s.status}">${s.status==='done'?'已完成':s.status==='doing'?'进行中':'待办'}</span>
+      </div>
+    </div>`).join('');
+}
+
+function cycleSOP(containerId, idx) {
+  const arr = containerId === 'sop-list' ? SOP_ITEMS : MGR_SOP;
+  const states = ['todo','doing','done'];
+  const cur = arr[idx].status;
+  arr[idx].status = states[(states.indexOf(cur)+1)%states.length];
+  renderSOPList(arr, containerId);
+}
+
+function renderCheckBars() {
+  const el = document.getElementById('check-bars');
+  if (!el) return;
+  el.innerHTML = CHECK_ITEMS.map(c => {
+    const pct = Math.round(c.cur/c.max*100);
+    const ok = pct >= 100;
+    const fill = ok ? 'green' : pct < 70 ? 'red' : '';
+    const check = ok ? '<span class="prog-check" style="color:var(--green)">✓</span>' : '<span class="prog-check"></span>';
+    return `<div class="prog-row${c.indent?' indent':''}">
+      <div class="prog-label">${c.label}</div>
+      <div class="prog-track"><div class="prog-fill ${fill}" style="width:${Math.min(pct,100)}%"></div></div>
+      <div class="prog-num" style="${pct<70?'color:var(--red)':ok?'color:var(--green)':''}">${c.cur}/${c.max}</div>
+      ${check}
+    </div>`;
+  }).join('');
+}
+
+function renderEmpGrid() {
+  const el = document.getElementById('emp-grid-mgr');
+  if (!el) return;
+  const levelCls = {300:'gold',200:'silver',150:'level150'};
+  el.innerHTML = EMPLOYEES.map(e => {
+    const bars = Object.entries(e.bars).map(([l,v])=>`
+      <div class="mini-bar">
+        <div class="mini-bar-label">${l}</div>
+        <div class="mini-bar-track"><div class="mini-bar-fill ${v>=90?'ok':v<70?'ng':''}" style="width:${v}%"></div></div>
+      </div>`).join('');
+    const scoreColor = e.score>=85?'var(--green)':e.score<70?'var(--red)':'var(--orange)';
+    const lvl = e.level ? parseInt(e.level) : 0;
+    const lvlTag = e.level ? `<span class="tag ${levelCls[lvl]||''}" style="font-size:10px">${e.level}</span>` : '';
+    const mpct = e.monthly_done && e.monthly_target ? Math.round(e.monthly_done/e.monthly_target*100) : 0;
+    return `<div class="emp-card ${e.warn?'warn':''}" onclick="openEmpModal('${e.id}')">
+      <div class="emp-card-head">
+        <div class="av">${e.name[0]}</div>
+        <div><div class="nm">${e.name} ${lvlTag}</div><div class="stg">${e.stage}</div></div>
+        ${e.warn?'<span class="badge" title="异常">!</span>':''}
+      </div>
+      <div class="emp-score" style="color:${scoreColor}">${e.score}</div>
+      <div class="emp-score-label">日报评分 · 月度 ${mpct}%</div>
+      <div class="mini-bars">${bars}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderMgrMemberBars() {
+  const el = document.getElementById('mgr-member-bars');
+  if (!el) return;
+  const members = EMPLOYEES.map(e=>({name:e.name, done:e.monthly_done, target:e.monthly_target, level:e.level}));
+  el.innerHTML = members.map(m => {
+    const pct = Math.round(m.done/m.target*100);
+    const color = pct>=80?'var(--green)':pct<50?'var(--red)':'var(--orange)';
+    const tagColor = pct>=80?'green':pct<50?'red':'orange';
+    return `<div class="prog-row">
+      <div class="prog-label">${m.name}</div>
+      <div class="prog-track"><div class="prog-fill" style="width:${pct}%;background:${color}"></div></div>
+      <div class="prog-num">${m.done}万</div>
+      <span class="tag ${tagColor}" style="font-size:10px;flex-shrink:0">${pct}%</span>
+    </div>`;
+  }).join('');
+}
+
+// ====== TABS ======
+function switchTab(group, id, el) {
+  // find all tabs in same parent
+  const parent = el.closest('.card, .left-col, .card-sm');
+  if (parent) {
+    parent.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    parent.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  }
+  el.classList.add('active');
+  document.getElementById(group+'-'+id).classList.add('active');
+}
+
+// ====== MODAL ======
+function openEmpModal(id) {
+  const emp = EMPLOYEES.find(e=>e.id===id);
+  if (!emp) return;
+  document.getElementById('modal-emp-name').textContent = emp.name + ' · 员工详情';
+  document.getElementById('modal-emp-body').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+      <div class="card card-sm"><div class="card-title">今日评分</div>
+        <div style="font-size:28px;font-weight:700;color:${emp.score>=85?'var(--green)':emp.score<70?'var(--red)':'var(--orange)'}">${emp.score}</div>
+        <div style="font-size:12px;color:var(--muted)">成长阶段 ${emp.stage}</div>
+      </div>
+      <div class="card card-sm"><div class="card-title">今日指标</div>
+        ${Object.entries(emp.bars).map(([l,v])=>`<div class="prog-row">
+          <div class="prog-label" style="width:70px">${l}</div>
+          <div class="prog-track"><div class="prog-fill ${v>=90?'green':v<70?'red':''}" style="width:${v}%"></div></div>
+          <div class="prog-num">${v}%</div></div>`).join('')}
+      </div>
+    </div>
+    <div class="card card-sm"><div class="card-title">近期订单</div>
+      <table class="data-table"><thead><tr><th>订单号</th><th>金额</th><th>状态</th></tr></thead>
+      <tbody>
+        <tr><td>#VT-26-03${emp.id.slice(-2)}</td><td>$3,200</td><td><span class="tag orange">待处理</span></td></tr>
+        <tr><td>#VT-26-02${emp.id.slice(-2)}</td><td>$5,100</td><td><span class="tag green">已签收</span></td></tr>
+      </tbody></table>
+    </div>`;
+  document.getElementById('emp-modal').classList.add('open');
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+
+// ====== REPORT ======
+function submitReport() {
+  const txt = document.getElementById('report-text').value.trim();
+  if (txt.length < 20) { toast('请填写至少 20 字的日报内容'); return; }
+  document.getElementById('report-loading').style.display = 'flex';
+  document.getElementById('report-score').style.display = 'none';
+  setTimeout(()=>{
+    document.getElementById('report-loading').style.display = 'none';
+    document.getElementById('report-score').style.display = 'block';
+    toast('日报提交成功，AI 评分完成：82 分');
+  }, 3000);
+}
+
+function saveDraft() { toast('草稿已保存'); }
+function resetReport() {
+  document.getElementById('report-score').style.display = 'none';
+  document.getElementById('report-text').value = '';
+  toast('可重新编辑日报');
+}
+
+// ====== LOGIN ======
+function doLogin() {
+  const user = document.getElementById('login-user').value.trim();
+  const pass = document.getElementById('login-pass').value;
+  const roleOverride = document.getElementById('login-role').value;
+  const err = document.getElementById('login-err');
+  const acc = ACCOUNTS[user];
+  if (!acc || acc.pass !== pass) {
+    err.style.display = 'block'; return;
+  }
+  err.style.display = 'none';
+  const role = roleOverride || acc.role;
+  showPage(role + '-page');
+  initPage(role);
+}
+
+function logout() { showPage('login-page'); }
+
+function quickLogin(user, pass) {
+  document.getElementById('login-user').value = user;
+  document.getElementById('login-pass').value = pass;
+  doLogin();
+}
+
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function initPage(role) {
+  if (role === 'staff') {
+    renderSOPList(SOP_ITEMS, 'sop-list');
+    renderCheckBars();
+  } else if (role === 'manager') {
+    renderMgrMemberBars();
+    renderEmpGrid();
+    renderSOPList(MGR_SOP, 'mgr-sop-list');
+  }
+}
+
+// ====== TOAST ======
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'), 2500);
+}
+
+// keyboard
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && document.getElementById('login-page').classList.contains('active')) doLogin();
+  if (e.key === 'Escape') document.querySelectorAll('.modal-overlay.open').forEach(m=>m.classList.remove('open'));
+});
+
+// click outside modal
+document.getElementById('emp-modal').addEventListener('click', function(e){
+  if (e.target === this) closeModal('emp-modal');
+});
+</script>
+</body>
+</html>

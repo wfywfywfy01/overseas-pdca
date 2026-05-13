@@ -318,3 +318,374 @@
 [447902419043] Sales used 'dear' in a non-standard way
 [447902419043] Additional note: Sales provided valuable information about the ALPHAFOLD model pre-order date.
 [447902419043] Sales did not use the standard opening phrase 'Hello dear'. Make sure to use this in future communications.
+
+### [2026-05-07 16:18:14] 待主管确认的新发现
+[447707906604] Remind sales agents to use branded greetings and proactively collect client's contact information.
+[447856998686] 记录销售在对话中使用非标准问候语'Hi dear'，需加强培训和监控。
+[447856998686] 记录销售使用非标准问候语'Hi dear,'。需加强培训，确保所有对话首字母大写，使用正式问候语，并主动引导客户留下联系方式。
+[447856998686] Add 'Hi dear' as a mandatory greeting in sales communication.
+[447856998686] 记录：销售在开场时未使用标准尊称和引导留联系方式，需加强培训。
+[447454576860] Add handling customer's request for smart ring models to sales training.
+[447454576860] 记录坐席在开场时使用非正式问候语'Hi'，需加强培训。
+[447454576860] Add 'sleep solutions' to product references for future conversations.
+[447454576860] 在培训中强调避免使用禁用词和表情符号，提供详细的物流信息以满足客户需求。
+[447454576860] 在培训中强调：所有对话首字母大写，使用正式问候语，并主动引导客户留下联系方式。
+[447563039947] Add 'Sales failed to use brand standard greeting and did not collect customer's contact information.' to MEMORY.md
+[447563043708] 记录待处理问题：非正式问候语
+[447563043708] Add case to MEMORY.md for handling customer preference for discontinued models.
+[447563043708] Add reminder for Sales to use full names and titles of customers.
+[447563043708] In case of questions regarding tracking numbers or shipping status, provide a detailed explanation of the shipping process and inform the customer when they can expect to receive the tracking number.
+[447563043708] Add reminder to ask for client's WhatsApp and email information.
+[447561135639] Emphasize on using proper grammar and formal language in all communications.
+[447561135639] Add a reminder to monitor and reinforce proper greeting usage and contact info collection in sales communication.
+[447561135639] 客户感谢时，使用正式语气回应
+[447561135639] Sales使用非正式问候语'hi'
+[447926782772] Add USDT as a potential payment option for sales communication.
+[447926782772] Sales used informal greeting 'Hello' and did not refer to customer by name or title. Need to reinforce the use of formal brand tone and address customers by their names/titles.
+[447565113692] Add handling of abandonment to training materials.
+[447707926787] Add reminder for Sales to use customer's name, provide complete greetings, and actively collect contact info.
+[447707926787] Add handling payment issues to the training agenda.
+[447563043707] Add a reminder for Sales agents to quickly respond with pricing upon request.
+[447563043707] Add 'emoji' to banned words list
+[447563043707] Sales used 'Okay' and 'Sure' which are not in line with Vertu brand tone. Use 'Yes dear,' + repeat customer's original message for affirmation.
+[447563043707] Add a reminder for Sales agents to provide specific device details and prices upon request.
+[447934635890] Add a reminder for Sales to ask for contact information after presenting product details.
+[447934635890] Add 'No problem😇' and 'Alright🤞🏻' to banned words list.
+[447934635890] Sales should use full branded greeting with customer name and refer to colleagues as 'colleagues' instead of specific titles.
+[447934635890] 记录坐席未使用正式问候语的新发现，需加强培训。
+[447934635884] Add: Sales failed to respond professionally and maintain brand tone in case with customer 626336***.
+[447902419043] Add a reminder to ask customers about their preferred color and storage capacity.
+[447902419043] Add reminder to ask for client's preferred color and storage.
+[447902419043] Add a reminder for sales agents to ask clients about their preferred color and storage option.
+[447902419043] Add reminder for sales agents to use customer's name/title with 'dear'.
+[447902419043] Emoji-only responses are not allowed in Vertu communications.
+
+### [2026-05-11 14:56:01] 待主管确认的新发现
+[447480783151] Add: Use customer's name/title and refer to product as 'Vertu Limited edition agentq supercar model'.
+[447454576860] Add a reminder for sales agents to use 'Yes dear,' in their responses.
+[447454576860] Add 'chirag' as a problematic word due to its informal nature.
+[447454576860] Add a reminder for sales agents to handle payment-related issues with patience and professionalism. Also, ensure to collect customer's WhatsApp or email for future communication.
+[447454576860] Remind Sales to use 'Yes dear,' + repeat customer's original message in responses.
+[447454576860] 在处理国际客户（哥伦比亚）时，需先确认流程和物流，再推荐产品，并主动索要WhatsApp以便跟进。
+[447310406513] 记录待改进：非正式问候语
+[447563039947] 在MEMORY.md中记录：对于高意向客户（如询问产品特点），必须完整回答并主动引导留WhatsApp和邮箱，以便跟进。
+[447563039947] 记录坐席未按标准开场，需加强培训。
+[447563039947] Sales failed to maintain brand tone and professionalism. Ensure polite, exclusive tone in all communications.
+[447563039947] Add: Casual greetings are not aligned with Vertu's premium brand tone. Sales should use formal language and customer name/title consistently.
+[447561135639] Add a note on handling urgent refunds and shipping concerns with empathy and patience.
+[447561135639] Add a note on the importance of having sales agents available during work hours to handle customer issues.
+[447561135639] Add a reminder for Sales to use brand standard greeting.
+[447561135639] Sales uses informal greeting 'Hi'.
+[447561135639] Remind Sales to ask for client's preferred product category.
+[447563043708] Sales needs to use customer's name and proactively ask for contact information.
+[447563043708] Add a reminder for Sales to use 'Yes dear' and repeat customer's previous message.
+[447598227665] 记录销售在开场时未使用标准尊称和引导留联系方式，需加强培训。
+[447598227665] 记录坐席在开场时未使用标准尊称和引导留联系方式，需加强培训。
+[447598227665] 在MEMORY.md中记录：销售在推荐特殊版本时，必须使用优雅问候语和完整推荐内容，并主动引导客户留下WhatsApp和邮箱。
+[447565113692] Add case of not providing requested link for future reference.
+[447565113692] Investigate internal processes for any possible causes of box smell.
+[447926782772] Sales should actively ask for customer's contact information (WhatsApp/email) to enhance communication efficiency.
+[447563043707] Add reminder for Sales to use 'Yes dear,' and collect WhatsApp/email during conversations.
+[447563043707] Add reminder for Sales to use 'Yes dear,' + repeat customer's original message consistently.
+[447563043707] Add: Sales should handle customer's price requests with patience and professionalism, and ensure contact info collection in case of travel or delay.
+[447563043707] Add reminder to collect customer contact info after product presentation.
+[447563043707] Add: When discussing Vertu's METAVERTU CURVE model, ensure to mention the Concierge Service and its benefits.
+[447565727049] Add note on using polite language in informal situations
+[447707926787] Sales未使用正式问候语
+[447934635890] Increase monitoring on banned words usage and improve brand tone consistency.
+[447934635890] Emoji-only responses should be avoided. Sales should respond with a polite and professional message.
+[447902419043] 禁用词：'🤗', 优雅引导语句，联系方式收集
+[447902419043] Emphasize the use of formal language in all communications.
+[447902419043] 在培训中强调优雅开场白和避免过度推销，同时加入禁用词监控
+[447902419043] Add: Emoji-only responses not allowed; Promotional language should be avoided
+[447902419043] Sales uses casual language 'don’t miss' and emojis.
+
+### [2026-05-11 15:13:51] 待主管确认的新发现
+[447707906604] Add: Emoji-only responses should be avoided. Sales handled abandonment gracefully.
+[447454576860] Add: Emoji usage is not allowed in Vertu communications. Sales should prioritize addressing customer preferences and concerns.
+[447454576860] Add case for training: Sales used informal language 'Ok' and emoji-only responses
+[447454576860] Add handling of international customers' inquiries, especially regarding import duties and taxes.
+[447454576860] Add 'casual greeting' to banned words list.
+[447454576860] Add: Sales used casual greeting 'Hi' and emoji-only responses, failed to handle abandonment. Update: Sales did not use proper brand tone when talking about finalized plan.
+[447563039947] Sales used informal language 'okp'. Ensure all communications maintain a professional and exclusive tone. Use polite language and proper grammar.
+[447563039947] Sales did not use customer title and used casual greeting. Need to reinforce proper brand tone in communication.
+[447563043708] Add case to MEMORY.md as an example of sales abandonment scenario mishandling.
+[447563043708] Sales agent used overly promotional and unclear language ('Don't miss the ultra low discount', 'house year Agent q'), which does not align with Vertu's premium brand tone. Need to reinforce use of polite, exclusive phrasing and proper grammar in all communications.
+[447561135639] Sales failed to handle abandonment and did not collect customer's contact information.
+[447561135639] When handling address changes, make sure to confirm and update it in our system.
+[447561135639] Add reminder for Sales to use branded greeting in future conversations.
+[447561135639] Sales opening message should include customer's name/title and refer to Vertu brand positioning.
+[447565113692] Add reminder for sales to provide complete discount offers and collect customer's WhatsApp or email for follow-up.
+[447565113692] In case of customs duty inquiries, Sales should provide a direct and clear answer.
+[447926782772] Remind Sales to use 'Yes dear,' + repeat customer's original statement after customer statements.
+[447513884048] Emphasize on using brand-standard greetings and avoiding excessive emoticon usage.
+[447592258205] Sales failed to use customer's name or title.
+[447565727049] Add casual greeting 'Hi there' to banned list.
+[447565727049] Sales uses informal greeting 'Hi there'
+[447565727049] Sales uses informal greeting 'Hi there', need to reinforce use of polite, exclusive phrasing and proper grammar in all communications.
+[447565727049] Add to training: Formal greeting and contact collection.
+[447565727049] Sales used casual greeting 'Hi there'.
+[447707926787] Remind sales agents to mention the free gift offer when discussing specific models.
+[447707926787] Sales using casual greeting 'Hi there'
+[447707926787] Add a reminder to provide full details of the 1TB version when discussing product options.
+[447707926787] 记录销售使用非正式问候语'Hi'，未主动引导留联系方式
+[447707926787] Sales uses 'Hi' instead of proper brand greeting
+[447598275339] Sales used informal greeting 'Hi there'. Need to reinforce proper greetings and title usage.
+[447598275339] Casual greetings are inappropriate for Vertu brand communication. Sales agents should use formal opening greetings and refer to customers by their names or titles.
+[447598275339] Sales uses informal greeting 'Hi there'.
+[447598275339] Add casual greetings to banned words list
+[447598275339] Sales uses informal greeting 'Hi there' instead of using client's title and a proper branded greeting. Please reinforce training on formal brand tone.
+[447934635890] Add case to MEMORY.md for handling customer abandonment scenarios.
+[447512071774] Add to training: Emphasize maintaining a professional tone and avoiding casual language.
+[447512071774] 强调优雅语气和联系方式收集
+[447512071774] 增加使用过多表情符号的情况到MEMORY.md，并提醒销售保持优雅语气和避免过多表情符号。
+[447512071774] Additional issue: Sales used emoji-only responses and casual language.
+
+### [2026-05-11 15:28:16] 待主管确认的新发现
+[447707906604] Add reminder for Sales to use 'Yes dear,' in their responses.
+[447707906604] Emoji-only responses are not allowed. Maintain proper brand tone in communication.
+[447310406513] Add reminder to provide clear information on product differences and pricing.
+[447310406513] Sales在初次回应时使用小写'hi'，不符合Vertu品牌标准。需加强培训：所有对话首字母大写，使用正式问候语，并主动引导客户留下联系方式。
+[447454576860] Add a reminder for Sales to handle customer's 'not ready now' situations by collecting contact info and offering assistance in the future.
+[447454576860] Additional issue: Sales failed to refer to the customer by name or title.
+[447454576860] Emphasize proper grammar and formal language in platinum-tier sales interactions.
+[447454576860] Emphasize the use of polite language and avoid emojis as sole responses.
+[447454576860] Add 'Hi' to banned words list.
+[447563039947] Add: Sales should use formal greeting with customer title (e.g., 'Dear Sir') in future communications.
+[447563039947] Add: Informal greeting 'Hi'.
+[447563039947] Remind Sales to use clients' names in greetings.
+[447563039947] 记录待处理问题：非正式问句
+[447563039947] 记录坐席未按标准开场，需加强培训
+[447561135639] Sales did not use 'Yes dear,' in response to customer's message. Ensure this standard greeting is used consistently.
+[447561135639] Add reminders of using brand-standard greetings and personalized address.
+[447561135639] Add 'handling abandonment' to MEMORY.md
+[447561135639] Add a reminder for Sales to provide the requested price for 12GB + 512 Rom in future conversations.
+[447561135639] Sales should use 'Yes dear,' + repeat customer's original message when responding. Also, follow up with clients who express disinterest.
+[447926782772] Ensure sales verify customer's contact information and maintain proper brand tone.
+[447926782772] Add case reference for unprofessional handling of customer inquiries regarding order status and tracking information.
+[447926782772] Add reminder for Sales agents to use proper salutations and titles when greeting customers.
+[447926782772] Add a reminder for sales agents to respond directly and clearly to customer inquiries.
+[447565113692] Add 'May I have your WhatsApp or email address?' after handling war situation concerns.
+[447565113692] Add case to problem cases library.
+[447565113692] Add handling of inquiries about local boutique prices to the training materials.
+[447565113692] 记录待处理问题：销售未使用标准问候语和客户名字，需加强培训
+[447592258205] Add reminder to use formal greetings in sales communication.
+[447707926787] Sales uses informal greeting 'Hi there', need to use 'Dear Customer' or similar.
+[447707926787] Sales used casual greeting 'Hi there'.
+[447707926787] Sales used informal greeting 'Hi there'. Ask for customer's preferred contact method.
+[447707926787] Sales used informal greeting 'Hi there'. Need to reinforce use of polite, exclusive phrasing in all communications.
+[447707926787] Sales uses informal greeting 'Hi there', need to reinforce use of polite, exclusive phrasing.
+[447563043707] Add a reminder for sales agents to handle customer inquiries about product authenticity with professionalism and attention.
+[447563043707] Add 'Hi dear customer, thank you for your interest in Vertu. May I kindly ask for your preferred method of communication (WhatsApp/Email) to better assist you?' to the sales opening template.
+[447934635890] Add 'casual greeting' to banned phrases list.
+[447934635890] Sales使用非正式问候语'hi'
+[447934635890] 记录Sales在初次回应时使用小写'hi'，不符合Vertu品牌标准。需加强培训：所有对话首字母大写，使用正式问候语，并主动引导客户留下联系方式。
+[447902419043] Add informal greetings to the list of banned words and reinforce the use of formal language in all communications.
+
+### [2026-05-11 15:42:33] 金牌案例库
+[2026-05-04] 坐席:447565113692 | 综合92.0分
+亮点: Effective handling of customer concerns and successful approval for import duty coverage
+→ 待主管确认收录
+
+### [2026-05-11 15:42:33] 金牌案例库
+[2026-05-04] 坐席:447565113692 | 综合91.2分
+亮点: Effective use of exclusivity and urgency.
+→ 待主管确认收录
+
+### [2026-05-11 15:42:33] 待主管确认的新发现
+[447707906604] 优雅开场白需包含敬语和个性化问候，并主动引导客户留下联系方式。
+[447454576860] Sales should be aware of Klarna's EMA option and address any related issues.
+[447454576860] Add handling of customers who already own a Samsung Fold 7 to the training.
+[447454576860] Emoji-only responses are not allowed. Please use proper language and avoid using emojis as the sole response.
+[447454576860] 在培训中强调：所有对话首字母大写，使用正式问候语，并主动引导客户留下联系方式。
+[447454576860] Sales used banned word 'Q' and emoji-only responses, failed to handle abandonment. Need retraining on luxury brand communication standards and abandonment follow-up protocol.
+[447310406513] Sales should address temporary unavailability of customers by encouraging them to leave contact information. Informal language ('ok', '🙏') is prohibited.
+[447310406513] Additional issue: Sales did not handle the situation properly when the customer asked about logistics, taxes, or after-sales service.
+[447310406513] 增加使用过多表情符号的监控
+[447563039947] Add note on maintaining brand exclusivity and avoiding casual language.
+[447563039947] Ensure sales agents use proper greetings, refer to customers by name, and introduce Vertu brand and product features. Collect customer's WhatsApp and email for future communication.
+[447563039947] Add informal greeting 'Hi' to banned words list.
+[447563039947] Sales uses casual greetings. Train to use proper brand tone.
+[447563039947] Sales uses casual greeting 'Hi friend' and emoji-only responses, failed to handle abandonment. Need retraining on luxury brand communication standards and abandonment follow-up protocol.
+[447563043708] Add a reminder for sales agents to verify product availability before responding to customer inquiries.
+[447563043708] Add handling of payment issues to training materials.
+[447563043708] Add 'hi', 'okay got it' to banned words list.
+[447563043708] Add: Sales failed to use 'Yes dear,' in response to customer's single-word messages
+[447563043708] 在MEMORY.md中记录：对于初次沟通时，需使用标准问候语和引导留联系方式。
+[447561135639] Add: Sales uses informal greeting 'Cool'.
+[447561135639] 记录销售在开场时未使用标准问候语，需加强培训。
+[447561135639] Handle difficult situations with empathy and professionalism; maintain brand tone
+[447561135639] Sales needs training on opening conversation with brand positioning and proper greeting. Collect customer contact info after presenting product options.
+[447513884048] 记录未来培训中需要强调使用标准问候语和尊称
+[447926782772] Add handling of abandonment during public holidays to training.
+[447926782772] Add handling spam emails and addressing customer inquiries on product locations.
+[447926782772] Sales在初次回应时使用小写'hi'，不符合Vertu品牌标准。需加强培训：所有对话首字母大写，使用正式问候语，并主动引导客户留下联系方式。
+[447565113692] Remind Sales to use 'Yes dear,' in their responses and maintain a consistent brand tone.
+[447565113692] Add tracking of shipping statuses during public holidays.
+[447563043707] 在培训中强调：初次回应时使用正式尊称和问候语，并主动引导客户留下联系方式。
+[447563043707] Add 'Hi dear,' as standard greeting for Vertu sales agents.
+[447563043707] Update sales training materials to emphasize the importance of using standard brand opening with customer name/title.
+[447563043707] 新发现：Sales在开场时未使用标准尊称和引导留联系方式。需加强培训。
+[447563043707] 在推荐VIP礼品包时，请确保客户的WhatsApp和电子邮箱，以便提供更多详细信息并进行跟进。
+[447707926787] Sales uses informal greeting 'Hi there'. Ensure to use proper brand tone and greetings in future communications.
+[447707926787] Add casual greeting issue to memory.
+[447934635890] Add a reminder in MEMORY.md to confirm customer's preferred currency before providing payment links.
+[447934635890] Add handling of impatient customers to training.
+
+### [2026-05-11 16:00:00] 待主管确认的新发现
+[447707906604] Add: Sales used casual greeting 'Hi' in conversation. Need to reinforce use of polite, exclusive phrasing and proper grammar in all communications.
+[447707906604] 增加使用过多表情符号的监控，并强调优雅语气。
+[447707906604] Sales在对话中使用禁用词'😄'，需加强品牌话术监控和培训。
+[447707906604] 记录：客户已购买过产品，需提及以便表达关注。
+[447454576860] Add 'Avoid using emojis in communication' to MEMORY.md
+[447454576860] Add a reminder to ask for contact info after the order is placed.
+[447454576860] Add a reminder to check for proper use of 'Yes dear,' + customer's original words in sales communications.
+[447454576860] Add: Sales used emojis and casual language in communication.
+[447454576860] Add: Sales needs to use formal greetings (e.g., 'Dear Customer') and address customer's questions about SIM compatibility in detail.
+[447310406513] Add: Sales used banned words 'K', '😊', and '🤔' in communication. Need to reinforce luxury brand communication standards.
+[447310406513] Add handling of blocked numbers to MEMORY.md
+[447310406513] 记录坐席在开场时未使用标准尊称和引导留联系方式，需加强培训。
+[447563039947] 记录销售在开场时使用非正式问候语'Hi',需加强培训
+[447563039947] 在话术模板中，强调优雅问候语和品牌位置提及
+[447563039947] Add 'Hi' to the list of banned words.
+[447563039947] 记录待处理问题：非正式问候语
+[447561135639] 非正式问候语的发现
+[447563043708] Add 'Sales used casual greeting 'hi'.' to MEMORY.md
+[447565701825] 在初次回应时，使用正式问候语'Dear Customer,'并主动引导客户留下联系方式。
+[447513884048] Add case to memory: Sales failed to handle customer complaint about battery life and lack of promised app in German. Need to reinforce handling of defective products and customer expectations.
+[447926782772] Add a reminder for Sales to use the correct greeting in future conversations.
+[447926782772] 记录销售在回答国产疑虑时未提及产品来自英国，需加强品牌调性培训。
+[447926782772] Sales should provide detailed information on regional affiliations. Refer to local partnerships when answering client queries.
+[447926782772] Add sales agent's use of casual word 'sure' in MEMORY.md
+[447565113692] Add 'updates duration' to the list of topics that must be addressed in future communications.
+[447565113692] Add note on using 'Yes dear,' + repeat customer's original message for all responses.
+[447565113692] Update sales training on using Vertu brand standard language, including replacing banned words like 'sure' with 'Yes dear,' and promptly collecting customer's WhatsApp or email for better communication.
+[447592258205] Sales使用非正式问候语'hi'
+[447563043707] Add to MEMORY.md: Sales should use formal greetings with the customer's name or title.
+[447563043707] Add reminder to use formal language and maintain brand tone
+[447563043707] Add a reminder for Sales agents to address customer inquiries about pricing and delivery times more efficiently.
+[447565727049] 记录Sales使用非正式问候语'Here'
+[447565727049] Add training reminder for proper greetings and brand tone
+[447565727049] 在培训中强调：所有对话首字母大写，使用正式问候语，并主动引导客户留下联系方式。
+[447565727049] 在培训中强调：所有对话首字母大写，使用正式问候语，并主动引导客户留下联系方式。
+[447707926787] Sales使用非正式问候语'Hi'
+[447934635890] Sales failed to handle abandonment and did not collect customer's contact info. Need to reinforce luxury brand communication standards and abandonment follow-up protocol.
+[447934635890] Add a reminder for Sales to use the brand standard phrase 'Yes dear,' followed by repeating the customer's original statement.
+[447934635890] Add a reminder to monitor and correct the use of banned words in sales communications.
+[447934635890] Add: Sales did not use 'Yes dear,' + repeat customer's original words. Sales failed to proactively collect contact info and follow up on conversion or future purchase.
+[447902419043] 记录销售在开场时未使用标准尊称，需加强培训。
+
+### [2026-05-11 16:20:02] 金牌案例库
+[2026-05-06] 坐席:447563043708 | 综合92.0分
+亮点: Sales successfully assisted customer with customs clearance and provided support for preparing payment voucher if needed.
+→ 待主管确认收录
+
+### [2026-05-11 16:20:02] 待主管确认的新发现
+[447707906604] Sales used informal greeting 'Hi'. Need to reinforce proper brand tone.
+[447707906604] 增加新发现：销售在对话中使用禁用词'😊'，且未提及优雅留资引导。建议加强培训，强调禁用词替换和正式语气。
+[447707906604] 增加优雅留资引导句，并强化禁用词监控
+[447454576860] 在培训中强调保持优雅的语气，避免过度推销，并主动引导客户留下联系方式。
+[447454576860] Sales used 'unfortunately' in a negative context. Train agents to avoid negative framing and maintain the brand tone.
+[447454576860] When discussing financing options, make sure to provide complete information about all available options. Also, remind Sales to collect customer's contact info for follow-up assistance.
+[447454576860] Add reminder for Sales agents to use customer's name/title instead of 'dear'.
+[447310406513] 记录Sales在初次回应时使用非正式问候语，需加强培训。
+[447310406513] Add reminder for Sales to promptly offer available models and actively request client's contact details.
+[447310406513] Emoji-only responses are not allowed. Make sure to use complete sentences with proper grammar.
+[447563039947] Add a reminder for sales agents to address client concerns promptly and refer them to the Vertu Concierge Service for further assistance. Also, remind agents to collect customer contact information.
+[447561135639] Sales used non-standard greeting 'Hi', need reinforcement on standard greetings in all communications.
+[447561135639] Add a reminder for sales to collect customer's WhatsApp and email information during the conversation.
+[447561135639] Sales used informal greeting 'Hello' and did not confirm receipt of previous message.
+[447561135639] Add: Sales didn't use 'Yes dear,' and didn't proactively guide leaving contact info.
+[447565701825] 在培训中强调：所有对话首字母大写，使用正式问候语，并主动引导客户留下联系方式。
+[447563043708] Add: Sales used casual greeting 'Hi' and emoji-only responses, failed to handle abandonment. Sales used overly promotional language ('misses the gift of earphone') and informal tone.
+[447563043708] Add 'Ok' and emoji to the banned words list. Emphasize the importance of collecting customer contact information and maintaining professional language in all communications.
+[447563043708] Add note on providing clear explanation for invoice and payment amounts.
+[447565113692] Add reminder to collect customer's contact information and avoid using casual language in sales communication.
+[447565113692] Handle order cancellations with urgency and keep customers updated on the status.
+[447565113692] Add handling customer concerns about fees and services to training.
+[447565113692] Add a reminder for sales agents to offer alternative delivery methods or arrange refunds when handling abandonment issues.
+[447926782772] Add a reminder to the MEMORY.md file: Sales should use full greetings with brand positioning and collect customer contact information promptly.
+[447926782772] Add a reminder to handle customer dissatisfaction with empathy and professionalism.
+[447926782772] Add 'ensure smooth handling of abandonment' to memory.md
+[447926782772] Add 'Please leave your WhatsApp or email for further assistance.' as a sales follow-up step.
+[447707926787] Add Greek language support as a known feature.
+[447707926787] Add case to MEMORY.md: Sales failed to use brand-standard greeting and customer name/title.
+[447707926787] Remind Sales to use proper greetings and maintain brand tone.
+[447707926787] Add case to MEMORY.md for handling abandonment.
+[447707926787] 在处理国际客户（哥伦比亚）时，需先确认流程和物流，再推荐产品，并主动索要WhatsApp以便跟进。
+[447563043707] Sales should use brand standard greeting and proactively collect customer's WhatsApp or email.
+[447563043707] Add avoidance of casual language to MEMORY.md
+[447563043707] Add 'Good evening, my friend.' as a possible opening line for Sales.
+[447563043707] Add reminder to use brand standard greetings in all conversations.
+[447565756798] Add reminder to use formal greetings in future communications
+[447565756798] Sales used casual greeting 'Hello, there' instead of brand standard. Need to reinforce proper greetings and contact info collection.
+[447565756798] Sales uses informal greeting 'Hello, there.' Need to reinforce proper brand greetings.
+[447565756798] Add 'Hello, there.' as a new banned greeting.
+[447565756798] Sales uses informal greeting 'Hello, there'
+[447598275339] Add informal greeting 'Hi there' to the list of banned words.
+[447598275339] Sales used informal greeting 'Hi there' and did not collect customer name
+[447598275339] Add reminder for Sales to use customer's name in opening and maintain consistent premium tone.
+[447565727049] In case of unresponsive team members, proactively escalate and provide alternative contacts.
+[447934635890] Add case to MEMORY.md: When handling customer requests regarding trade-up programs and expedited shipping, ensure Sales maintains brand tone and professionalism.
+[447934635890] Add a reminder for sales agents to handle cancellation requests with appropriate urgency and professionalism.
+[447934635890] Sales should respond to requests for model and price list with direct information.
+[447902419043] Add 'Preferred color and storage' to sales opening script.
+[447902419043] Add 'preferred color and storage capacity' as a prompt for sales agents when discussing Vertu models.
+[447902419043] Add a reminder to ask customers about their preferred color and storage options.
+
+### [2026-05-12 14:00:22] 金牌案例库
+[2026-05-08] 坐席:447856998686 | 综合63.2分
+亮点: Correct use of customer name and polite greeting
+→ 待主管确认收录
+
+### [2026-05-12 14:00:22] 待主管确认的新发现
+[447856998686] Remind Sales to use 'Yes dear,' in response to customer's messages.
+[447856998686] Add reminder for Sales to use branded greetings and reference to customer's name in the first message.
+[447856998686] 增加对非正式问候语和过多表情符号的监控
+[447856998686] Add: Emoji-only responses are not allowed. Sales must use proper English with complete sentences.
+[447707906604] 增加在跟进客户产品使用时，需避免过多非正式语气符号的建议
+[447707906604] Emphasize proper grammar and avoid using only emojis.
+[447454576860] 在培训中强调：所有对话首字母大写，使用正式问候语，并避免使用难以识别的表情符号。
+[447454576860] 在推荐产品时，请提及可用的优惠、折扣或特别服务，以显示我们对客户的尊重和关注。
+[447454576860] 记录新支付选项Klarna，建议在培训中强调销售应使用'Yes dear,' + 重复客户原话 + 主动引导留WhatsApp和邮箱。
+[447454576860] Add a reminder for Sales to use the standard opening phrase 'Dear [customer name],' and actively guide customers to leave their WhatsApp and email information.
+[447563039947] Add reminder for Sales to maintain a professional tone and avoid casual language or emojis.
+[447563039947] Add: Sales should use formal greeting and handle incomplete messages properly.
+[447563039947] 优雅产品描述，但未提及客户名字
+[447563039947] Update on formal greetings: Consider using 'Dear valued customer,' or 'Greetings from Vertu,' for a more professional tone.
+[447563039947] Add issue: Sales uses informal greeting 'Hi my friend'.
+[447561135639] Add reminder to use brand-standard greetings and confirm customer's preferred language.
+[447561135639] Add reminder to use 'Yes dear,' + repeat customer's original message in responses.
+[447561135639] Add 'preferred payment method' as a key point in sales communication.
+[447561135639] Add website maintenance issues to MEMORY.md as a potential abandonment reason.
+[447561135639] Add a reminder to maintain consistent use of customer's name and title.
+[447563043708] Add a reminder for Sales agents to mention battery capacity and charging speed in product descriptions.
+[447563043708] Sales used informal greeting 'hello'.
+[447565113692] Add handling customs-related issues with detailed supporting documents.
+[447565113692] Additional new findings: Sales used overly casual greetings and emoji-only responses. Need retraining on luxury brand communication standards and abandonment follow-up protocol.
+[447565113692] Add 'handle abandonment' as a new training topic.
+[447592258205] 记录坐席在初次回应时使用非正式问候语，需加强品牌话术标准培训。
+[447592258205] Clarify concierge service payment methods and use polite language when discussing personal information.
+[447926782772] Add a reminder for Sales agents to use the brand standard greeting in their communication.
+[447926782772] Additional training needed for handling customer price inquiries and maintaining brand tone.
+[447926782772] Add training on handling customer concerns and collecting contact info.
+[447565736730] 在培训中强调开场白需包含敬语和个性化问候，并主动引导客户留下联系方式。
+[447565736730] Add 'haha' to banned words list.
+[447565736730] Add reminder for Sales to use 'Yes dear,' + repeat customer's previous message in all communications.
+[447565736730] Add sales handling of inquiries about cheaper models and emphasize Vertu's exclusivity.
+[447563043707] Add: When answering about store locations, ensure to provide a complete and accurate list.
+[447563043707] Add a reminder for sales agents to handle customer difficulties and maintain brand tone.
+[447563043707] Sales should use the brand standard greeting with customer name, and proactively guide customers to leave contact information.
+[447707926787] Sales uses informal greeting 'Hi there'
+[447707926787] Sales used casual greeting 'Hi there'. Need to reinforce proper brand tone.
+[447707926787] Add 'Hi dear,' as brand standard opening phrase
+[447707926787] Add casual greeting 'Hi there' to banned words list.
+[447707926787] 记录坐席在开场时未使用标准尊称和引导留联系方式，需加强培训。
+[447565727049] Sales should always use 'Yes dear,' followed by repeating the customer's original message. Make sure to actively collect their WhatsApp or email.
+[447934635890] Add a reminder for sales to follow up with customers who delay purchase, and maintain brand tone by using 'Yes dear,' + repeating the customer's original message.
+[447934635890] Add: Sales should use brand standard greetings and proactively collect customer's WhatsApp and email.
+[447934635890] Add Turkish market to sales target list.
+[447934635890] 在培训中强调使用正式问候语，如 'Good morning, Gagan. It is a pleasure to serve you as a Vertu customer.'。
+[447902419043] Add reminder for Sales to use formal greetings and maintain the brand's exclusive tone.
+[447512071774] 记录：销售在对话中使用了非正式表情，需加强培训和监控。
+[447512071774] Add reminder to use 'Yes dear,' in response to customer messages.

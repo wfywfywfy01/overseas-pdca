@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>私域意向客户看板 · 2026年5月</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0d1117; color: #e6edf3; font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif; min-height: 100vh; }
+
+  .header { padding: 24px 32px 16px; border-bottom: 1px solid #21262d; display: flex; align-items: center; justify-content: space-between; }
+  .header h1 { font-size: 20px; font-weight: 600; color: #f0f6fc; }
+  .header h1 span { color: #7ee787; }
+  .meta { font-size: 12px; color: #8b949e; }
+  .badge { background: #1f3a1f; color: #7ee787; border: 1px solid #3fb950; border-radius: 12px; padding: 2px 10px; font-size: 12px; margin-left: 8px; }
+
+  .kpi-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; padding: 24px 32px; }
+  .kpi { background: #161b22; border: 1px solid #21262d; border-radius: 12px; padding: 20px; }
+  .kpi .label { font-size: 11px; color: #8b949e; letter-spacing: .5px; text-transform: uppercase; margin-bottom: 8px; }
+  .kpi .value { font-size: 28px; font-weight: 700; line-height: 1; }
+  .kpi .sub { font-size: 12px; color: #8b949e; margin-top: 6px; }
+  .kpi.green .value { color: #7ee787; }
+  .kpi.blue  .value { color: #58a6ff; }
+  .kpi.amber .value { color: #e3b341; }
+  .kpi.purple.value { color: #bc8cff; }
+  .kpi.purple .value{ color: #bc8cff; }
+  .kpi.red   .value { color: #f85149; }
+
+  .section { padding: 0 32px 16px; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  .row3 { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margin-bottom: 16px; }
+  .card { background: #161b22; border: 1px solid #21262d; border-radius: 12px; padding: 20px; }
+  .card h2 { font-size: 13px; color: #8b949e; font-weight: 500; margin-bottom: 16px; }
+  .chart { width: 100%; }
+
+  .notice { margin: 0 32px 16px; background: #1c2128; border: 1px solid #30363d; border-radius: 8px; padding: 12px 16px; font-size: 12px; color: #8b949e; line-height: 1.6; }
+  .notice strong { color: #e3b341; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead th { text-align: left; padding: 10px 14px; color: #8b949e; font-weight: 500; font-size: 11px; text-transform: uppercase; letter-spacing: .4px; border-bottom: 1px solid #21262d; }
+  tbody tr { border-bottom: 1px solid #1c2128; transition: background .15s; }
+  tbody tr:hover { background: #1c2128; }
+  tbody td { padding: 11px 14px; }
+  .bar-bg { background: #21262d; border-radius: 4px; height: 6px; overflow: hidden; width: 100px; }
+  .bar-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, #1f6feb, #58a6ff); }
+  .bar-fill.gold { background: linear-gradient(90deg, #9e6a03, #e3b341); }
+  .highlight { color: #e3b341; font-weight: 600; }
+  .dim { color: #8b949e; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <h1>🔍 私域意向客户看板 · <span>2026年5月</span></h1>
+    <p class="meta" style="margin-top:4px">数据来源：SalesEpoch WA聊天记录分析 · 识别方式：客户主动询价 + 明确购买意图信号 · USD→CNY 汇率 7.2</p>
+  </div>
+  <div style="text-align:right">
+    <span class="badge">✅ 全量：1-10日</span>
+    <p class="meta" style="margin-top:6px">更新于 2026-05-12</p>
+  </div>
+</div>
+
+<div class="kpi-row">
+  <div class="kpi blue">
+    <div class="label">高意向对话</div>
+    <div class="value">87</div>
+    <div class="sub">共 2,022 次对话 · 占比 4.3%</div>
+  </div>
+  <div class="kpi amber">
+    <div class="label">意向涉及金额</div>
+    <div class="value">¥220.9万</div>
+    <div class="sub">$306,938 USD · 含报价未成交</div>
+  </div>
+  <div class="kpi green">
+    <div class="label">私域实际成交</div>
+    <div class="value">¥48.9万</div>
+    <div class="sub">5月已确认销售订单</div>
+  </div>
+  <div class="kpi purple">
+    <div class="label">意向转化率（参考）</div>
+    <div class="value">22%</div>
+    <div class="sub">成交额 ÷ 意向金额</div>
+  </div>
+  <div class="kpi red">
+    <div class="label">未转化潜在金额</div>
+    <div class="value">¥172万</div>
+    <div class="sub">有意向但尚未成交</div>
+  </div>
+</div>
+
+<div class="notice">
+  <strong>⚠️ 分析说明：</strong>
+  意向识别基于客户消息中的询价词句 + 明确购买意图语句（如"how much / want to buy / send payment details"等），并记录对话中出现的最高报价金额。
+  <strong>非语义 AI 分析，存在误判</strong>；金额为参考性规模估算，非合同金额。5月11日数据待次日同步。
+  其中 <strong>5月8日肖映 $60,000 单笔</strong>可能为批量询价，需人工核实。
+</div>
+
+<div class="section">
+  <div class="row2">
+    <div class="card">
+      <h2>每日意向客户数 vs 总对话量</h2>
+      <div class="chart" id="dailyChart" style="height:260px"></div>
+    </div>
+    <div class="card">
+      <h2>每日意向涉及金额（万 CNY）</h2>
+      <div class="chart" id="amountChart" style="height:260px"></div>
+    </div>
+  </div>
+
+  <div class="row2">
+    <div class="card">
+      <h2>销售员意向客户数排名</h2>
+      <div class="chart" id="countChart" style="height:320px"></div>
+    </div>
+    <div class="card">
+      <h2>销售员意向涉及金额排名（万 CNY）</h2>
+      <div class="chart" id="amtChart" style="height:320px"></div>
+    </div>
+  </div>
+
+  <div class="row3">
+    <div class="card">
+      <h2>转化漏斗</h2>
+      <div class="chart" id="funnelChart" style="height:200px"></div>
+    </div>
+    <div class="card">
+      <h2>意向金额人员占比</h2>
+      <div class="chart" id="pieChart" style="height:200px"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>销售员意向明细排名（按金额）</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>销售员</th>
+          <th>意向客户数</th>
+          <th>均价 / 客（CNY）</th>
+          <th>涉及金额（CNY）</th>
+          <th>占总意向额</th>
+          <th>金额分布</th>
+        </tr>
+      </thead>
+      <tbody id="rankTable"></tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+const R = 7.2;
+
+const daily = {
+  dates:   ['5/1','5/2','5/3','5/4','5/5','5/6','5/7','5/8','5/9','5/10'],
+  convos:  [240, 204, 203, 180, 243, 217, 116, 231, 234, 154],
+  intent:  [7,   9,   6,   10,  9,   8,   7,   12,  11,  8],
+  usd:     [34460, 32238, 27179, 26111, 18275, 31470, 6858, 82915, 24093, 23339]
+};
+
+const rawSeats = [
+  { name:'陈玉霞',  count:11, usd:59810  },
+  { name:'肖映',    count:1,  usd:60000  },
+  { name:'许淋玲',  count:7,  usd:39099  },
+  { name:'陈晓霜',  count:20, usd:34836  },
+  { name:'向俞金',  count:8,  usd:34480  },
+  { name:'李玉琴',  count:10, usd:17314  },
+  { name:'何川',    count:11, usd:16794  },
+  { name:'刘彦麟',  count:3,  usd:16568  },
+  { name:'郑丽苹',  count:7,  usd:10759  },
+  { name:'夏欢',    count:2,  usd:5900   },
+  { name:'毛涵',    count:1,  usd:5380   },
+  { name:'张心言',  count:2,  usd:3599   },
+  { name:'邓琳莹',  count:3,  usd:2399   },
+  { name:'贾梦林',  count:1,  usd:0      },
+].map(s => ({...s, cny: Math.round(s.usd * R)}))
+ .sort((a,b) => b.cny - a.cny);
+
+const totalCNY = rawSeats.reduce((s,r) => s + r.cny, 0);
+const COLORS = ['#58a6ff','#e3b341','#7ee787','#bc8cff','#f85149','#79c0ff','#ffa657','#d2a8ff','#aff5b4','#ffd33d','#ff7b72','#a5d6ff','#56d364','#d29922'];
+
+// Daily trend
+const dc = echarts.init(document.getElementById('dailyChart'));
+dc.setOption({
+  backgroundColor:'transparent',
+  tooltip:{trigger:'axis',axisPointer:{type:'shadow'}},
+  legend:{data:['总对话','意向客户'],textStyle:{color:'#8b949e'},bottom:0},
+  grid:{top:10,bottom:36,left:44,right:12},
+  xAxis:{type:'category',data:daily.dates,axisLabel:{color:'#8b949e'},axisLine:{lineStyle:{color:'#21262d'}}},
+  yAxis:[
+    {type:'value',name:'对话',nameTextStyle:{color:'#8b949e',fontSize:11},axisLabel:{color:'#8b949e'},splitLine:{lineStyle:{color:'#21262d'}}},
+    {type:'value',name:'意向',nameTextStyle:{color:'#8b949e',fontSize:11},axisLabel:{color:'#8b949e'},splitLine:{show:false},max:20}
+  ],
+  series:[
+    {name:'总对话',type:'bar',data:daily.convos,yAxisIndex:0,barMaxWidth:28,
+     itemStyle:{color:'#21262d',borderRadius:[3,3,0,0]}},
+    {name:'意向客户',type:'line',data:daily.intent,yAxisIndex:1,
+     symbol:'circle',symbolSize:7,lineStyle:{color:'#58a6ff',width:2},
+     itemStyle:{color:'#58a6ff'},areaStyle:{color:'rgba(88,166,255,.15)'},
+     label:{show:true,color:'#58a6ff',fontSize:11,position:'top'}}
+  ]
+});
+
+// Daily amount
+const ac = echarts.init(document.getElementById('amountChart'));
+ac.setOption({
+  backgroundColor:'transparent',
+  tooltip:{trigger:'axis',formatter:p=>`${p[0].name}<br/>¥${(p[0].value/10000).toFixed(1)}万`},
+  grid:{top:10,bottom:20,left:50,right:12},
+  xAxis:{type:'category',data:daily.dates,axisLabel:{color:'#8b949e'},axisLine:{lineStyle:{color:'#21262d'}}},
+  yAxis:{type:'value',axisLabel:{color:'#8b949e',formatter:v=>(v/10000).toFixed(0)+'万'},splitLine:{lineStyle:{color:'#21262d'}}},
+  series:[{
+    type:'bar',
+    data:daily.usd.map(v=>Math.round(v*R)),
+    barMaxWidth:32,
+    itemStyle:{
+      color:(p)=> p.dataIndex===7 ? {type:'linear',x:0,y:0,x2:0,y2:1,colorStops:[{offset:0,color:'#f85149'},{offset:1,color:'#9e2a23'}]}
+                                  : {type:'linear',x:0,y:0,x2:0,y2:1,colorStops:[{offset:0,color:'#e3b341'},{offset:1,color:'#9e6a03'}]},
+      borderRadius:[4,4,0,0]
+    },
+    label:{show:true,position:'top',color:'#8b949e',fontSize:10,formatter:p=>(p.value/10000).toFixed(1)+'万'}
+  }]
+});
+
+// Count chart
+const cc = echarts.init(document.getElementById('countChart'));
+const byCount = [...rawSeats].sort((a,b)=>b.count-a.count);
+cc.setOption({
+  backgroundColor:'transparent',
+  tooltip:{trigger:'axis',axisPointer:{type:'shadow'}},
+  grid:{top:10,bottom:10,left:60,right:50},
+  xAxis:{type:'value',axisLabel:{color:'#8b949e'},splitLine:{lineStyle:{color:'#21262d'}}},
+  yAxis:{type:'category',data:byCount.map(s=>s.name).reverse(),axisLabel:{color:'#e6edf3'},axisLine:{lineStyle:{color:'#21262d'}}},
+  series:[{
+    type:'bar',data:byCount.map(s=>s.count).reverse(),barMaxWidth:20,
+    itemStyle:{color:{type:'linear',x:0,y:0,x2:1,y2:0,colorStops:[{offset:0,color:'#1f6feb'},{offset:1,color:'#58a6ff'}]},borderRadius:[0,4,4,0]},
+    label:{show:true,position:'right',color:'#8b949e',fontSize:11,formatter:p=>p.value+'组'}
+  }]
+});
+
+// Amount chart
+const amc = echarts.init(document.getElementById('amtChart'));
+amc.setOption({
+  backgroundColor:'transparent',
+  tooltip:{trigger:'axis',axisPointer:{type:'shadow'},formatter:p=>`${p[0].name}<br/>¥${(p[0].value/10000).toFixed(1)}万`},
+  grid:{top:10,bottom:10,left:60,right:70},
+  xAxis:{type:'value',axisLabel:{color:'#8b949e',formatter:v=>(v/10000).toFixed(0)+'万'},splitLine:{lineStyle:{color:'#21262d'}}},
+  yAxis:{type:'category',data:rawSeats.map(s=>s.name).reverse(),axisLabel:{color:'#e6edf3'},axisLine:{lineStyle:{color:'#21262d'}}},
+  series:[{
+    type:'bar',data:rawSeats.map(s=>s.cny).reverse(),barMaxWidth:20,
+    itemStyle:{color:{type:'linear',x:0,y:0,x2:1,y2:0,colorStops:[{offset:0,color:'#9e6a03'},{offset:1,color:'#e3b341'}]},borderRadius:[0,4,4,0]},
+    label:{show:true,position:'right',color:'#8b949e',fontSize:11,formatter:p=>(p.value/10000).toFixed(1)+'万'}
+  }]
+});
+
+// Funnel
+const fc = echarts.init(document.getElementById('funnelChart'));
+fc.setOption({
+  backgroundColor:'transparent',
+  tooltip:{trigger:'item',formatter:'{b}: {c}'},
+  series:[{
+    type:'funnel',left:'5%',width:'90%',top:10,bottom:10,
+    sort:'descending',gap:4,
+    label:{show:true,position:'inside',color:'#fff',fontSize:13,fontWeight:600,
+           formatter:p=>`${p.name}  ${p.value.toLocaleString()}`},
+    itemStyle:{borderWidth:0},
+    data:[
+      {value:2022,  name:'总对话数',   itemStyle:{color:'#21262d'}},
+      {value:87,    name:'高意向',     itemStyle:{color:'#1f6feb'}},
+      {value:16,    name:'估算成交单', itemStyle:{color:'#2ea043'}},
+    ]
+  }]
+});
+
+// Pie
+const pc = echarts.init(document.getElementById('pieChart'));
+pc.setOption({
+  backgroundColor:'transparent',
+  tooltip:{trigger:'item',formatter:p=>`${p.name}<br/>¥${(p.value/10000).toFixed(1)}万 (${p.percent}%)`},
+  series:[{
+    type:'pie',radius:['38%','68%'],center:['50%','52%'],
+    label:{color:'#8b949e',fontSize:10,formatter:p=>`${p.name}\n${p.percent}%`},
+    data:rawSeats.filter(s=>s.cny>0).map((s,i)=>({name:s.name,value:s.cny,itemStyle:{color:COLORS[i]}}))
+  }]
+});
+
+// Table
+const maxCNY = rawSeats[0].cny;
+const tbody = document.getElementById('rankTable');
+rawSeats.forEach((s,i)=>{
+  const pct = ((s.cny/totalCNY)*100).toFixed(1);
+  const avg = s.count ? Math.round(s.cny/s.count) : 0;
+  const bw  = Math.round((s.cny/maxCNY)*100);
+  const flag = s.name==='肖映' ? ' <span style="color:#f85149;font-size:11px">⚠️需核实</span>' : '';
+  tbody.innerHTML += `
+  <tr>
+    <td class="dim">${i+1}</td>
+    <td><strong>${s.name}</strong>${flag}</td>
+    <td>${s.count} 组</td>
+    <td class="dim">¥${avg.toLocaleString()}</td>
+    <td class="${i<3?'highlight':''}">¥${s.cny.toLocaleString()}</td>
+    <td class="dim">${pct}%</td>
+    <td><div class="bar-bg"><div class="bar-fill gold" style="width:${bw}%"></div></div></td>
+  </tr>`;
+});
+
+window.addEventListener('resize',()=>[dc,ac,cc,amc,fc,pc].forEach(c=>c.resize()));
+</script>
+</body>
+</html>
