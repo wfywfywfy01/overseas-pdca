@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>海外私域 PDCA · 主管视图</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#fafaf8;--bg2:#f4f4f0;--card:#ffffff;
+  --border:#e5e7eb;--border2:#d1d5db;
+  --text:#111827;--muted:#6b7280;--muted2:#9ca3af;
+  --green:#16a34a;--green-bg:#f0fdf4;--green-border:#bbf7d0;
+  --red:#dc2626;--red-bg:#fef2f2;--red-border:#fecaca;
+  --orange:#ea580c;--orange-bg:#fff7ed;--orange-border:#fed7aa;
+  --blue:#2563eb;--blue-bg:#eff6ff;--blue-border:#bfdbfe;
+  --purple:#7c3aed;--purple-bg:#f5f3ff;--purple-border:#ddd6fe;
+  --gold:#b45309;--gold-bg:#fffbeb;--gold-border:#fde68a;
+  --radius:8px;--shadow:0 1px 3px rgba(0,0,0,.08);--shadow2:0 4px 16px rgba(0,0,0,.1);
+}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Segoe UI',sans-serif;font-size:14px;line-height:1.5}
+
+/* HEADER */
+.app-header{height:56px;background:var(--card);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 24px;position:sticky;top:0;z-index:100}
+.header-left{display:flex;align-items:center;gap:12px}
+.avatar{width:34px;height:34px;border-radius:50%;background:#2563eb;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;flex-shrink:0}
+.header-info .name{font-size:14px;font-weight:600}
+.header-info .meta{font-size:12px;color:var(--muted)}
+.tag{display:inline-flex;align-items:center;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:500;background:var(--bg2);color:var(--muted);border:1px solid var(--border)}
+.tag.green{background:var(--green-bg);color:var(--green);border-color:var(--green-border)}
+.tag.red{background:var(--red-bg);color:var(--red);border-color:var(--red-border)}
+.tag.orange{background:var(--orange-bg);color:var(--orange);border-color:var(--orange-border)}
+.tag.blue{background:var(--blue-bg);color:var(--blue);border-color:var(--blue-border)}
+.tag.gold{background:var(--gold-bg);color:var(--gold);border-color:var(--gold-border);font-weight:600}
+.tag.silver{background:var(--bg2);color:var(--muted);border-color:var(--border2);font-weight:600}
+.btn-sm{padding:6px 12px;border-radius:var(--radius);border:1px solid var(--border2);background:var(--card);font-size:12px;cursor:pointer;font-weight:500;color:var(--text)}
+.btn-sm:hover{background:var(--bg2)}
+.btn-sm.dark{background:#111827;color:#fff;border-color:#111827}
+.btn-sm.dark:hover{opacity:.85}
+
+/* TIME NAV */
+.time-nav{display:flex;align-items:center;gap:6px;padding:10px 24px;background:var(--bg2);border-bottom:1px solid var(--border)}
+.time-nav-label{font-size:12px;color:var(--muted);font-weight:500;margin-right:6px;white-space:nowrap}
+.time-tab{padding:5px 20px;border-radius:16px;border:1px solid var(--border2);background:var(--card);font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;transition:all .15s}
+.time-tab.active{background:#2563eb;color:#fff;border-color:#2563eb}
+.time-tab:hover:not(.active){border-color:#2563eb;color:#2563eb}
+.time-panel{display:none}
+.time-panel.active{display:block}
+
+/* LAYOUT */
+.main-layout{display:grid;grid-template-columns:1fr 300px;min-height:calc(100vh - 96px)}
+.left-col{padding:24px;display:flex;flex-direction:column;gap:20px;border-right:1px solid var(--border)}
+.right-col{padding:20px;display:flex;flex-direction:column;gap:16px;background:var(--bg)}
+
+/* CARDS */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow)}
+.card-sm{padding:16px}
+.card-title{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:14px}
+.section-label{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.step-badge{width:22px;height:22px;border-radius:50%;background:#2563eb;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.step-badge.dark{background:#111827}
+.step-badge.warn{background:var(--orange)}
+.step-name{font-size:15px;font-weight:700}
+.step-sub{font-size:12px;color:var(--muted);font-weight:400;margin-left:4px}
+
+/* SOP TIMELINE */
+.sop-timeline{display:flex;flex-direction:column;gap:6px}
+.sop-item{display:flex;align-items:flex-start;gap:12px;padding:11px 14px;border:1px solid var(--border);border-radius:var(--radius);background:var(--card);cursor:pointer;transition:all .15s}
+.sop-item:hover{border-color:#2563eb}
+.sop-item.done{background:var(--green-bg);border-color:var(--green-border)}
+.sop-item.doing{background:#eff6ff;border-color:var(--blue-border)}
+.sop-dot{width:8px;height:8px;border-radius:50%;background:var(--border2);flex-shrink:0;margin-top:5px}
+.sop-item.done .sop-dot{background:var(--green)}
+.sop-item.doing .sop-dot{background:var(--blue);box-shadow:0 0 0 3px var(--blue-bg)}
+.sop-time{font-size:11px;color:var(--muted);width:88px;flex-shrink:0;padding-top:1px;font-variant-numeric:tabular-nums}
+.sop-content{flex:1}
+.sop-module{font-size:13px;font-weight:600}
+.sop-desc{font-size:12px;color:var(--muted);margin-top:2px;line-height:1.4}
+.sop-status{margin-left:auto;flex-shrink:0;padding-top:1px}
+.status-chip{padding:3px 10px;border-radius:12px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--border2);background:var(--bg);color:var(--muted);white-space:nowrap;user-select:none}
+.status-chip.doing{background:var(--blue-bg);color:var(--blue);border-color:var(--blue-border)}
+.status-chip.done{background:var(--green-bg);color:var(--green);border-color:var(--green-border)}
+
+/* MEMBER MATRIX */
+.member-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px}
+.member-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px;cursor:pointer;transition:all .15s;position:relative}
+.member-card:hover{box-shadow:var(--shadow2);border-color:#2563eb}
+.member-card.warn{border-color:var(--orange-border);background:var(--orange-bg)}
+.member-card.alert{border-color:var(--red-border);background:var(--red-bg)}
+.mc-head{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.mc-av{width:30px;height:30px;border-radius:50%;background:#111827;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0}
+.mc-name{font-size:13px;font-weight:600}
+.mc-stage{font-size:11px;color:var(--muted)}
+.mc-score{font-size:22px;font-weight:700;margin:2px 0 2px}
+.mc-score-label{font-size:11px;color:var(--muted);margin-bottom:8px}
+.mini-bar{display:flex;align-items:center;gap:6px;margin-bottom:4px}
+.mini-bar:last-child{margin-bottom:0}
+.mini-label{font-size:11px;color:var(--muted);width:44px;flex-shrink:0}
+.mini-track{flex:1;height:4px;background:var(--bg2);border-radius:2px;overflow:hidden}
+.mini-fill{height:100%;border-radius:2px;background:#111827;transition:width .4s}
+.mini-fill.ok{background:var(--green)}
+.mini-fill.ng{background:var(--red)}
+.mini-fill.warn{background:var(--orange)}
+.warn-badge{position:absolute;top:10px;right:10px;width:18px;height:18px;border-radius:50%;background:var(--red);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center}
+
+/* PROGRESS ROWS */
+.prog-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.prog-row:last-child{margin-bottom:0}
+.prog-label{width:80px;font-size:13px;color:var(--text);flex-shrink:0}
+.prog-track{flex:1;height:7px;background:var(--bg2);border-radius:4px;overflow:hidden}
+.prog-fill{height:100%;border-radius:4px;background:#2563eb;transition:width .4s}
+.prog-fill.ok{background:var(--green)}
+.prog-fill.warn{background:var(--orange)}
+.prog-fill.bad{background:var(--red)}
+.prog-num{width:80px;text-align:right;font-size:12px;color:var(--muted)}
+.prog-tag{flex-shrink:0}
+
+/* ANOMALY */
+.anomaly-list{display:flex;flex-direction:column;gap:8px}
+.anomaly-item{padding:12px 14px;border:1px solid var(--orange-border);background:var(--orange-bg);border-radius:var(--radius)}
+.anomaly-item.critical{border-color:var(--red-border);background:var(--red-bg)}
+.an-title{font-size:13px;font-weight:600;color:var(--orange)}
+.anomaly-item.critical .an-title{color:var(--red)}
+.an-desc{font-size:12px;color:var(--muted);margin-top:3px;line-height:1.5}
+.an-action{margin-top:8px}
+
+/* TABS */
+.tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:14px}
+.tab{padding:7px 16px;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s}
+.tab.active{color:#2563eb;border-color:#2563eb}
+.tab-content{display:none}
+.tab-content.active{display:block}
+
+/* RANK */
+.rank-list{display:flex;flex-direction:column;gap:5px}
+.rank-item{display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--bg);border-radius:var(--radius)}
+.rank-num{width:20px;font-size:13px;font-weight:700;color:var(--muted);text-align:center}
+.rank-num.top{color:#2563eb}
+.rank-name{flex:1;font-size:13px}
+.rank-val{font-size:13px;font-weight:600}
+
+/* HERMES */
+.hermes-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px}
+.hermes-header{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.hermes-icon{width:28px;height:28px;border-radius:50%;background:#2563eb;color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+.hermes-title{font-size:13px;font-weight:600}
+.hermes-body{font-size:12px;color:var(--muted);line-height:1.8;background:var(--bg);border-radius:var(--radius);padding:12px;margin-bottom:12px}
+.hermes-body b{color:var(--text)}
+.hermes-actions{display:flex;flex-direction:column;gap:6px}
+.hermes-btn{padding:7px 12px;border-radius:var(--radius);border:1px solid var(--border2);background:var(--card);font-size:12px;cursor:pointer;text-align:left;transition:background .15s}
+.hermes-btn:hover{background:var(--bg2)}
+.hermes-btn.primary{background:#2563eb;color:#fff;border-color:#2563eb}
+.hermes-btn.primary:hover{opacity:.85}
+
+/* DATA TABLE */
+.data-table{width:100%;border-collapse:collapse}
+.data-table th{font-size:11px;color:var(--muted);font-weight:500;text-align:left;padding:7px 12px;border-bottom:1px solid var(--border);text-transform:uppercase;letter-spacing:.03em}
+.data-table td{padding:9px 12px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:middle}
+.data-table tr:last-child td{border-bottom:none}
+.data-table tr:hover td{background:var(--bg)}
+
+/* WEEK/QUARTER GRIDS (月/年视图) */
+.week-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.week-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:14px}
+.week-card.wk-done{background:var(--green-bg);border-color:var(--green-border)}
+.week-card.wk-current{background:var(--card);border-color:#2563eb;box-shadow:var(--shadow)}
+.week-card.wk-future{opacity:.6}
+.wk-label{font-size:11px;color:var(--muted);font-weight:600;margin-bottom:6px;display:flex;justify-content:space-between}
+.wk-plan{font-size:18px;font-weight:700}
+.wk-unit{font-size:12px;font-weight:400;color:var(--muted)}
+.wk-actual{font-size:12px;margin-top:3px}
+.wk-prog{height:3px;background:var(--border2);border-radius:2px;margin-top:8px;overflow:hidden}
+.wk-fill{height:100%;border-radius:2px;transition:width .4s}
+
+.quarter-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.quarter-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;position:relative;overflow:hidden}
+.quarter-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--border2)}
+.quarter-card.q-done::before{background:var(--orange)}
+.quarter-card.q-current::before{background:var(--blue)}
+.qc-badge{display:inline-flex;padding:1px 6px;border-radius:4px;font-size:10px;font-weight:600}
+.qc-label{font-size:11px;color:var(--muted);font-weight:600;letter-spacing:.04em;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
+.qc-plan{font-size:20px;font-weight:700;letter-spacing:-.02em}
+.qc-actual{font-size:12px;margin-top:4px}
+.qc-prog{height:4px;background:var(--bg2);border-radius:2px;margin-top:10px;overflow:hidden}
+.qc-fill{height:100%;border-radius:2px;transition:width .4s}
+.qc-sub{font-size:11px;color:var(--muted);margin-top:5px}
+
+.month-table{width:100%;border-collapse:collapse}
+.month-table th{font-size:11px;color:var(--muted);padding:7px 12px;text-align:left;border-bottom:1px solid var(--border);font-weight:500;text-transform:uppercase;letter-spacing:.03em}
+.month-table td{padding:9px 12px;font-size:13px;border-bottom:1px solid var(--border);vertical-align:middle}
+.month-table tr.m-subtotal td{background:var(--bg2);font-weight:600;font-size:12px}
+.month-table tr.m-current td{background:var(--blue-bg)}
+.month-table tr.m-future td{color:var(--muted)}
+.month-table tr:last-child td{border-bottom:none}
+
+/* SOURCE BARS */
+.source-row{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.source-row:last-child{margin-bottom:0}
+.source-label{width:100px;font-size:13px;flex-shrink:0}
+.source-bar-wrap{flex:1;display:flex;flex-direction:column;gap:4px}
+.source-track{height:8px;background:var(--bg2);border-radius:4px;overflow:hidden}
+.source-fill-zz{height:100%;background:var(--blue);border-radius:4px 0 0 4px;display:inline-block;transition:width .4s}
+.source-fill-zl{height:100%;background:var(--purple);border-radius:0 4px 4px 0;display:inline-block;transition:width .4s}
+.source-nums{font-size:11px;color:var(--muted);display:flex;justify-content:space-between}
+
+/* KPI STRIP */
+.kpi-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.kpi-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;position:relative;overflow:hidden}
+.kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--border2)}
+.kpi-card.ok::before{background:var(--green)}
+.kpi-card.warn::before{background:var(--orange)}
+.kpi-card.behind::before{background:var(--red)}
+.kpi-card.neutral::before{background:#2563eb}
+.kc-label{font-size:11px;color:var(--muted);font-weight:500;margin-bottom:6px}
+.kc-value{font-size:22px;font-weight:700;letter-spacing:-.02em}
+.kc-sub{font-size:11px;color:var(--muted);margin-top:3px}
+.kc-prog{height:3px;background:var(--bg2);border-radius:2px;margin-top:8px;overflow:hidden}
+.kc-fill{height:100%;border-radius:2px;transition:width .4s}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:#111827;color:#fff;padding:11px 18px;border-radius:var(--radius);font-size:13px;box-shadow:var(--shadow2);z-index:999;opacity:0;transform:translateY(8px);transition:all .25s;pointer-events:none}
+.toast.show{opacity:1;transform:translateY(0)}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="app-header">
+  <div class="header-left">
+    <div class="avatar">何</div>
+    <div class="header-info">
+      <div class="name">何川 <span class="tag blue">组长</span> <span class="tag">何川组</span></div>
+      <div class="meta">5 名员工 · 年度目标 1595 万 · 2026-05-14</div>
+    </div>
+  </div>
+  <div style="display:flex;align-items:center;gap:12px">
+    <span style="font-size:12px;color:var(--muted)">海外私域部</span>
+    <button class="btn-sm" onclick="showToast('已退出')">退出</button>
+  </div>
+</div>
+
+<!-- TIME NAV -->
+<div class="time-nav">
+  <span class="time-nav-label">时间维度</span>
+  <button class="time-tab active" onclick="switchTime('day',this)">日视图</button>
+  <button class="time-tab" onclick="switchTime('month',this)">月视图</button>
+  <button class="time-tab" onclick="switchTime('year',this)">年视图</button>
+  <span style="margin-left:auto;font-size:12px;color:var(--muted2)">计划向下拆：年 → 季 → 月 → 日 · 执行向上累</span>
+</div>
+
+<!-- ========== 日视图 ========== -->
+<div id="panel-day" class="time-panel active">
+  <div class="main-layout">
+    <div class="left-col">
+
+      <!-- 主管 SOP -->
+      <div>
+        <div class="section-label">
+          <div class="step-badge dark">D</div>
+          <div class="step-name">主管日 SOP<span class="step-sub">今日节奏 · 点击切换状态</span></div>
+        </div>
+        <div class="sop-timeline" id="mgr-sop"></div>
+      </div>
+
+      <!-- 今日团队看板 -->
+      <div>
+        <div class="section-label">
+          <div class="step-badge dark">C</div>
+          <div class="step-name">今日团队进度<span class="step-sub">点击查看成员详情</span></div>
+        </div>
+        <div class="member-grid" id="member-grid"></div>
+      </div>
+
+      <!-- 成员汇总进度 -->
+      <div>
+        <div class="section-label">
+          <div class="step-badge dark">%</div>
+          <div class="step-name">今日业绩汇总<span class="step-sub">组内各成员当日完成</span></div>
+        </div>
+        <div class="card card-sm" id="member-bars"></div>
+      </div>
+
+      <!-- 异常与待办 -->
+      <div>
+        <div class="section-label">
+          <div class="step-badge warn">!</div>
+          <div class="step-name">异常与待办<span class="step-sub">需主管介入</span></div>
+        </div>
+        <div class="anomaly-list">
+          <div class="anomaly-item critical">
+            <div class="an-title">停滞订单 · 毛涵 #VT-2026-0302</div>
+            <div class="an-desc">问题订单超 10 天未处理，客户催款，需立即介入协助跟进</div>
+            <div class="an-action"><button class="btn-sm" style="font-size:11px" onclick="showToast('已标记跟进')">立即处理</button></div>
+          </div>
+          <div class="anomaly-item">
+            <div class="an-title">连续低分 · 毛涵</div>
+            <div class="an-desc">连续 4 天日报评分 &lt;70，私信量持续低于标准 40%，建议今日约谈</div>
+            <div class="an-action"><button class="btn-sm" style="font-size:11px" onclick="showToast('已安排约谈')">安排约谈</button></div>
+          </div>
+          <div class="anomaly-item">
+            <div class="an-title">跨部门协同 · 物流延迟</div>
+            <div class="an-desc">陈玉霞 / 刘佳鑫 各 1 个发货中订单超预计到达日期，需与物流核实</div>
+            <div class="an-action"><button class="btn-sm" style="font-size:11px" onclick="showToast('已提交物流核查')">联系物流</button></div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /left -->
+
+    <div class="right-col">
+
+      <!-- 今日组内排行 -->
+      <div class="card card-sm">
+        <div class="card-title">今日组内排行</div>
+        <div class="tabs" style="margin-bottom:10px">
+          <div class="tab active" onclick="switchTab('r','reach',this)">触达</div>
+          <div class="tab" onclick="switchTab('r','perf',this)">业绩</div>
+        </div>
+        <div id="r-reach" class="tab-content active">
+          <div class="rank-list">
+            <div class="rank-item"><span class="rank-num top">1</span><span class="rank-name">陈莉</span><span class="rank-val">52</span></div>
+            <div class="rank-item"><span class="rank-num top">2</span><span class="rank-name">陈玉霞</span><span class="rank-val">48</span></div>
+            <div class="rank-item"><span class="rank-num">3</span><span class="rank-name">郑丽苹</span><span class="rank-val">47</span></div>
+            <div class="rank-item"><span class="rank-num">4</span><span class="rank-name">刘佳鑫</span><span class="rank-val">41</span></div>
+            <div class="rank-item" style="background:var(--red-bg)"><span class="rank-num">5</span><span class="rank-name" style="color:var(--red)">毛涵</span><span class="rank-val" style="color:var(--red)">21</span></div>
+          </div>
+        </div>
+        <div id="r-perf" class="tab-content">
+          <div class="rank-list">
+            <div class="rank-item"><span class="rank-num top">1</span><span class="rank-name">陈莉</span><span class="rank-val">1.4万</span></div>
+            <div class="rank-item"><span class="rank-num top">2</span><span class="rank-name">郑丽苹</span><span class="rank-val">0.48万</span></div>
+            <div class="rank-item"><span class="rank-num">3</span><span class="rank-name">刘佳鑫</span><span class="rank-val">0.41万</span></div>
+            <div class="rank-item"><span class="rank-num">4</span><span class="rank-name">陈玉霞</span><span class="rank-val">0.38万</span></div>
+            <div class="rank-item" style="background:var(--red-bg)"><span class="rank-num">5</span><span class="rank-name" style="color:var(--red)">毛涵</span><span class="rank-val" style="color:var(--red)">0万</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hermes 组级建议 -->
+      <div class="hermes-card">
+        <div class="hermes-header">
+          <div class="hermes-icon">H</div>
+          <div class="hermes-title">Hermes · 组级建议</div>
+        </div>
+        <div class="hermes-body">
+          本周发现：S 类客户在<b>周三/周四</b>响应率最高（58% vs 周一/二 31%）。<br><br>
+          建议将 S 类优先触达安排在每周三/四上午 10–12 点，预计私信转化率 <b>+18%</b>。
+        </div>
+        <div class="hermes-actions">
+          <button class="hermes-btn primary" onclick="showToast('已写入组记忆')">✓ 写入组记忆</button>
+          <button class="hermes-btn" onclick="showToast('已抽象为 Skill')">⚙ 抽象为 Skill</button>
+          <button class="hermes-btn" onclick="showToast('已拒绝')">✗ 拒绝</button>
+        </div>
+      </div>
+
+      <!-- 待审核案例 -->
+      <div class="card card-sm">
+        <div class="card-title">待审核日报案例</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="padding:10px;border:1px solid var(--border);border-radius:var(--radius)">
+            <div style="font-size:13px;font-weight:600">陈玉霞 · 05-13 日报</div>
+            <div style="font-size:12px;color:var(--muted);margin:4px 0">关键词搜索法 · 评分 96 分</div>
+            <button class="btn-sm dark" style="font-size:11px;padding:4px 10px" onclick="showToast('已收录为金牌案例')">收录金牌案例</button>
+          </div>
+          <div style="padding:10px;border:1px solid var(--border);border-radius:var(--radius)">
+            <div style="font-size:13px;font-weight:600">陈莉 · 05-12 日报</div>
+            <div style="font-size:12px;color:var(--muted);margin:4px 0">S类客户成交话术 · 评分 91 分</div>
+            <button class="btn-sm dark" style="font-size:11px;padding:4px 10px" onclick="showToast('已收录为金牌案例')">收录金牌案例</button>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /right -->
+  </div>
+</div>
+
+<!-- ========== 月视图 ========== -->
+<div id="panel-month" class="time-panel">
+  <div class="main-layout">
+    <div class="left-col">
+
+      <!-- 月度 KPI -->
+      <div>
+        <div class="section-label">
+          <div class="step-badge dark">月</div>
+          <div class="step-name">5月组目标<span class="step-sub">2026-05-01 ~ 05-31</span></div>
+        </div>
+        <div class="kpi-strip">
+          <div class="kpi-card neutral">
+            <div class="kc-label">组月度目标</div>
+            <div class="kc-value">122<span style="font-size:13px;font-weight:400;color:var(--muted)">万</span></div>
+            <div class="kc-sub">5 人 · 年度1595万</div>
+            <div class="kc-prog"><div class="kc-fill" style="width:100%;background:#2563eb"></div></div>
+          </div>
+          <div class="kpi-card warn">
+            <div class="kc-label">组已完成</div>
+            <div class="kc-value">42.3<span style="font-size:13px;font-weight:400;color:var(--muted)">万</span></div>
+            <div class="kc-sub">34.7% · 剩余 85.7 万</div>
+            <div class="kc-prog"><div class="kc-fill" style="width:34.7%;background:var(--orange)"></div></div>
+          </div>
+          <div class="kpi-card behind">
+            <div class="kc-label">剩余天数</div>
+            <div class="kc-value">17<span style="font-size:13px;font-weight:400;color:var(--muted)">天</span></div>
+            <div class="kc-sub">需日均 5.04 万</div>
+            <div class="kc-prog"><div class="kc-fill" style="width:55%;background:var(--red)"></div></div>
+          </div>
+          <div class="kpi-card ok">
+            <div class="kc-label">组平均评分</div>
+            <div class="kc-value">83<span style="font-size:13px;font-weight:400;color:var(--muted)">/100</span></div>
+            <div class="kc-sub">连续 5 天达标</div>
+            <div class="kc-prog"><div class="kc-fill" style="width:83%;background:var(--green)"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 周拆解 -->
+      <div>
+        <div class="section-label">
+          <div class="step-badge dark">W</div>
+          <div class="step-name">组周拆解<span class="step-sub">月目标 → 4 周</span></div>
+        </div>
+        <div class="week-grid">
+          <div class="week-card wk-done">
+            <div class="wk-label"><span>W1 · 5/1–7</span><span class="tag green" style="font-size:10px">已完成</span></div>
+            <div class="wk-plan">30.5<span class="wk-unit">万</span></div>
+            <div class="wk-actual" style="color:var(--orange)">实际 18.2万 (60%)</div>
+            <div class="wk-prog"><div class="wk-fill" style="width:60%;background:var(--orange)"></div></div>
+          </div>
+          <div class="week-card wk-current">
+            <div class="wk-label"><span>W2 · 5/8–14</span><span class="tag blue" style="font-size:10px">进行中</span></div>
+            <div class="wk-plan">30.5<span class="wk-unit">万</span></div>
+            <div class="wk-actual" style="color:var(--blue)">已完成 24.1万 (79%)</div>
+            <div class="wk-prog"><div class="wk-fill" style="width:79%;background:var(--blue)"></div></div>
+          </div>
+          <div class="week-card wk-future">
+            <div class="wk-label"><span>W3 · 5/15–21</span><span style="font-size:10px;color:var(--muted2)">待开始</span></div>
+            <div class="wk-plan">30.5<span class="wk-unit">万</span></div>
+            <div class="wk-actual" style="color:var(--muted2)">需加速</div>
+            <div class="wk-prog"><div class="wk-fill" style="width:0%"></div></div>
+          </div>
+          <div class="week-card wk-future">
+            <div class="wk-label"><span>W4 · 5/22–31</span><span style="font-size:10px;color:var(--muted2)">待开始</span></div>
+            <div class="wk-plan">30.5<span class="wk-unit">万</span></div>
+            <div class="wk-actual" style="color:var(--muted2)">冲刺周</div>
+            <div class="wk-prog"><div class="wk-fill" style="width:0%"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 成员月度进度 -->
+      <div>
+        <div class="section-label">
+          <div class="step-badge dark">人</div>
+          <div class="step-name">成员月度进度<span class="step-sub">各成员本月目标 vs 实际</span></div>
+        </div>
+        <div class="card card-sm" id="month-member-bars"></div>
+      </div>
+
+      <!-- 来源结构 -->
+      <div>
+        <div class="section-label">
+          <div class="step-badge dark">$</div>
+          <div class="step-name">组业绩来源<span class="step-sub">守正 vs 增量</span></div>
+        </div>
+        <div class="card card-sm">
+          <div style="font-size:12px;color:var(--muted);margin-bottom:16px">
+            组本月 <b style="color:var(--text)">42.3万</b> / 目标 122万 ·
+            <span style="color:var(--blue)">■ 守正</span>
+            <span style="color:var(--purple);margin-left:6px">■ 增量</span>
+          </div>
+          <div class="source-row">
+            <div class="source-label">官网当月询盘</div>
+            <div class="source-bar-wrap">
+              <div class="source-track"><div style="display:flex;height:100%">
+                <div class="source-fill-zz" style="width:48%"></div>
+                <div class="source-fill-zl" style="width:18%"></div>
+              </div></div>
+              <div class="source-nums"><span>守正 7.2万 + 增量 2.4万</span><span style="font-weight:600">9.6万 (23%)</span></div>
+            </div>
+          </div>
+          <div class="source-row">
+            <div class="source-label">历史月线索</div>
+            <div class="source-bar-wrap">
+              <div class="source-track"><div style="display:flex;height:100%">
+                <div class="source-fill-zz" style="width:60%"></div>
+                <div class="source-fill-zl" style="width:22%"></div>
+              </div></div>
+              <div class="source-nums"><span>守正 9.8万 + 增量 4.1万</span><span style="font-weight:600">13.9万 (33%)</span></div>
+            </div>
+          </div>
+          <div class="source-row">
+            <div class="source-label">自拓流量</div>
+            <div class="source-bar-wrap">
+              <div class="source-track"><div style="display:flex;height:100%">
+                <div class="source-fill-zz" style="width:25%"></div>
+                <div class="source-fill-zl" style="width:12%"></div>
+              </div></div>
+              <div class="source-nums"><span>守正 4.2万 + 增量 1.9万</span><span style="font-weight:600">6.1万 (14%)</span></div>
+            </div>
+          </div>
+          <div class="source-row">
+            <div class="source-label">老客户复购</div>
+            <div class="source-bar-wrap">
+              <div class="source-track"><div style="display:flex;height:100%">
+                <div class="source-fill-zz" style="width:58%"></div>
+                <div class="source-fill-zl" style="width:16%"></div>
+              </div></div>
+              <div class="source-nums"><span>守正 10.1万 + 增量 2.6万</span><span style="font-weight:600">12.7万 (30%)</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /left -->
+
+    <div class="right-col">
+
+      <!-- 月度完成率圆环 -->
+      <div class="card card-sm">
+        <div class="card-title">组月度完成率</div>
+        <div style="text-align:center;padding:10px 0">
+          <div style="position:relative;width:100px;height:100px;margin:0 auto">
+            <svg viewBox="0 0 36 36" style="width:100%;height:100%;transform:rotate(-90deg)">
+              <circle cx="18" cy="18" r="15.9" fill="none" stroke="var(--bg2)" stroke-width="3"/>
+              <circle cx="18" cy="18" r="15.9" fill="none" stroke="var(--orange)" stroke-width="3"
+                stroke-dasharray="34.7 65.3" stroke-linecap="round"/>
+            </svg>
+            <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
+              <div style="font-size:20px;font-weight:700">34.7%</div>
+              <div style="font-size:10px;color:var(--muted)">完成率</div>
+            </div>
+          </div>
+          <div style="margin-top:10px;font-size:12px;color:var(--muted)">42.3万 / 122万</div>
+          <div style="margin-top:4px;font-size:11px;padding:3px 10px;background:var(--orange-bg);color:var(--orange);border-radius:12px;display:inline-block">落后节奏 11%</div>
+        </div>
+      </div>
+
+      <!-- 成员月度排行 -->
+      <div class="card card-sm">
+        <div class="card-title">成员月度排行</div>
+        <div class="rank-list">
+          <div class="rank-item"><span class="rank-num top">1</span><span class="rank-name">陈莉 <span class="tag gold" style="font-size:10px">300W</span></span><span class="rank-val">9.2万</span></div>
+          <div class="rank-item"><span class="rank-num top">2</span><span class="rank-name">郑丽苹 <span class="tag gold" style="font-size:10px">300W</span></span><span class="rank-val">8.4万</span></div>
+          <div class="rank-item"><span class="rank-num">3</span><span class="rank-name">陈玉霞 <span class="tag gold" style="font-size:10px">300W</span></span><span class="rank-val">7.8万</span></div>
+          <div class="rank-item"><span class="rank-num">4</span><span class="rank-name">刘佳鑫 <span class="tag silver" style="font-size:10px">200W</span></span><span class="rank-val">7.6万</span></div>
+          <div class="rank-item" style="background:var(--red-bg)"><span class="rank-num">5</span><span class="rank-name" style="color:var(--red)">毛涵 <span class="tag silver" style="font-size:10px">200W</span></span><span class="rank-val" style="color:var(--red)">4.8万</span></div>
+        </div>
+      </div>
+
+      <!-- Hermes 月度 -->
+      <div class="hermes-card">
+        <div class="hermes-header">
+          <div class="hermes-icon">H</div>
+          <div class="hermes-title">Hermes · 月度分析</div>
+        </div>
+        <div class="hermes-body">
+          组前 14 天完成 42.3万，按节奏月末预计 <b>~94万</b>，距目标缺口 <b>28万</b>。<br><br>
+          主要拖累：毛涵仅完成 4.8/20万 (24%)。建议本周主管直接介入毛涵跟单，目标本月补至 12万。
+        </div>
+        <div class="hermes-actions">
+          <button class="hermes-btn primary" onclick="showToast('已制定改进计划')">制定改进计划</button>
+          <button class="hermes-btn" onclick="showToast('已忽略')">忽略</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ========== 年视图 ========== -->
+<div id="panel-year" class="time-panel">
+  <div class="main-layout">
+    <div class="left-col">
+
+      <!-- 年度总览 -->
+      <div>
+        <div class="section-label">
+          <div class="step-badge dark">年</div>
+          <div class="step-name">2026 组年度目标<span class="step-sub">年初向下拆解</span></div>
+        </div>
+        <div class="card card-sm" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;align-items:center">
+          <div>
+            <div style="font-size:12px;color:var(--muted);margin-bottom:6px">年度目标</div>
+            <div style="font-size:32px;font-weight:700">1595<span style="font-size:15px;font-weight:400;color:var(--muted)">万</span></div>
+            <div style="font-size:12px;color:var(--muted);margin-top:4px">守正1100 + 增量495</div>
+          </div>
+          <div>
+            <div style="font-size:12px;color:var(--muted);margin-bottom:6px">YTD 已完成</div>
+            <div style="font-size:32px;font-weight:700;color:var(--orange)">247<span style="font-size:15px;font-weight:400;color:var(--muted)">万</span></div>
+            <div style="font-size:12px;color:var(--muted);margin-top:4px">缺口 1348 万</div>
+          </div>
+          <div>
+            <div style="font-size:12px;color:var(--muted);margin-bottom:6px">年度进度</div>
+            <div style="font-size:32px;font-weight:700;color:var(--red)">15.5%</div>
+            <div style="font-size:12px;color:var(--red);margin-top:4px">落后预期（应 37%）</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 季度拆解 -->
+      <div>
+        <div class="section-label">
+          <div class="step-badge dark">Q</div>
+          <div class="step-name">季度拆解<span class="step-sub">1595万 → 4 季</span></div>
+        </div>
+        <div class="quarter-grid">
+          <div class="quarter-card q-done">
+            <div class="qc-label">Q1 · 1–3月 <span class="qc-badge" style="background:var(--orange-bg);color:var(--orange)">已结束</span></div>
+            <div class="qc-plan">400<span style="font-size:13px;font-weight:400;color:var(--muted)">万</span></div>
+            <div class="qc-actual" style="color:var(--orange)">实际 205万 (51.3%)</div>
+            <div class="qc-prog"><div class="qc-fill" style="width:51.3%;background:var(--orange)"></div></div>
+            <div class="qc-sub">差距 195万 · 严重落后</div>
+          </div>
+          <div class="quarter-card q-current">
+            <div class="qc-label">Q2 · 4–6月 <span class="qc-badge" style="background:var(--blue-bg);color:var(--blue)">进行中</span></div>
+            <div class="qc-plan">410<span style="font-size:13px;font-weight:400;color:var(--muted)">万</span></div>
+            <div class="qc-actual" style="color:var(--blue)">已完成 42万 (10.2%)</div>
+            <div class="qc-prog"><div class="qc-fill" style="width:10.2%;background:var(--blue)"></div></div>
+            <div class="qc-sub">含 4月 + 5月进行中</div>
+          </div>
+          <div class="quarter-card">
+            <div class="qc-label">Q3 · 7–9月 <span class="qc-badge" style="background:var(--bg2);color:var(--muted)">待开始</span></div>
+            <div class="qc-plan">420<span style="font-size:13px;font-weight:400;color:var(--muted)">万</span></div>
+            <div class="qc-actual" style="color:var(--muted2)">未开始</div>
+            <div class="qc-prog"><div class="qc-fill" style="width:0%"></div></div>
+            <div class="qc-sub">H2 冲刺重点季</div>
+          </div>
+          <div class="quarter-card">
+            <div class="qc-label">Q4 · 10–12月 <span class="qc-badge" style="background:var(--bg2);color:var(--muted)">待开始</span></div>
+            <div class="qc-plan">365<span style="font-size:13px;font-weight:400;color:var(--muted)">万</span></div>
+            <div class="qc-actual" style="color:var(--muted2)">未开始</div>
+            <div class="qc-prog"><div class="qc-fill" style="width:0%"></div></div>
+            <div class="qc-sub">年末大促 · 含双11</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 成员年度目标明细 -->
+      <div>
+        <div class="section-label">
+          <div class="step-badge dark">人</div>
+          <div class="step-name">成员年度目标<span class="step-sub">个人计划 → 季度拆解</span></div>
+        </div>
+        <div class="card card-sm" style="padding:0;overflow:hidden">
+          <table class="month-table">
+            <thead>
+              <tr>
+                <th>成员</th>
+                <th>级别</th>
+                <th>年度目标</th>
+                <th>Q1 完成</th>
+                <th>Q2 进度</th>
+                <th>YTD 合计</th>
+                <th>年度达成率</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>陈莉</td><td><span class="tag gold">300W</span></td><td>347万</td><td style="color:var(--orange)">62万</td><td style="color:var(--blue)">9.2万+</td><td>71.2万</td><td><span style="color:var(--orange)">20.5%</span></td></tr>
+              <tr><td>郑丽苹</td><td><span class="tag gold">300W</span></td><td>347万</td><td style="color:var(--orange)">54万</td><td style="color:var(--blue)">8.4万+</td><td>62.4万</td><td><span style="color:var(--red)">18%</span></td></tr>
+              <tr><td>陈玉霞</td><td><span class="tag gold">300W</span></td><td>347万</td><td style="color:var(--orange)">58万</td><td style="color:var(--blue)">7.8万+</td><td>65.8万</td><td><span style="color:var(--orange)">19%</span></td></tr>
+              <tr><td>刘佳鑫</td><td><span class="tag silver">200W</span></td><td>320万</td><td style="color:var(--orange)">21万</td><td style="color:var(--blue)">7.6万+</td><td>28.6万</td><td><span style="color:var(--red)">8.9%</span></td></tr>
+              <tr style="background:var(--red-bg)"><td style="color:var(--red)">毛涵</td><td><span class="tag silver">200W</span></td><td>234万</td><td style="color:var(--red)">10万</td><td style="color:var(--red)">4.8万+</td><td style="color:var(--red)">14.8万</td><td><span style="color:var(--red);font-weight:700">6.3%</span></td></tr>
+              <tr class="m-subtotal"><td colspan="2">组合计</td><td>1595万</td><td style="color:var(--orange)">205万</td><td style="color:var(--blue)">37.8万+</td><td>242.8万</td><td style="color:var(--red)">15.2%</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div><!-- /left -->
+
+    <div class="right-col">
+
+      <!-- 年度进度 -->
+      <div class="card card-sm">
+        <div class="card-title">组年度完成率</div>
+        <div style="text-align:center;padding:10px 0">
+          <div style="position:relative;width:110px;height:110px;margin:0 auto">
+            <svg viewBox="0 0 36 36" style="width:100%;height:100%;transform:rotate(-90deg)">
+              <circle cx="18" cy="18" r="15.9" fill="none" stroke="var(--bg2)" stroke-width="3"/>
+              <circle cx="18" cy="18" r="15.9" fill="none" stroke="var(--red)" stroke-width="3"
+                stroke-dasharray="15.5 84.5" stroke-linecap="round"/>
+            </svg>
+            <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
+              <div style="font-size:22px;font-weight:700;color:var(--red)">15.5%</div>
+              <div style="font-size:10px;color:var(--muted)">实际完成</div>
+            </div>
+          </div>
+          <div style="margin-top:8px;font-size:12px;color:var(--muted)">247万 / 1595万</div>
+          <div style="margin-top:4px;font-size:11px;padding:3px 10px;background:var(--red-bg);color:var(--red);border-radius:12px;display:inline-block">落后 21.5%</div>
+        </div>
+        <div style="border-top:1px solid var(--border);padding-top:10px;margin-top:4px;display:flex;flex-direction:column;gap:6px">
+          <div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--muted)">Q1 完成率</span><span style="color:var(--orange);font-weight:600">51.3%</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--muted)">Q2 完成率</span><span style="color:var(--blue);font-weight:600">10.2%+</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--muted)">预计全年</span><span style="color:var(--red);font-weight:600">~770万</span></div>
+        </div>
+      </div>
+
+      <!-- Hermes 年度 -->
+      <div class="hermes-card">
+        <div class="hermes-header">
+          <div class="hermes-icon">H</div>
+          <div class="hermes-title">Hermes · 年度预警</div>
+        </div>
+        <div class="hermes-body">
+          按当前节奏组全年预计 <b style="color:var(--red)">~770万</b>，距目标 1595万差 <b>825万</b>。<br><br>
+          最大风险：毛涵全年预计仅 40万（目标234万）。建议评估是否启动人员调整，或将毛涵的 quota 重分配给组内高绩效成员。
+        </div>
+        <div class="hermes-actions">
+          <button class="hermes-btn primary" onclick="showToast('已上报总监')">上报总监</button>
+          <button class="hermes-btn" onclick="showToast('已制定改进计划')">制定改进计划</button>
+        </div>
+      </div>
+
+      <!-- 年度里程碑 -->
+      <div class="card card-sm">
+        <div class="card-title">组年度里程碑</div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;gap:10px;align-items:flex-start">
+            <div style="width:8px;height:8px;border-radius:50%;background:var(--red);margin-top:4px;flex-shrink:0"></div>
+            <div><div style="font-size:13px;font-weight:600">Q1 严重落后</div><div style="font-size:11px;color:var(--muted)">目标400万，实际205万 (51%)</div></div>
+          </div>
+          <div style="display:flex;gap:10px;align-items:flex-start">
+            <div style="width:8px;height:8px;border-radius:50%;background:var(--blue);margin-top:4px;flex-shrink:0"></div>
+            <div><div style="font-size:13px;font-weight:600">Q2 加速冲刺中</div><div style="font-size:11px;color:var(--muted)">目标410万，需5月全力补差</div></div>
+          </div>
+          <div style="display:flex;gap:10px;align-items:flex-start">
+            <div style="width:8px;height:8px;border-radius:50%;background:var(--border2);margin-top:4px;flex-shrink:0"></div>
+            <div><div style="font-size:13px;font-weight:600;color:var(--muted)">H2 大促布局</div><div style="font-size:11px;color:var(--muted2)">双11/双12 专项策略待制定</div></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ===== DATA =====
+const MGR_SOP = [
+  {time:'08:50–09:00', module:'数据预检', desc:'查看昨日各成员完成率、日报评分、今日预警', status:'done'},
+  {time:'09:00–09:15', module:'公司早会', desc:'接收总监指令，同步部门重点', status:'done'},
+  {time:'09:15–09:45', module:'组内晨会', desc:'主推款、话术重心、今日排班确认', status:'done'},
+  {time:'10:00–12:00', module:'执行过程管控', desc:'实时跟进成员进度，介入弃单/S类卡点', status:'doing'},
+  {time:'14:00–15:30', module:'话术质检', desc:'每人抽查 5–10 组聊天记录，标注优劣', status:'todo'},
+  {time:'15:30–16:30', module:'业务协同', desc:'跨部门卡点处理（物流/设计/财务）', status:'todo'},
+  {time:'16:30–17:00', module:'约谈/辅导', desc:'今日异常成员 1 对 1 辅导（毛涵）', status:'todo'},
+  {time:'17:00–18:00', module:'复盘与计划', desc:'当日完成情况汇总，明日任务分配', status:'todo'},
+];
+
+const MEMBERS = [
+  {name:'陈莉',   av:'陈', stage:'D90+', level:'300W', score:88, warn:false, bars:{私信:92,触达:95,社媒:100}, today:1.4, target:1.22},
+  {name:'郑丽苹', av:'郑', stage:'D90+', level:'300W', score:85, warn:false, bars:{私信:80,触达:84,社媒:100}, today:0.48, target:1.19},
+  {name:'陈玉霞', av:'陈', stage:'D90+', level:'300W', score:91, warn:false, bars:{私信:95,触达:96,社媒:100}, today:0.38, target:1.22},
+  {name:'刘佳鑫', av:'刘', stage:'D90+', level:'200W', score:82, warn:false, bars:{私信:83,触达:86,社媒:100}, today:0.41, target:1.00},
+  {name:'毛涵',   av:'毛', stage:'D90+', level:'200W', score:61, warn:true,  bars:{私信:42,触达:51,社媒:50},  today:0, target:0.9},
+];
+
+const MONTH_MEMBERS = [
+  {name:'陈莉',   done:9.2,  target:25, level:'300W'},
+  {name:'郑丽苹', done:8.4,  target:25, level:'300W'},
+  {name:'陈玉霞', done:7.8,  target:22, level:'300W'},
+  {name:'刘佳鑫', done:7.6,  target:22, level:'200W'},
+  {name:'毛涵',   done:4.8,  target:20, level:'200W'},
+];
+
+// ===== RENDER =====
+function renderMgrSOP() {
+  const el = document.getElementById('mgr-sop');
+  el.innerHTML = MGR_SOP.map((s, i) => {
+    const label = s.status === 'done' ? '已完成' : s.status === 'doing' ? '进行中' : '待办';
+    return `<div class="sop-item ${s.status}" onclick="cycleSOP(${i})">
+      <div class="sop-dot"></div>
+      <div class="sop-time">${s.time}</div>
+      <div class="sop-content">
+        <div class="sop-module">${s.module}</div>
+        <div class="sop-desc">${s.desc}</div>
+      </div>
+      <div class="sop-status"><span class="status-chip ${s.status}">${label}</span></div>
+    </div>`;
+  }).join('');
+}
+
+function cycleSOP(i) {
+  const s = ['todo','doing','done'];
+  MGR_SOP[i].status = s[(s.indexOf(MGR_SOP[i].status)+1)%3];
+  renderMgrSOP();
+}
+
+function renderMemberGrid() {
+  const el = document.getElementById('member-grid');
+  el.innerHTML = MEMBERS.map(m => {
+    const scoreColor = m.score>=85?'var(--green)':m.score<70?'var(--red)':'var(--orange)';
+    const levelCls = m.level==='300W'?'gold':'silver';
+    const bars = Object.entries(m.bars).map(([l,v])=>`
+      <div class="mini-bar">
+        <div class="mini-label">${l}</div>
+        <div class="mini-track"><div class="mini-fill ${v>=90?'ok':v<60?'ng':'warn'}" style="width:${v}%"></div></div>
+        <div style="font-size:11px;color:var(--muted);width:28px;text-align:right">${v}%</div>
+      </div>`).join('');
+    return `<div class="member-card ${m.warn?'alert':''}" onclick="showToast('${m.name} 详情 - 开发中')">
+      ${m.warn?'<div class="warn-badge">!</div>':''}
+      <div class="mc-head">
+        <div class="mc-av">${m.av}</div>
+        <div><div class="mc-name">${m.name} <span class="tag ${levelCls}" style="font-size:10px">${m.level}</span></div>
+        <div class="mc-stage">${m.stage}</div></div>
+      </div>
+      <div class="mc-score" style="color:${scoreColor}">${m.score}</div>
+      <div class="mc-score-label">日报评分 · 今日 ${m.today>0?m.today+'万':'未成单'}</div>
+      ${bars}
+    </div>`;
+  }).join('');
+}
+
+function renderMemberBars() {
+  const el = document.getElementById('member-bars');
+  el.innerHTML = MEMBERS.map(m => {
+    const pct = Math.min(Math.round(m.today/m.target*100),100);
+    const c = pct>=80?'ok':pct<40?'bad':'warn';
+    const tagCls = pct>=80?'green':pct<40?'red':'orange';
+    return `<div class="prog-row">
+      <div class="prog-label">${m.name}</div>
+      <div class="prog-track"><div class="prog-fill ${c}" style="width:${pct}%"></div></div>
+      <div class="prog-num">${m.today}万</div>
+      <span class="tag ${tagCls}" style="font-size:10px;flex-shrink:0">${pct}%</span>
+    </div>`;
+  }).join('');
+}
+
+function renderMonthMemberBars() {
+  const el = document.getElementById('month-member-bars');
+  el.innerHTML = MONTH_MEMBERS.map(m => {
+    const pct = Math.min(Math.round(m.done/m.target*100),100);
+    const c = pct>=70?'ok':pct<40?'bad':'warn';
+    const tagCls = pct>=70?'green':pct<40?'red':'orange';
+    const levelCls = m.level==='300W'?'gold':'silver';
+    return `<div class="prog-row">
+      <div class="prog-label">${m.name} <span class="tag ${levelCls}" style="font-size:10px;vertical-align:middle">${m.level}</span></div>
+      <div class="prog-track"><div class="prog-fill ${c}" style="width:${pct}%"></div></div>
+      <div class="prog-num">${m.done}/${m.target}万</div>
+      <span class="tag ${tagCls}" style="font-size:10px;flex-shrink:0">${pct}%</span>
+    </div>`;
+  }).join('');
+}
+
+// ===== TABS =====
+function switchTab(g, id, el) {
+  const p = el.closest('.card,.card-sm');
+  if(p){
+    p.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    p.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  }
+  el.classList.add('active');
+  document.getElementById(g+'-'+id).classList.add('active');
+}
+
+// ===== TIME NAV =====
+function switchTime(dim, el) {
+  document.querySelectorAll('.time-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.time-panel').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('panel-'+dim).classList.add('active');
+}
+
+// ===== TOAST =====
+function showToast(msg){
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),2500);
+}
+
+// ===== INIT =====
+renderMgrSOP();
+renderMemberGrid();
+renderMemberBars();
+renderMonthMemberBars();
+</script>
+</body>
+</html>
