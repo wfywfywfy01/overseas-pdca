@@ -433,7 +433,7 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
           <div class="step-badge">月</div>
           <div class="step-name">5月目标<span class="step-sub">2026-05-01 ~ 05-31</span></div>
         </div>
-        <div class="kpi-strip">
+        <div class="kpi-strip" id="month-kpi-strip">
           <div class="kpi-card neutral">
             <div class="kc-label">月度目标</div>
             <div class="kc-value">25<span style="font-size:13px;font-weight:400;color:var(--muted)">万</span></div>
@@ -467,7 +467,7 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
           <div class="step-badge">W</div>
           <div class="step-name">周维度拆解<span class="step-sub">月目标 → 4 周分配</span></div>
         </div>
-        <div class="week-grid">
+        <div class="week-grid" id="week-grid-month">
           <div class="week-card wk-done">
             <div class="wk-label"><span>W1 · 5/1–7</span><span class="tag green" style="font-size:10px">已完成</span></div>
             <div class="wk-plan">6.25<span class="wk-unit">万</span></div>
@@ -628,7 +628,7 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
       <!-- 月度排行 -->
       <div class="card card-sm">
         <div class="card-title">本月排行（何川组）</div>
-        <div class="rank-list">
+        <div class="rank-list" id="rank-month-list">
           <div class="rank-item"><span class="rank-num top">1</span><span class="rank-name">陈莉</span><span class="rank-val">9.2万</span></div>
           <div class="rank-item me"><span class="rank-num">2</span><span class="rank-name">郑丽苹（我）</span><span class="rank-val">8.4万</span></div>
           <div class="rank-item"><span class="rank-num">3</span><span class="rank-name">陈玉霞</span><span class="rank-val">7.8万</span></div>
@@ -668,7 +668,7 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
           <div class="step-badge">年</div>
           <div class="step-name">2026 年度目标<span class="step-sub">年初计划向下拆解</span></div>
         </div>
-        <div class="card card-sm" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;align-items:center">
+        <div class="card card-sm" id="year-kpi-summary" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;align-items:center">
           <div>
             <div style="font-size:12px;color:var(--muted);margin-bottom:6px">年度目标</div>
             <div style="font-size:32px;font-weight:700">347<span style="font-size:15px;font-weight:400;color:var(--muted)">万</span></div>
@@ -693,7 +693,7 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
           <div class="step-badge">Q</div>
           <div class="step-name">季度拆解<span class="step-sub">年度目标 → 4 季</span></div>
         </div>
-        <div class="quarter-grid">
+        <div class="quarter-grid" id="quarter-grid">
           <div class="quarter-card q-done">
             <div class="qc-label">Q1 · 1–3月 <span class="qc-badge" style="background:var(--orange-bg);color:var(--orange)">已结束</span></div>
             <div class="qc-plan">80<span style="font-size:13px;font-weight:400;color:var(--muted)">万</span></div>
@@ -743,7 +743,7 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
                 <th>状态</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody id="monthly-table-body">
               <tr><td>1月</td><td style="color:var(--muted)">Q1</td><td>26万</td><td>21万</td><td><span style="color:var(--orange)">80.8%</span></td><td><span class="tag orange">低于目标</span></td></tr>
               <tr><td>2月</td><td style="color:var(--muted)">Q1</td><td>27万</td><td>14万</td><td><span style="color:var(--red)">51.9%</span></td><td><span class="tag red">春节影响</span></td></tr>
               <tr><td>3月</td><td style="color:var(--muted)">Q1</td><td>27万</td><td>14万</td><td><span style="color:var(--red)">51.9%</span></td><td><span class="tag red">低于目标</span></td></tr>
@@ -972,7 +972,7 @@ function renderCheckBars() {
 }
 
 // ===== DAILY SUMMARY =====
-function renderDailySummary() {
+function renderDailySummary(apiKpi) {
   const done = SOP_DATA.filter(s => s.status === 'done').length;
   const doing = SOP_DATA.filter(s => s.status === 'doing').length;
   const total = SOP_DATA.length;
@@ -1002,7 +1002,7 @@ function renderDailySummary() {
     </div>
     <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--muted)">
       <span>今日业绩</span>
-      <span style="font-weight:600;color:var(--text)">0.48 / 1.19 万</span>
+      <span style="font-weight:600;color:var(--text)">${apiKpi ? apiKpi.today_done_wan + ' / ' + apiKpi.today_target_wan + ' 万' : '0.48 / 1.19 万'}</span>
     </div>
     <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--muted)">
       <span>三方私信</span>
@@ -1056,11 +1056,211 @@ function showToast(msg) {
   setTimeout(() => el.classList.remove('show'), 2500);
 }
 
+// ===== API CONFIG =====
+const API_BASE = window.PDCA_API_BASE || '';   // 同域时留空；跨域时填 'https://your-vps.com'
+const CURRENT_USER_ID = new URLSearchParams(location.search).get('uid') || 12865;
+
+// ===== API FETCH =====
+async function fetchAPI(path) {
+  try {
+    const r = await fetch(API_BASE + path);
+    if (!r.ok) throw new Error(r.status);
+    return await r.json();
+  } catch(e) {
+    console.warn('[PDCA API]', path, e.message);
+    return null;
+  }
+}
+
+function kpiStatus(pct) {
+  return pct >= 80 ? 'ok' : pct >= 40 ? 'warn' : 'behind';
+}
+
+async function loadDayData() {
+  const d = await fetchAPI(`/api/pdca/staff/${CURRENT_USER_ID}/day`);
+  if (!d) return;
+  const k = d.kpi;
+  KPI_DATA[0] = {label:'今日目标',    value:k.today_target_wan, unit:'万', sub:`月度日均拆解`,                        cur:k.today_target_wan, max:k.today_target_wan, cls:'neutral'};
+  KPI_DATA[1] = {label:'今日已完成',  value:k.today_done_wan,   unit:'万', sub:`${k.today_pct}% · 还需 ${(k.today_target_wan-k.today_done_wan).toFixed(2)} 万`, cur:k.today_done_wan, max:k.today_target_wan, cls:kpiStatus(k.today_pct)};
+  KPI_DATA[2] = {label:'本月完成',    value:k.month_done_wan,   unit:'万', sub:`月目标 ${k.month_target_wan} 万 · ${k.month_pct}%`, cur:k.month_done_wan, max:k.month_target_wan, cls:kpiStatus(k.month_pct)};
+  KPI_DATA[3] = {label:'本月成单',    value:k.month_orders,     unit:'单', sub:`剩 ${k.remaining_days} 天 · 需日均 ${k.daily_needed_wan} 万`, cur:k.month_orders, max:Math.max(k.month_orders,9), cls:'ok'};
+  renderKPI();
+
+  // Update daily summary real perf
+  renderDailySummary(k);
+
+  // Rankings — perf
+  if (d.ranking && d.ranking.perf && d.ranking.perf.length) {
+    const el = document.getElementById('rank-perf');
+    if (el) el.innerHTML = d.ranking.perf.map((r,i)=>`
+      <div class="rank-item${r.is_me?' me':''}">
+        <span class="rank-num${i<2?' top':''}">${i+1}</span>
+        <span class="rank-name">${r.name}${r.is_me?' (我)':''}</span>
+        <span class="rank-val">${r.val_wan}万</span>
+      </div>`).join('');
+  }
+}
+
+async function loadMonthData() {
+  const d = await fetchAPI(`/api/pdca/staff/${CURRENT_USER_ID}/month`);
+  if (!d) return;
+  const k = d.kpi;
+
+  // Month KPI cards
+  const strip = document.getElementById('month-kpi-strip');
+  if (strip) {
+    const remaining_pct = Math.round((k.remaining_days / 31) * 100);
+    strip.innerHTML = `
+      <div class="kpi-card neutral">
+        <div class="kc-label">月度目标</div>
+        <div class="kc-value">${(k.month_target_wan/10).toFixed(0)}<span style="font-size:13px;font-weight:400;color:var(--muted)">万</span></div>
+        <div class="kc-sub">已过 ${31-k.remaining_days}/31 天</div>
+        <div class="kc-prog"><div class="kc-fill" style="width:100%;background:#111827"></div></div>
+      </div>
+      <div class="kpi-card ${kpiStatus(k.month_pct)}">
+        <div class="kc-label">已完成</div>
+        <div class="kc-value">${k.month_done_wan}<span style="font-size:13px;font-weight:400;color:var(--muted)">万</span></div>
+        <div class="kc-sub">${k.month_pct}% · 缺口 ${(k.month_target_wan-k.month_done_wan).toFixed(1)} 万</div>
+        <div class="kc-prog"><div class="kc-fill" style="width:${k.month_pct}%;background:var(--orange)"></div></div>
+      </div>
+      <div class="kpi-card behind">
+        <div class="kc-label">剩余天数</div>
+        <div class="kc-value">${k.remaining_days}<span style="font-size:13px;font-weight:400;color:var(--muted)">天</span></div>
+        <div class="kc-sub">需日均 ${k.daily_needed_wan} 万</div>
+        <div class="kc-prog"><div class="kc-fill" style="width:${remaining_pct}%;background:var(--red)"></div></div>
+      </div>
+      <div class="kpi-card ok">
+        <div class="kc-label">本月排行</div>
+        <div class="kc-value">${(d.ranking||[]).findIndex(r=>r.is_me)+1||'?'}<span style="font-size:13px;font-weight:400;color:var(--muted)">名</span></div>
+        <div class="kc-sub">共 ${(d.ranking||[]).length} 人</div>
+        <div class="kc-prog"><div class="kc-fill" style="width:80%;background:var(--green)"></div></div>
+      </div>`;
+  }
+
+  // Week grid
+  if (d.weeks) {
+    const wg = document.getElementById('week-grid-month');
+    if (wg) wg.innerHTML = d.weeks.map(w=>{
+      const cls = w.status === 'done' ? 'wk-done' : w.status === 'current' ? 'wk-current' : 'wk-future';
+      const badge = w.status === 'done' ? '<span class="tag green" style="font-size:10px">已完成</span>'
+                  : w.status === 'current' ? '<span class="tag blue" style="font-size:10px">进行中</span>'
+                  : '<span style="font-size:10px;color:var(--muted2)">待开始</span>';
+      const actual = w.status !== 'future'
+        ? `<div class="wk-actual" style="color:var(--blue)">已完成 ${w.done_wan} 万 <span style="font-size:11px;color:var(--muted)">(${w.pct}%)</span></div>`
+        : `<div class="wk-actual" style="color:var(--muted2)">待开始</div>`;
+      return `<div class="week-card ${cls}">
+        <div class="wk-label"><span>${w.label}</span>${badge}</div>
+        <div class="wk-plan">${w.target_wan}<span class="wk-unit">万</span></div>
+        ${actual}
+        <div class="wk-prog"><div class="wk-fill" style="width:${w.pct||0}%;background:var(--blue)"></div></div>
+      </div>`;
+    }).join('');
+  }
+
+  // Month ranking
+  if (d.ranking && d.ranking.length) {
+    const el = document.getElementById('rank-month-list');
+    if (el) el.innerHTML = d.ranking.map((r,i)=>`
+      <div class="rank-item${r.is_me?' me':''}">
+        <span class="rank-num${i<2?' top':''}">${i+1}</span>
+        <span class="rank-name">${r.name}${r.is_me?' (我)':''}</span>
+        <span class="rank-val">${r.val_wan}万</span>
+      </div>`).join('');
+  }
+}
+
+async function loadYearData() {
+  const d = await fetchAPI(`/api/pdca/staff/${CURRENT_USER_ID}/year`);
+  if (!d) return;
+  const k = d.kpi;
+
+  const yk = document.getElementById('year-kpi-summary');
+  if (yk) {
+    yk.innerHTML = `
+      <div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:6px">年度目标</div>
+        <div style="font-size:32px;font-weight:700">${k.year_target_wan}<span style="font-size:15px;font-weight:400;color:var(--muted)">万</span></div>
+      </div>
+      <div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:6px">YTD 已完成</div>
+        <div style="font-size:32px;font-weight:700;color:var(--orange)">${k.ytd_done_wan}<span style="font-size:15px;font-weight:400;color:var(--muted)">万</span></div>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px">缺口 ${(k.year_target_wan-k.ytd_done_wan).toFixed(1)} 万</div>
+      </div>
+      <div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:6px">年度进度</div>
+        <div style="font-size:32px;font-weight:700;color:var(--red)">${k.ytd_pct}%</div>
+        <div style="font-size:12px;color:var(--red);margin-top:4px">预期应达 ${k.expected_pct}%</div>
+      </div>`;
+  }
+
+  // Quarter cards
+  if (d.quarters) {
+    const qg = document.getElementById('quarter-grid');
+    const qNames = ['Q1 · 1–3月','Q2 · 4–6月','Q3 · 7–9月','Q4 · 10–12月'];
+    if (qg) qg.innerHTML = d.quarters.map((q,i)=>{
+      const cls = q.status === 'done' ? 'q-done' : q.status === 'current' ? 'q-current' : '';
+      const badge = q.status === 'done' ? `<span class="qc-badge" style="background:var(--orange-bg);color:var(--orange)">已结束</span>`
+                  : q.status === 'current' ? `<span class="qc-badge" style="background:var(--blue-bg);color:var(--blue)">进行中</span>`
+                  : `<span class="qc-badge" style="background:var(--bg2);color:var(--muted)">待开始</span>`;
+      const actual = q.status === 'future'
+        ? `<div class="qc-actual" style="color:var(--muted2)">未开始</div>`
+        : `<div class="qc-actual" style="color:var(--orange)">已完成 ${q.done_wan} 万 <span style="font-size:11px;color:var(--muted)">(${q.pct}%)</span></div>`;
+      return `<div class="quarter-card ${cls}">
+        <div class="qc-label">${qNames[i]} ${badge}</div>
+        <div class="qc-plan">${q.target_wan}<span style="font-size:13px;font-weight:400;color:var(--muted)">万</span></div>
+        ${actual}
+        <div class="qc-prog"><div class="qc-fill" style="width:${q.pct||0}%;background:var(--orange)"></div></div>
+      </div>`;
+    }).join('');
+  }
+
+  // Monthly table
+  if (d.monthly) {
+    const tb = document.getElementById('monthly-table-body');
+    if (tb) {
+      const qNames = ['Q1','Q2','Q3','Q4'];
+      const monNames = ['','1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+      let html = '';
+      let lastQ = 0;
+      d.monthly.forEach(m => {
+        if (m.quarter !== lastQ) {
+          lastQ = m.quarter;
+        }
+        const isCurrent = m.status === 'current';
+        const cls = isCurrent ? 'class="m-current"' : m.status === 'future' ? 'class="m-future"' : '';
+        const doneTd = m.done_wan != null
+          ? `<td>${isCurrent?`<b>${m.done_wan}万</b> <span style="font-size:11px;color:var(--blue)">进行中</span>`:m.done_wan+'万'}</td>`
+          : '<td>—</td>';
+        const pctTd = m.pct != null
+          ? `<td><span style="color:${m.pct>=80?'var(--green)':m.pct<50?'var(--red)':'var(--orange)'}">${m.pct}%</span></td>`
+          : '<td>—</td>';
+        const statusTd = m.status === 'current' ? `<td><span class="tag blue">进行中</span></td>`
+                       : m.status === 'future' ? `<td><span class="tag">待开始</span></td>`
+                       : m.pct >= 80 ? `<td><span class="tag green">达标</span></td>`
+                       : `<td><span class="tag red">低于目标</span></td>`;
+        html += `<tr ${cls}><td>${monNames[m.month]}</td><td style="color:var(--muted)">${qNames[m.quarter-1]}</td><td>${m.target_wan}万</td>${doneTd}${pctTd}${statusTd}</tr>`;
+
+        // Subtotal row at end of quarter
+        if (m.month % 3 === 0) {
+          const qData = d.quarters[m.quarter-1];
+          html += `<tr class="m-subtotal"><td colspan="2">${qNames[m.quarter-1]} 小计</td><td>${qData.target_wan}万</td><td>${qData.done_wan}万${qData.status==='current'?'+':''}</td><td style="color:var(--orange)">${qData.pct||0}%${qData.status==='current'?'+':''}</td><td><span class="tag ${qData.status==='future'?'':'orange'}">${qData.status==='future'?'待开始':qData.status==='current'?'进行中':'未达标'}</span></td></tr>`;
+        }
+      });
+      tb.innerHTML = html;
+    }
+  }
+}
+
 // ===== INIT =====
 renderKPI();
 renderSOP();
 renderCheckBars();
 renderDailySummary();
+
+// Async API load
+loadDayData();
+loadMonthData();
+loadYearData();
 
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') resetReport();

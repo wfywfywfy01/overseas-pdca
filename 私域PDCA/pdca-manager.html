@@ -385,7 +385,7 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
           <div class="step-badge dark">月</div>
           <div class="step-name">5月组目标<span class="step-sub">2026-05-01 ~ 05-31</span></div>
         </div>
-        <div class="kpi-strip">
+        <div class="kpi-strip" id="mgr-month-kpi-strip">
           <div class="kpi-card neutral">
             <div class="kc-label">组月度目标</div>
             <div class="kc-value">122<span style="font-size:13px;font-weight:400;color:var(--muted)">万</span></div>
@@ -578,7 +578,7 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
           <div class="step-badge dark">年</div>
           <div class="step-name">2026 组年度目标<span class="step-sub">年初向下拆解</span></div>
         </div>
-        <div class="card card-sm" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;align-items:center">
+        <div class="card card-sm" id="mgr-year-kpi" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;align-items:center">
           <div>
             <div style="font-size:12px;color:var(--muted);margin-bottom:6px">年度目标</div>
             <div style="font-size:32px;font-weight:700">1595<span style="font-size:15px;font-weight:400;color:var(--muted)">万</span></div>
@@ -654,7 +654,7 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
                 <th>年度达成率</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody id="mgr-year-member-body">
               <tr><td>陈莉</td><td><span class="tag gold">300W</span></td><td>347万</td><td style="color:var(--orange)">62万</td><td style="color:var(--blue)">9.2万+</td><td>71.2万</td><td><span style="color:var(--orange)">20.5%</span></td></tr>
               <tr><td>郑丽苹</td><td><span class="tag gold">300W</span></td><td>347万</td><td style="color:var(--orange)">54万</td><td style="color:var(--blue)">8.4万+</td><td>62.4万</td><td><span style="color:var(--red)">18%</span></td></tr>
               <tr><td>陈玉霞</td><td><span class="tag gold">300W</span></td><td>347万</td><td style="color:var(--orange)">58万</td><td style="color:var(--blue)">7.8万+</td><td>65.8万</td><td><span style="color:var(--orange)">19%</span></td></tr>
@@ -870,11 +870,134 @@ function showToast(msg){
   setTimeout(()=>el.classList.remove('show'),2500);
 }
 
+// ===== API CONFIG =====
+const API_BASE = window.PDCA_API_BASE || '';
+const TEAM_ID  = new URLSearchParams(location.search).get('team') || 1;
+
+async function fetchAPI(path) {
+  try {
+    const r = await fetch(API_BASE + path);
+    if (!r.ok) throw new Error(r.status);
+    return await r.json();
+  } catch(e) {
+    console.warn('[PDCA API]', path, e.message);
+    return null;
+  }
+}
+
+function kpiStatus(p) { return p>=80?'ok':p>=40?'warn':'behind'; }
+
+async function loadMgrDayData() {
+  const d = await fetchAPI(`/api/pdca/manager/${TEAM_ID}/day`);
+  if (!d) return;
+
+  // Update member grid with real data
+  if (d.members && d.members.length) {
+    // Merge real data into MEMBERS array by position / lookup
+    d.members.forEach(m => {
+      const idx = MEMBERS.findIndex(mem => mem.name.includes(m.name.slice(0,1)));
+      if (idx >= 0) {
+        MEMBERS[idx].today  = m.today_wan;
+        MEMBERS[idx].target = m.today_target_wan;
+        MEMBERS[idx].warn   = m.warn;
+      }
+    });
+    renderMemberGrid();
+    renderMemberBars();
+  }
+}
+
+async function loadMgrMonthData() {
+  const d = await fetchAPI(`/api/pdca/manager/${TEAM_ID}/month`);
+  if (!d) return;
+
+  if (d.members && d.members.length) {
+    d.members.forEach(m => {
+      const idx = MONTH_MEMBERS.findIndex(mem => mem.name.includes(m.name.slice(0,1)));
+      if (idx >= 0) {
+        MONTH_MEMBERS[idx].done   = m.done_wan;
+        MONTH_MEMBERS[idx].target = m.target_wan;
+      }
+    });
+    renderMonthMemberBars();
+  }
+
+  // Update group KPI strip if element present
+  const strip = document.getElementById('mgr-month-kpi-strip');
+  if (strip && d.kpi) {
+    const k = d.kpi;
+    strip.innerHTML = `
+      <div class="kpi-card neutral">
+        <div class="kc-label">组月度目标</div>
+        <div class="kc-value">${k.month_target_wan}<span style="font-size:13px;font-weight:400;color:var(--muted)">万</span></div>
+        <div class="kc-sub">${k.member_count} 人</div>
+        <div class="kc-prog"><div class="kc-fill" style="width:100%;background:#2563eb"></div></div>
+      </div>
+      <div class="kpi-card ${kpiStatus(k.month_pct)}">
+        <div class="kc-label">组已完成</div>
+        <div class="kc-value">${k.month_done_wan}<span style="font-size:13px;font-weight:400;color:var(--muted)">万</span></div>
+        <div class="kc-sub">${k.month_pct}% · 剩余 ${(k.month_target_wan-k.month_done_wan).toFixed(1)} 万</div>
+        <div class="kc-prog"><div class="kc-fill" style="width:${k.month_pct}%;background:var(--orange)"></div></div>
+      </div>
+      <div class="kpi-card behind">
+        <div class="kc-label">剩余天数</div>
+        <div class="kc-value">${k.remaining_days}<span style="font-size:13px;font-weight:400;color:var(--muted)">天</span></div>
+        <div class="kc-sub">需日均 ${k.daily_needed_wan} 万</div>
+        <div class="kc-prog"><div class="kc-fill" style="width:55%;background:var(--red)"></div></div>
+      </div>
+      <div class="kpi-card ok">
+        <div class="kc-label">组平均达成</div>
+        <div class="kc-value">${k.month_pct}<span style="font-size:13px;font-weight:400;color:var(--muted)">%</span></div>
+        <div class="kc-sub">${k.month_pct>=70?'节奏正常':'需加速'}</div>
+        <div class="kc-prog"><div class="kc-fill" style="width:${k.month_pct}%;background:var(--green)"></div></div>
+      </div>`;
+  }
+}
+
+async function loadMgrYearData() {
+  const d = await fetchAPI(`/api/pdca/manager/${TEAM_ID}/year`);
+  if (!d) return;
+  const k = d.kpi;
+
+  const yk = document.getElementById('mgr-year-kpi');
+  if (yk && k) {
+    yk.innerHTML = `
+      <div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:6px">组年度目标</div>
+        <div style="font-size:32px;font-weight:700">${k.year_target_wan}<span style="font-size:15px;font-weight:400;color:var(--muted)">万</span></div>
+      </div>
+      <div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:6px">YTD 已完成</div>
+        <div style="font-size:32px;font-weight:700;color:var(--orange)">${k.ytd_wan}<span style="font-size:15px;font-weight:400;color:var(--muted)">万</span></div>
+      </div>
+      <div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:6px">年度进度</div>
+        <div style="font-size:32px;font-weight:700;color:var(--red)">${k.ytd_pct}%</div>
+        <div style="font-size:12px;color:var(--red);margin-top:4px">预期应达 ${k.expected_pct}%</div>
+      </div>`;
+  }
+
+  if (d.members && d.members.length) {
+    const tbody = document.getElementById('mgr-year-member-body');
+    if (tbody) tbody.innerHTML = d.members.map((m,i) => `
+      <tr>
+        <td>${m.name}</td>
+        <td>${m.ytd_wan} 万</td>
+        <td>${m.year_target_wan} 万</td>
+        <td><span style="color:${m.pct>=80?'var(--green)':m.pct<50?'var(--red)':'var(--orange)'}">${m.pct}%</span></td>
+      </tr>`).join('');
+  }
+}
+
 // ===== INIT =====
 renderMgrSOP();
 renderMemberGrid();
 renderMemberBars();
 renderMonthMemberBars();
+
+loadMgrDayData();
+loadMgrMonthData();
+loadMgrYearData();
 </script>
 </body>
 </html>
