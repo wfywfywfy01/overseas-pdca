@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>海外私域 PDCA · 日视图</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#fafaf8;--bg2:#f4f4f0;--card:#ffffff;
+  --border:#e5e7eb;--border2:#d1d5db;
+  --text:#111827;--muted:#6b7280;--muted2:#9ca3af;
+  --green:#16a34a;--green-bg:#f0fdf4;--green-border:#bbf7d0;
+  --red:#dc2626;--red-bg:#fef2f2;--red-border:#fecaca;
+  --orange:#ea580c;--orange-bg:#fff7ed;--orange-border:#fed7aa;
+  --blue:#2563eb;--blue-bg:#eff6ff;--blue-border:#bfdbfe;
+  --purple:#7c3aed;--purple-bg:#f5f3ff;--purple-border:#ddd6fe;
+  --gold:#b45309;--gold-bg:#fffbeb;--gold-border:#fde68a;
+  --radius:8px;--shadow:0 1px 3px rgba(0,0,0,.08);--shadow2:0 4px 16px rgba(0,0,0,.1);
+}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Segoe UI',sans-serif;font-size:14px;line-height:1.5}
+
+/* HEADER */
+.app-header{height:56px;background:var(--card);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 24px;position:sticky;top:0;z-index:100}
+.header-left{display:flex;align-items:center;gap:12px}
+.avatar{width:34px;height:34px;border-radius:50%;background:#111827;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;flex-shrink:0}
+.header-info .name{font-size:14px;font-weight:600}
+.header-info .meta{font-size:12px;color:var(--muted)}
+.header-right{display:flex;align-items:center;gap:12px;font-size:13px;color:var(--muted)}
+.tag{display:inline-flex;align-items:center;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:500;background:var(--bg2);color:var(--muted);border:1px solid var(--border)}
+.tag.green{background:var(--green-bg);color:var(--green);border-color:var(--green-border)}
+.tag.red{background:var(--red-bg);color:var(--red);border-color:var(--red-border)}
+.tag.orange{background:var(--orange-bg);color:var(--orange);border-color:var(--orange-border)}
+.tag.blue{background:var(--blue-bg);color:var(--blue);border-color:var(--blue-border)}
+.tag.gold{background:var(--gold-bg);color:var(--gold);border-color:var(--gold-border);font-weight:600}
+.btn-sm{padding:6px 12px;border-radius:var(--radius);border:1px solid var(--border2);background:var(--card);font-size:12px;cursor:pointer;font-weight:500;color:var(--text)}
+.btn-sm:hover{background:var(--bg2)}
+.btn-sm.dark{background:#111827;color:#fff;border-color:#111827}
+.btn-sm.dark:hover{opacity:.85}
+
+/* TIME NAV */
+.time-nav{display:flex;align-items:center;gap:6px;padding:10px 24px;background:var(--bg2);border-bottom:1px solid var(--border)}
+.time-nav-label{font-size:12px;color:var(--muted);font-weight:500;margin-right:6px;white-space:nowrap}
+.time-tab{padding:5px 20px;border-radius:16px;border:1px solid var(--border2);background:var(--card);font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;transition:all .15s}
+.time-tab.active{background:#111827;color:#fff;border-color:#111827}
+.time-tab:hover:not(.active){border-color:#111827;color:#111827}
+.time-tab.disabled{opacity:.4;cursor:not-allowed}
+.time-panel{display:none}
+.time-panel.active{display:block}
+
+/* LAYOUT */
+.main-layout{display:grid;grid-template-columns:1fr 300px;min-height:calc(100vh - 106px)}
+.left-col{padding:24px;display:flex;flex-direction:column;gap:20px;border-right:1px solid var(--border)}
+.right-col{padding:20px;display:flex;flex-direction:column;gap:16px;background:var(--bg)}
+
+/* CARDS */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow)}
+.card-sm{padding:16px}
+.card-title{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:14px}
+.section-label{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.step-badge{width:22px;height:22px;border-radius:50%;background:#111827;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.step-name{font-size:15px;font-weight:700}
+.step-sub{font-size:12px;color:var(--muted);font-weight:400;margin-left:4px}
+
+/* TODAY KPI STRIP */
+.kpi-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.kpi-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;position:relative;overflow:hidden}
+.kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--border2)}
+.kpi-card.ok::before{background:var(--green)}
+.kpi-card.warn::before{background:var(--orange)}
+.kpi-card.behind::before{background:var(--red)}
+.kpi-card.neutral::before{background:#111827}
+.kc-label{font-size:11px;color:var(--muted);font-weight:500;margin-bottom:6px}
+.kc-value{font-size:22px;font-weight:700;letter-spacing:-.02em}
+.kc-sub{font-size:11px;color:var(--muted);margin-top:3px}
+.kc-prog{height:3px;background:var(--bg2);border-radius:2px;margin-top:8px;overflow:hidden}
+.kc-fill{height:100%;border-radius:2px;transition:width .4s}
+
+/* SOP TIMELINE */
+.sop-timeline{display:flex;flex-direction:column;gap:6px}
+.sop-item{display:flex;align-items:flex-start;gap:12px;padding:11px 14px;border:1px solid var(--border);border-radius:var(--radius);background:var(--card);cursor:pointer;transition:all .15s;position:relative}
+.sop-item:hover{border-color:#111827}
+.sop-item.done{background:var(--green-bg);border-color:var(--green-border)}
+.sop-item.doing{background:#fffbeb;border-color:var(--gold-border)}
+.sop-item.skip{opacity:.5}
+.sop-dot{width:8px;height:8px;border-radius:50%;background:var(--border2);flex-shrink:0;margin-top:5px}
+.sop-item.done .sop-dot{background:var(--green)}
+.sop-item.doing .sop-dot{background:var(--orange);box-shadow:0 0 0 3px var(--orange-bg)}
+.sop-time{font-size:11px;color:var(--muted);width:88px;flex-shrink:0;padding-top:1px;font-variant-numeric:tabular-nums}
+.sop-content{flex:1;min-width:0}
+.sop-module{font-size:13px;font-weight:600;color:var(--text)}
+.sop-desc{font-size:12px;color:var(--muted);margin-top:2px;line-height:1.4}
+.sop-kpi{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
+.sop-kpi-chip{font-size:11px;padding:2px 7px;border-radius:10px;background:var(--bg2);color:var(--muted);border:1px solid var(--border)}
+.sop-kpi-chip.hit{background:var(--green-bg);color:var(--green);border-color:var(--green-border)}
+.sop-kpi-chip.miss{background:var(--red-bg);color:var(--red);border-color:var(--red-border)}
+.sop-kpi-chip.part{background:var(--orange-bg);color:var(--orange);border-color:var(--orange-border)}
+.sop-status{margin-left:auto;flex-shrink:0;padding-top:1px}
+.status-chip{padding:3px 10px;border-radius:12px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--border2);background:var(--bg);color:var(--muted);white-space:nowrap;user-select:none}
+.status-chip.doing{background:#fffbeb;color:#92400e;border-color:var(--gold-border)}
+.status-chip.done{background:var(--green-bg);color:var(--green);border-color:var(--green-border)}
+
+/* CHECK BARS */
+.prog-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.prog-row:last-child{margin-bottom:0}
+.prog-label{width:96px;font-size:13px;color:var(--text);flex-shrink:0}
+.prog-row.indent .prog-label{width:90px;padding-left:14px;font-size:12px;color:var(--muted)}
+.prog-track{flex:1;height:7px;background:var(--bg2);border-radius:4px;overflow:hidden}
+.prog-fill{height:100%;border-radius:4px;background:#111827;transition:width .4s}
+.prog-fill.ok{background:var(--green)}
+.prog-fill.warn{background:var(--orange)}
+.prog-fill.bad{background:var(--red)}
+.prog-num{width:64px;text-align:right;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.prog-check{font-size:13px;width:18px;flex-shrink:0;text-align:center}
+
+/* RANK LIST */
+.rank-list{display:flex;flex-direction:column;gap:5px}
+.rank-item{display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--bg);border-radius:var(--radius)}
+.rank-item.me{background:#fffbeb;border:1px solid var(--gold-border)}
+.rank-num{width:20px;font-size:13px;font-weight:700;color:var(--muted);text-align:center}
+.rank-num.top{color:#111827}
+.rank-name{flex:1;font-size:13px}
+.rank-val{font-size:13px;font-weight:600;color:var(--text)}
+
+/* HERMES */
+.hermes-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px}
+.hermes-header{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.hermes-icon{width:28px;height:28px;border-radius:50%;background:#111827;color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+.hermes-title{font-size:13px;font-weight:600}
+.hermes-body{font-size:12px;color:var(--muted);line-height:1.8;background:var(--bg);border-radius:var(--radius);padding:12px;margin-bottom:12px}
+.hermes-body b{color:var(--text)}
+.hermes-actions{display:flex;gap:6px}
+
+/* TABS */
+.tabs{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:14px}
+.tab{padding:7px 16px;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s}
+.tab.active{color:#111827;border-color:#111827}
+.tab-content{display:none}
+.tab-content.active{display:block}
+
+/* DATA TABLE */
+.data-table{width:100%;border-collapse:collapse}
+.data-table th{font-size:11px;color:var(--muted);font-weight:500;text-align:left;padding:7px 12px;border-bottom:1px solid var(--border);text-transform:uppercase;letter-spacing:.03em}
+.data-table td{padding:9px 12px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:middle}
+.data-table tr:last-child td{border-bottom:none}
+.data-table tr:hover td{background:var(--bg)}
+
+/* DAILY REPORT */
+.report-textarea{width:100%;min-height:130px;padding:11px 12px;border:1px solid var(--border2);border-radius:var(--radius);font-size:13px;font-family:inherit;resize:vertical;background:var(--bg);color:var(--text);outline:none;transition:border .15s;line-height:1.6}
+.report-textarea:focus{border-color:#111827}
+.loading-dots{display:inline-flex;gap:4px;align-items:center}
+.loading-dots span{width:5px;height:5px;border-radius:50%;background:var(--muted);animation:dot 1.2s infinite}
+.loading-dots span:nth-child(2){animation-delay:.2s}
+.loading-dots span:nth-child(3){animation-delay:.4s}
+@keyframes dot{0%,80%,100%{transform:scale(.6);opacity:.4}40%{transform:scale(1);opacity:1}}
+
+.score-card{background:var(--bg);border-radius:var(--radius);padding:14px;margin-top:12px}
+.score-big{font-size:32px;font-weight:700}
+.score-breakdown{margin-top:10px;display:flex;flex-direction:column;gap:5px}
+.score-row{display:flex;justify-content:space-between;font-size:13px}
+.score-row .sr-label{color:var(--muted)}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:#111827;color:#fff;padding:11px 18px;border-radius:var(--radius);font-size:13px;box-shadow:var(--shadow2);z-index:999;opacity:0;transform:translateY(8px);transition:all .25s;pointer-events:none}
+.toast.show{opacity:1;transform:translateY(0)}
+
+/* PLACEHOLDER */
+.placeholder-panel{display:flex;align-items:center;justify-content:center;min-height:300px;color:var(--muted2);font-size:14px;flex-direction:column;gap:8px}
+.placeholder-panel .ph-icon{font-size:32px;margin-bottom:4px}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="app-header">
+  <div class="header-left">
+    <div class="avatar">郑</div>
+    <div class="header-info">
+      <div class="name">郑丽苹 <span class="tag">何川组</span> <span class="tag green">D90+</span> <span class="tag gold">300W</span></div>
+      <div class="meta">入职 421 天 · 今日 2026-05-14（周四）</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <span style="font-size:12px">海外私域部</span>
+    <button class="btn-sm" onclick="showToast('已退出')">退出</button>
+  </div>
+</div>
+
+<!-- TIME NAV -->
+<div class="time-nav">
+  <span class="time-nav-label">时间维度</span>
+  <button class="time-tab active" onclick="switchTime('day',this)">日视图</button>
+  <button class="time-tab disabled" title="开发中">月视图</button>
+  <button class="time-tab disabled" title="开发中">年视图</button>
+  <span style="margin-left:auto;font-size:12px;color:var(--muted2)">执行向上累：日 → 月 → 季 → 年</span>
+</div>
+
+<!-- DAY PANEL -->
+<div id="panel-day" class="time-panel active">
+  <div class="main-layout">
+    <!-- LEFT COL -->
+    <div class="left-col">
+
+      <!-- 1. TODAY KPI -->
+      <div>
+        <div class="section-label">
+          <div class="step-badge">今</div>
+          <div class="step-name">今日目标<span class="step-sub">2026-05-14</span></div>
+        </div>
+        <div class="kpi-strip" id="kpi-strip"></div>
+      </div>
+
+      <!-- 2. SOP TIMELINE -->
+      <div>
+        <div class="section-label">
+          <div class="step-badge">D</div>
+          <div class="step-name">今日 SOP<span class="step-sub">点击切换状态</span></div>
+        </div>
+        <div class="sop-timeline" id="sop-list"></div>
+      </div>
+
+      <!-- 3. CHECK BARS -->
+      <div>
+        <div class="section-label">
+          <div class="step-badge">C</div>
+          <div class="step-name">今日完成度<span class="step-sub">实时进度</span></div>
+        </div>
+        <div class="card card-sm">
+          <div id="check-bars"></div>
+        </div>
+      </div>
+
+      <!-- 4. ACT: ORDERS / CUSTOMERS / INTENT / REPORT -->
+      <div>
+        <div class="section-label">
+          <div class="step-badge">A</div>
+          <div class="step-name">跟单 & 日报<span class="step-sub">今日操作</span></div>
+        </div>
+        <div class="card card-sm">
+          <div class="tabs">
+            <div class="tab active" onclick="switchTab('act','orders',this)">订单跟进</div>
+            <div class="tab" onclick="switchTab('act','intent',this)">意向客户</div>
+            <div class="tab" onclick="switchTab('act','report',this)">日报</div>
+          </div>
+
+          <!-- 订单 -->
+          <div id="act-orders" class="tab-content active">
+            <table class="data-table">
+              <thead><tr><th>订单号</th><th>客户</th><th>金额</th><th>状态</th><th>最后跟进</th></tr></thead>
+              <tbody>
+                <tr><td>#VT-2026-0391</td><td>Sarah L. <span class="tag" style="font-size:10px">美国</span></td><td style="font-weight:600">$3,200</td><td><span class="tag orange">待处理</span></td><td>今日 09:12</td></tr>
+                <tr><td>#VT-2026-0388</td><td>Mohammed A. <span class="tag" style="font-size:10px">沙特</span></td><td style="font-weight:600">$5,600</td><td><span class="tag blue">待发货</span></td><td>昨日</td></tr>
+                <tr><td>#VT-2026-0371</td><td>David K. <span class="tag" style="font-size:10px">英国</span></td><td style="font-weight:600">$4,800</td><td><span class="tag">发货中</span></td><td>05-10</td></tr>
+                <tr><td>#VT-2026-0342</td><td>Elena V. <span class="tag" style="font-size:10px">俄罗斯</span></td><td style="font-weight:600">$7,200</td><td><span class="tag green">已签收</span></td><td>05-09</td></tr>
+                <tr><td>#VT-2026-0318</td><td>John T. <span class="tag" style="font-size:10px">澳大利亚</span></td><td style="font-weight:600">$2,900</td><td><span class="tag red">退款中</span></td><td>05-06</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- 意向 -->
+          <div id="act-intent" class="tab-content">
+            <table class="data-table">
+              <thead><tr><th>客户</th><th>预估金额</th><th>意向信号</th><th>最近沟通</th><th>操作</th></tr></thead>
+              <tbody>
+                <tr><td>Sarah L. (美国)</td><td style="font-weight:600;color:var(--green)">$3,200</td><td>明确询价，要求报价单</td><td>今日 09:20</td><td><button class="btn-sm" style="font-size:11px;padding:3px 8px" onclick="showToast('已标记跟进')">跟进</button></td></tr>
+                <tr><td>Mohammed A. (沙特)</td><td style="font-weight:600;color:var(--green)">$5,600</td><td>确认颜色款式，问配送时间</td><td>昨日 16:30</td><td><button class="btn-sm" style="font-size:11px;padding:3px 8px" onclick="showToast('已标记跟进')">跟进</button></td></tr>
+                <tr><td>Kumar S. (印度)</td><td style="font-weight:600;color:var(--orange)">$2,800</td><td>询问分期付款</td><td>05-12 11:15</td><td><button class="btn-sm" style="font-size:11px;padding:3px 8px" onclick="showToast('已标记跟进')">跟进</button></td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- 日报 -->
+          <div id="act-report" class="tab-content">
+            <div style="margin-bottom:10px;font-size:12px;color:var(--muted)">今日日报 · 填写后提交，AI 将在 3 秒内给出评分</div>
+            <textarea class="report-textarea" id="report-text" placeholder="【业绩情况】今日成交 X 单，金额 X 元。&#10;【触达情况】三方私信 X 条，触达客户 X 人（S类X，AB类X，老客X，自拓X）。&#10;【跟进情况】重点客户 A：问题→进展。&#10;【社媒动作】ins X条，TK X条，yt X条，WA动态 X条。&#10;【明日计划】"></textarea>
+            <div style="margin-top:10px;display:flex;gap:8px">
+              <button class="btn-sm dark" onclick="submitReport()">提交日报</button>
+              <button class="btn-sm" onclick="showToast('草稿已保存')">保存草稿</button>
+            </div>
+            <div id="report-loading" style="display:none;margin-top:14px;color:var(--muted);font-size:13px;display:none">
+              AI 评审中 <div class="loading-dots"><span></span><span></span><span></span></div>
+            </div>
+            <div id="report-score" style="display:none">
+              <div class="score-card">
+                <div class="score-big">82<span style="font-size:16px;font-weight:400;color:var(--muted)">/100</span></div>
+                <div style="font-size:12px;color:var(--muted);margin-top:2px">合格 · 今日日报得分</div>
+                <div class="score-breakdown">
+                  <div class="score-row"><span class="sr-label">必填 4 项完整</span><span style="color:var(--green);font-weight:600">20/20</span></div>
+                  <div class="score-row"><span class="sr-label">量化指标</span><span style="color:var(--orange);font-weight:600">22/30</span></div>
+                  <div class="score-row"><span class="sr-label">跟进质量</span><span style="color:var(--orange);font-weight:600">16/20</span></div>
+                  <div class="score-row"><span class="sr-label">字数达标</span><span style="color:var(--green);font-weight:600">10/10</span></div>
+                  <div class="score-row"><span class="sr-label">写作质量</span><span style="color:var(--muted);font-weight:600">14/20</span></div>
+                </div>
+                <div style="margin-top:10px;font-size:12px;color:var(--muted);border-top:1px solid var(--border);padding-top:8px">
+                  <b style="color:var(--text)">AI 建议：</b><br>
+                  · 量化指标：未提及邮件触达数量<br>
+                  · 跟进质量：第二条跟进缺少结果描述
+                </div>
+                <div style="margin-top:8px;display:flex;gap:6px">
+                  <button class="btn-sm dark" onclick="resetReport()">修改重评</button>
+                  <button class="btn-sm" onclick="showToast('已提交')">确认提交</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /left-col -->
+
+    <!-- RIGHT COL -->
+    <div class="right-col">
+
+      <!-- 今日进度小结 -->
+      <div class="card card-sm">
+        <div class="card-title">今日进度小结</div>
+        <div style="display:flex;flex-direction:column;gap:10px" id="daily-summary"></div>
+      </div>
+
+      <!-- 排行榜 -->
+      <div class="card card-sm">
+        <div class="tabs" style="margin-bottom:10px">
+          <div class="tab active" onclick="switchTab('rank','reach',this)">触达排行</div>
+          <div class="tab" onclick="switchTab('rank','perf',this)">业绩排行</div>
+        </div>
+        <div id="rank-reach" class="tab-content active">
+          <div class="rank-list">
+            <div class="rank-item"><span class="rank-num top">1</span><span class="rank-name">陈玉霞</span><span class="rank-val">58</span></div>
+            <div class="rank-item"><span class="rank-num top">2</span><span class="rank-name">肖映</span><span class="rank-val">52</span></div>
+            <div class="rank-item me"><span class="rank-num">3</span><span class="rank-name">郑丽苹（我）</span><span class="rank-val">47</span></div>
+            <div class="rank-item"><span class="rank-num">4</span><span class="rank-name">许淋玲</span><span class="rank-val">44</span></div>
+            <div class="rank-item"><span class="rank-num">5</span><span class="rank-name">陈晓霜</span><span class="rank-val">39</span></div>
+          </div>
+        </div>
+        <div id="rank-perf" class="tab-content">
+          <div class="rank-list">
+            <div class="rank-item"><span class="rank-num top">1</span><span class="rank-name">肖映</span><span class="rank-val">6.0万</span></div>
+            <div class="rank-item"><span class="rank-num top">2</span><span class="rank-name">陈玉霞</span><span class="rank-val">5.98万</span></div>
+            <div class="rank-item"><span class="rank-num">3</span><span class="rank-name">许淋玲</span><span class="rank-val">3.91万</span></div>
+            <div class="rank-item me"><span class="rank-num">4</span><span class="rank-name">郑丽苹（我）</span><span class="rank-val">3.48万</span></div>
+            <div class="rank-item"><span class="rank-num">5</span><span class="rank-name">陈晓霜</span><span class="rank-val">2.97万</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hermes AI -->
+      <div class="hermes-card">
+        <div class="hermes-header">
+          <div class="hermes-icon">H</div>
+          <div class="hermes-title">Hermes AI · 今日建议</div>
+        </div>
+        <div class="hermes-body">
+          你本周私信达成率 <b>78%</b>，主要卡在 13:15–14:15 时段，该时段平均完成 <b>6 条</b>（目标 15）。<br><br>
+          建议参考陈玉霞 05-08 日报的<b>关键词搜索法</b>，1 小时完成 52 条。预计提升本时段效率 +40%。
+        </div>
+        <div class="hermes-actions">
+          <button class="btn-sm" onclick="showToast('已打开参考案例')">查看案例</button>
+          <button class="btn-sm" onclick="showToast('已标记已读')">已读</button>
+        </div>
+      </div>
+
+      <!-- 昨日日报得分 -->
+      <div class="card card-sm">
+        <div class="card-title">昨日日报评分</div>
+        <div style="display:flex;align-items:baseline;gap:6px">
+          <div style="font-size:28px;font-weight:700">78</div>
+          <div style="font-size:13px;color:var(--muted)">/100 · 合格</div>
+        </div>
+        <div style="margin-top:6px;font-size:12px;color:var(--muted)">较前日 +4 分 · 连续 3 天达标</div>
+        <div style="margin-top:10px;height:4px;background:var(--bg2);border-radius:2px;overflow:hidden">
+          <div style="width:78%;height:100%;background:var(--green);border-radius:2px"></div>
+        </div>
+      </div>
+
+    </div><!-- /right-col -->
+  </div>
+</div><!-- /panel-day -->
+
+<!-- MONTH PANEL (placeholder) -->
+<div id="panel-month" class="time-panel">
+  <div class="placeholder-panel">
+    <div class="ph-icon">📅</div>
+    <div style="font-weight:600">月视图 · 开发中</div>
+    <div style="font-size:12px;color:var(--muted2)">月度指标 · 来源分解 · 周维度拆解</div>
+  </div>
+</div>
+
+<!-- YEAR PANEL (placeholder) -->
+<div id="panel-year" class="time-panel">
+  <div class="placeholder-panel">
+    <div class="ph-icon">📊</div>
+    <div style="font-weight:600">年视图 · 开发中</div>
+    <div style="font-size:12px;color:var(--muted2)">年度目标 · 季度拆解 · 月度累计</div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ===== DATA =====
+const SOP_DATA = [
+  {time:'09:00–09:10', module:'公司早会', desc:'同步今日重点，接收主管指令', status:'done',
+   kpis:[]},
+  {time:'09:10–09:30', module:'数据复盘', desc:'查看昨日业绩、日报评分、异常提醒', status:'done',
+   kpis:[{label:'昨日评分 78 ✓', cls:'hit'}]},
+  {time:'09:30–10:00', module:'动态发送', desc:'发布 ins/TK/YT 内容，更新 WA 动态', status:'done',
+   kpis:[{label:'ins 1条 ✓', cls:'hit'},{label:'TK 1条 ✓', cls:'hit'},{label:'WA动态 ✓', cls:'hit'}]},
+  {time:'10:00–11:00', module:'三方私信（上午）', desc:'关键词搜索触达，目标 15 条', status:'doing',
+   kpis:[{label:'已完成 9/15', cls:'part'},{label:'S类优先', cls:''}]},
+  {time:'11:00–12:00', module:'S类客户跟进', desc:'优先响应 S 类客户，推进成交', status:'todo',
+   kpis:[{label:'Sarah L. $3,200', cls:''},{label:'Mohammed A.', cls:''}]},
+  {time:'13:15–14:15', module:'三方私信（午后）', desc:'持续触达，累计目标 40 条', status:'todo',
+   kpis:[{label:'目标 +15 条', cls:''}]},
+  {time:'14:15–15:00', module:'AB类跟进', desc:'跟进 AB 类客户，挖掘转化机会', status:'todo',
+   kpis:[{label:'Grace W.', cls:''},{label:'Lim K.', cls:''}]},
+  {time:'15:00–16:00', module:'老客户触达', desc:'添加老客户，日均目标 20 人', status:'todo',
+   kpis:[{label:'目标 20 人', cls:''}]},
+  {time:'16:00–17:00', module:'邮件营销', desc:'批量发送邮件，目标 200 封', status:'todo',
+   kpis:[{label:'目标 200 封', cls:''}]},
+  {time:'17:00–17:30', module:'弃单追回', desc:'15 min 内跟进弃单，检查今日弃单列表', status:'todo',
+   kpis:[]},
+  {time:'17:30–18:00', module:'日报填写', desc:'填写今日日报，AI 打分复盘', status:'todo',
+   kpis:[]},
+];
+
+const CHECK_DATA = [
+  {label:'三方私信', cur:32, max:40},
+  {label:'ins 发帖', cur:3, max:3},
+  {label:'TK 发帖', cur:2, max:3},
+  {label:'YT 发帖', cur:3, max:3},
+  {label:'触达总计', cur:42, max:50},
+  {label:'└ S 类', cur:10, max:10, indent:true},
+  {label:'└ AB 类', cur:8, max:10, indent:true},
+  {label:'└ 老客户', cur:18, max:20, indent:true},
+  {label:'└ 自拓', cur:6, max:10, indent:true},
+  {label:'老客添加', cur:9, max:10},
+  {label:'邮件触达', cur:170, max:200},
+  {label:'WA 动态', cur:3, max:3},
+];
+
+const KPI_DATA = [
+  {label:'今日目标', value:'1.19', unit:'万', sub:'月度日均拆解', cur:1.19, max:1.19, cls:'neutral'},
+  {label:'今日已完成', value:'0.48', unit:'万', sub:'40% · 还需 0.71 万', cur:0.48, max:1.19, cls:'behind'},
+  {label:'本月完成', value:'8.4', unit:'万', sub:'月目标 25 万 · 33.6%', cur:8.4, max:25, cls:'warn'},
+  {label:'日报连续达标', value:'3', unit:'天', sub:'昨日 78 分 · 合格', cur:3, max:7, cls:'ok'},
+];
+
+// ===== RENDER KPI STRIP =====
+function renderKPI() {
+  const el = document.getElementById('kpi-strip');
+  el.innerHTML = KPI_DATA.map(k => {
+    const pct = Math.min(Math.round(k.cur / k.max * 100), 100);
+    const fillColor = k.cls === 'ok' ? 'var(--green)' : k.cls === 'warn' ? 'var(--orange)' : k.cls === 'behind' ? 'var(--red)' : '#111827';
+    return `<div class="kpi-card ${k.cls}">
+      <div class="kc-label">${k.label}</div>
+      <div class="kc-value">${k.value}<span style="font-size:13px;font-weight:400;color:var(--muted)">${k.unit}</span></div>
+      <div class="kc-sub">${k.sub}</div>
+      <div class="kc-prog"><div class="kc-fill" style="width:${pct}%;background:${fillColor}"></div></div>
+    </div>`;
+  }).join('');
+}
+
+// ===== RENDER SOP =====
+function renderSOP() {
+  const el = document.getElementById('sop-list');
+  el.innerHTML = SOP_DATA.map((s, i) => {
+    const kpiHtml = s.kpis.length
+      ? `<div class="sop-kpi">${s.kpis.map(k=>`<span class="sop-kpi-chip ${k.cls}">${k.label}</span>`).join('')}</div>`
+      : '';
+    const chipLabel = s.status === 'done' ? '已完成' : s.status === 'doing' ? '进行中' : '待办';
+    return `<div class="sop-item ${s.status}" id="sop-${i}" onclick="cycleSOP(${i})">
+      <div class="sop-dot"></div>
+      <div class="sop-time">${s.time}</div>
+      <div class="sop-content">
+        <div class="sop-module">${s.module}</div>
+        <div class="sop-desc">${s.desc}</div>
+        ${kpiHtml}
+      </div>
+      <div class="sop-status">
+        <span class="status-chip ${s.status}">${chipLabel}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function cycleSOP(i) {
+  const states = ['todo', 'doing', 'done'];
+  SOP_DATA[i].status = states[(states.indexOf(SOP_DATA[i].status) + 1) % 3];
+  renderSOP();
+  renderDailySummary();
+}
+
+// ===== RENDER CHECK BARS =====
+function renderCheckBars() {
+  const el = document.getElementById('check-bars');
+  el.innerHTML = CHECK_DATA.map(c => {
+    const pct = Math.min(Math.round(c.cur / c.max * 100), 100);
+    const fillCls = pct >= 100 ? 'ok' : pct < 70 ? 'bad' : 'warn';
+    const checkIcon = pct >= 100 ? '<span class="prog-check" style="color:var(--green)">✓</span>' : '<span class="prog-check"></span>';
+    const numColor = pct >= 100 ? 'color:var(--green)' : pct < 70 ? 'color:var(--red)' : '';
+    return `<div class="prog-row${c.indent ? ' indent' : ''}">
+      <div class="prog-label">${c.label}</div>
+      <div class="prog-track"><div class="prog-fill ${fillCls}" style="width:${pct}%"></div></div>
+      <div class="prog-num" style="${numColor}">${c.cur}/${c.max}</div>
+      ${checkIcon}
+    </div>`;
+  }).join('');
+}
+
+// ===== DAILY SUMMARY =====
+function renderDailySummary() {
+  const done = SOP_DATA.filter(s => s.status === 'done').length;
+  const doing = SOP_DATA.filter(s => s.status === 'doing').length;
+  const total = SOP_DATA.length;
+  const sopPct = Math.round(done / total * 100);
+
+  const completedItems = CHECK_DATA.filter(c => c.cur >= c.max).length;
+  const checkPct = Math.round(completedItems / CHECK_DATA.filter(c => !c.indent).length * 100);
+
+  const el = document.getElementById('daily-summary');
+  el.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <div style="font-size:12px;color:var(--muted)">SOP 完成</div>
+        <div style="font-size:18px;font-weight:700">${done}/${total} <span style="font-size:12px;font-weight:400;color:var(--muted)">节点</span></div>
+      </div>
+      <div style="text-align:right">
+        ${doing > 0 ? `<span class="tag orange">${doing} 进行中</span>` : ''}
+        <div style="font-size:11px;color:var(--muted);margin-top:4px">${sopPct}%</div>
+      </div>
+    </div>
+    <div style="height:5px;background:var(--bg2);border-radius:3px;overflow:hidden">
+      <div style="width:${sopPct}%;height:100%;background:${sopPct>=80?'var(--green)':sopPct>=50?'var(--orange)':'var(--red)'};border-radius:3px;transition:width .4s"></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--muted);padding-top:4px;border-top:1px solid var(--border)">
+      <span>KPI 达标项</span>
+      <span style="font-weight:600;color:var(--text)">${completedItems} / ${CHECK_DATA.filter(c => !c.indent).length}</span>
+    </div>
+    <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--muted)">
+      <span>今日业绩</span>
+      <span style="font-weight:600;color:var(--text)">0.48 / 1.19 万</span>
+    </div>
+    <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--muted)">
+      <span>三方私信</span>
+      <span style="font-weight:600;color:${32>=40?'var(--green)':'var(--orange)'}">32 / 40</span>
+    </div>`;
+}
+
+// ===== TABS =====
+function switchTab(group, id, el) {
+  const parent = el.closest('.card, .card-sm');
+  if (parent) {
+    parent.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    parent.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  }
+  el.classList.add('active');
+  document.getElementById(group + '-' + id).classList.add('active');
+}
+
+// ===== TIME NAV =====
+function switchTime(dim, el) {
+  document.querySelectorAll('.time-tab:not(.disabled)').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.time-panel').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('panel-' + dim).classList.add('active');
+}
+
+// ===== REPORT =====
+function submitReport() {
+  const txt = document.getElementById('report-text').value.trim();
+  if (txt.length < 20) { showToast('请填写至少 20 字'); return; }
+  const loading = document.getElementById('report-loading');
+  const score = document.getElementById('report-score');
+  loading.style.display = 'flex';
+  score.style.display = 'none';
+  setTimeout(() => {
+    loading.style.display = 'none';
+    score.style.display = 'block';
+    showToast('日报提交成功，AI 评分：82 分');
+  }, 2500);
+}
+function resetReport() {
+  document.getElementById('report-score').style.display = 'none';
+  document.getElementById('report-text').value = '';
+}
+
+// ===== TOAST =====
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2500);
+}
+
+// ===== INIT =====
+renderKPI();
+renderSOP();
+renderCheckBars();
+renderDailySummary();
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') resetReport();
+});
+</script>
+</body>
+</html>
