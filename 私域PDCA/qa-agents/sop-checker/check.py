@@ -25,29 +25,22 @@ THRESHOLDS = {
 }
 
 
+# Metrics where lower is better (response time); all others: higher is better
+_LOWER_IS_BETTER = {"first_response_s"}
+
 def grade_metric(value: float, key: str) -> str:
     t = THRESHOLDS.get(key, {})
-    if key == "first_response_s":
+    if not t or "excellent" not in t:
+        return "N/A"
+    if key in _LOWER_IS_BETTER:
         if value <= t["excellent"]:  return "优秀"
         if value <= t["good"]:       return "良好"
         if value <= t["pass"]:       return "及格"
-        return "待改进"
-    if key == "daily_sends":
+    else:
         if value >= t["excellent"]:  return "优秀"
         if value >= t["good"]:       return "良好"
         if value >= t["pass"]:       return "及格"
-        return "待改进"
-    if key == "old_customer":
-        if value >= t["excellent"]:  return "优秀"
-        if value >= t["good"]:       return "良好"
-        if value >= t["pass"]:       return "及格"
-        return "待改进"
-    if key == "third_party_dms":
-        if value >= t["excellent"]:  return "优秀"
-        if value >= t["good"]:       return "良好"
-        if value >= t["pass"]:       return "及格"
-        return "待改进"
-    return "N/A"
+    return "待改进"
 
 
 # ── Metric calculators ────────────────────────────────────────────────────────
@@ -176,6 +169,19 @@ def calc_abandoned_orders(seat_data: dict) -> dict:
 
 # ── Main ──────────────────────────────────────────────────────────────────────
 
+
+def _calc_composite_score(seat_result: dict) -> float:
+    """Composite SOP score: average of 4 key metrics, scaled to 100."""
+    grade_map = {"优秀": 4, "良好": 3, "及格": 2, "待改进": 1, "N/A": 0}
+    grades = [
+        seat_result["first_response"]["grade"],
+        seat_result["daily_sends"]["grade"],
+        seat_result["old_customer_activation"]["grade"],
+        seat_result["third_party_dms"]["grade"],
+    ]
+    scored = [grade_map[g] for g in grades if g != "N/A"]
+    return round(sum(scored) / len(scored) * 25, 1) if scored else 0.0
+
 def run_sop_check(data: dict) -> dict:
     date_str = data["date"]
     print(f"[SOPChecker] 开始检查 {date_str} SOP指标")
@@ -201,16 +207,7 @@ def run_sop_check(data: dict) -> dict:
             "abandoned_orders": calc_abandoned_orders(seat_data),
         }
 
-        # Composite SOP score (each metric contributes equally)
-        grades = [
-            r["first_response"]["grade"],
-            r["daily_sends"]["grade"],
-            r["old_customer_activation"]["grade"],
-            r["third_party_dms"]["grade"],
-        ]
-        grade_map = {"优秀": 4, "良好": 3, "及格": 2, "待改进": 1, "N/A": 0}
-        scored = [grade_map[g] for g in grades if g != "N/A"]
-        r["sop_score"] = round(sum(scored) / len(scored) * 25, 1) if scored else 0
+        r["sop_score"] = _calc_composite_score(r)
 
         results[account] = r
         seat_summaries.append(

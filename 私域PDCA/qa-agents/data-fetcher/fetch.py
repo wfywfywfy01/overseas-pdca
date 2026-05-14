@@ -114,6 +114,49 @@ def split_by_wa_account(messages: list[dict], seats_cfg: dict) -> dict[str, list
     return by_wa
 
 
+def _process_seat(
+    seat: dict, date_str: str, seats_cfg: dict,
+    agent_phones: set[str], wa_seats: dict, failed: list,
+) -> None:
+    """Fetch messages for one SalesEpoch seat and merge into wa_seats."""
+    account = seat.get("userName") or seat.get("username", "")
+    if not account:
+        return
+    try:
+        messages = fetch_seat_messages(account, date_str)
+        if not messages:
+            return
+        if seats_cfg:
+            by_wa = split_by_wa_account(messages, seats_cfg)
+            for wid, wa_msgs in by_wa.items():
+                cfg = seats_cfg[wid]
+                if wid not in wa_seats:
+                    wa_seats[wid] = {
+                        "phone": wid, "name": cfg["name"],
+                        "wa_names": cfg.get("wa_names", []),
+                        "se_account": account,
+                        "message_count": 0,
+                        "conversations": {}, "raw_messages": [],
+                    }
+                wa_seats[wid]["raw_messages"].extend(wa_msgs)
+                wa_seats[wid]["message_count"] += len(wa_msgs)
+                for cid, msgs in group_by_customer(wa_msgs, agent_phones).items():
+                    wa_seats[wid]["conversations"].setdefault(cid, []).extend(msgs)
+                print(f"  [{cfg['name']} / {wid}] +{len(wa_msgs)} 条")
+        else:
+            convos = group_by_customer(messages)
+            wa_seats[account] = {
+                "phone": account, "name": account, "wa_names": [],
+                "se_account": account, "message_count": len(messages),
+                "conversations": convos, "raw_messages": messages,
+            }
+            print(f"  [{account}] {len(messages)} 条消息")
+    except Exception as e:
+        print(f"  [{account}] 拉取失败: {e}")
+        failed.append(account)
+        append_memory("data-fetcher", "API异常记录", f"[{date_str}] {account} | {e}")
+
+
 def fetch_all(date_str: str | None = None) -> dict:
     date_str = date_str or yesterday_str()
     print(f"[DataFetcher] 开始拉取 {date_str} 数据")
@@ -125,62 +168,14 @@ def fetch_all(date_str: str | None = None) -> dict:
     else:
         print("[DataFetcher] ⚠️  seats_config.json 未找到，将拉取全部账号")
 
-    se_accounts = get_all_seats()
-    # 以 WA phone 为主键的最终结果
+    se_accounts  = get_all_seats()
     wa_seats: dict[str, dict] = {}
-    failed = []
-    # 所有在册坐席的 WA 号，用于过滤坐席互发消息
+    failed: list[str] = []
     agent_phones: set[str] = set(seats_cfg.keys()) if seats_cfg else set()
 
     for seat in se_accounts:
-        account = seat.get("userName") or seat.get("username", "")
-        if not account:
-            continue
-        try:
-            messages = fetch_seat_messages(account, date_str)
-            if not messages:
-                continue
+        _process_seat(seat, date_str, seats_cfg, agent_phones, wa_seats, failed)
 
-            if seats_cfg:
-                # 按 WA 号拆分，只保留名单中的
-                by_wa = split_by_wa_account(messages, seats_cfg)
-                for wid, wa_msgs in by_wa.items():
-                    cfg = seats_cfg[wid]
-                    if wid not in wa_seats:
-                        wa_seats[wid] = {
-                            "phone": wid,
-                            "name": cfg["name"],
-                            "wa_names": cfg.get("wa_names", []),
-                            "se_account": account,
-                            "message_count": 0,
-                            "conversations": {},
-                            "raw_messages": [],
-                        }
-                    wa_seats[wid]["raw_messages"].extend(wa_msgs)
-                    wa_seats[wid]["message_count"] += len(wa_msgs)
-                    # 合并对话：过滤群消息和坐席互发
-                    for cid, msgs in group_by_customer(wa_msgs, agent_phones).items():
-                        wa_seats[wid]["conversations"].setdefault(cid, []).extend(msgs)
-                    print(f"  [{cfg['name']} / {wid}] +{len(wa_msgs)} 条")
-            else:
-                # 无配置，退回按 SalesEpoch 账号
-                convos = group_by_customer(messages)
-                wa_seats[account] = {
-                    "phone": account,
-                    "name": account,
-                    "wa_names": [],
-                    "se_account": account,
-                    "message_count": len(messages),
-                    "conversations": convos,
-                    "raw_messages": messages,
-                }
-                print(f"  [{account}] {len(messages)} 条消息")
-        except Exception as e:
-            print(f"  [{account}] 拉取失败: {e}")
-            failed.append(account)
-            append_memory("data-fetcher", "API异常记录", f"[{date_str}] {account} | {e}")
-
-    # 对每个 WA 账号的对话按时间排序
     for wid, seat_data in wa_seats.items():
         for cid in seat_data["conversations"]:
             seat_data["conversations"][cid].sort(key=lambda x: x["chatTime"])
@@ -189,20 +184,17 @@ def fetch_all(date_str: str | None = None) -> dict:
     print(f"[DataFetcher] 完成: {active} 个 WA 账号有消息 / 共 {len(wa_seats)} 个")
 
     result = {
-        "date": date_str,
-        "fetched_at": datetime.now().isoformat(),
-        "seat_count": len(wa_seats),
-        "seats": wa_seats,
+        "date":        date_str,
+        "fetched_at":  datetime.now().isoformat(),
+        "seat_count":  len(wa_seats),
+        "seats":       wa_seats,
         "failed_seats": failed,
     }
-
     out = report_path(date_str, "data.json")
     out.write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8")
     print(f"[DataFetcher] 数据已保存 → {out}")
-
     append_memory(
-        "data-fetcher",
-        "坐席账号记录",
+        "data-fetcher", "坐席账号记录",
         f"[{date_str}] WA账号 {len(wa_seats)} 个，活跃 {active} 个",
     )
     return result

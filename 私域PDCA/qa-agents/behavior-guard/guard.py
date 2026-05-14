@@ -232,59 +232,65 @@ def detect_zero_outreach(seat_data: dict) -> list[dict]:
 
 # ── Main ──────────────────────────────────────────────────────────────────────
 
+def _run_detectors_for_seat(
+    seat_data: dict, high_patterns: list[str], mid_patterns: list[str],
+) -> list[dict]:
+    """Run all anomaly detectors for one seat and return deduplicated alerts."""
+    raw: list[dict] = (
+        scan_banned_words(seat_data, high_patterns, mid_patterns)
+        + detect_bombing(seat_data)
+        + detect_selective_reply(seat_data)
+        + detect_high_intent_neglect(seat_data)
+        + detect_bulk_send(seat_data)
+        + detect_zombie_followup(seat_data)
+        + detect_zero_outreach(seat_data)
+    )
+    seen: set = set()
+    deduped: list[dict] = []
+    for a in raw:
+        k = (a.get("type"), a.get("customer"), a.get("chatTime"), a.get("window_start"))
+        if k not in seen:
+            seen.add(k)
+            deduped.append(a)
+    return deduped
+
+
+def _dedup_high_alerts(alerts: list[dict]) -> list[dict]:
+    seen: set = set()
+    result: list[dict] = []
+    for a in alerts:
+        k = (a.get("account"), a.get("type"), a.get("customer"),
+             a.get("chatTime"), a.get("window_start"))
+        if k not in seen:
+            seen.add(k)
+            result.append(a)
+    return result
+
+
 def run_guard(data: dict) -> dict:
     date_str = data["date"]
     print(f"[BehaviorGuard] 开始异常检测 {date_str}")
 
     high_patterns, mid_patterns = load_banned_words_from_memory()
     results: dict[str, list] = {}
-    all_high_alerts = []
-    new_patterns: list[str] = []
+    all_high_alerts: list[dict] = []
 
     for account, seat_data in data["seats"].items():
-        alerts: list[dict] = []
-
-        alerts += scan_banned_words(seat_data, high_patterns, mid_patterns)
-        alerts += detect_bombing(seat_data)
-        alerts += detect_selective_reply(seat_data)
-        alerts += detect_high_intent_neglect(seat_data)
-        alerts += detect_bulk_send(seat_data)
-        alerts += detect_zombie_followup(seat_data)
-        alerts += detect_zero_outreach(seat_data)
-
-        # Deduplicate per-seat alerts
-        seen: set = set()
-        deduped_alerts: list[dict] = []
-        for a in alerts:
-            k = (a.get("type"), a.get("customer"), a.get("chatTime"), a.get("window_start"))
-            if k not in seen:
-                seen.add(k)
-                deduped_alerts.append(a)
-        alerts = deduped_alerts
-
+        alerts = _run_detectors_for_seat(seat_data, high_patterns, mid_patterns)
         for a in alerts:
             a["account"] = account
             if a["risk"] == "高":
                 all_high_alerts.append(a)
                 print(f"  ⚠️  [高风险] {account} | {a['type']} | 客户:{a.get('customer','?')}")
-
         results[account] = alerts
 
-    # Deduplicate high alerts (same account+type+customer+time)
-    seen_keys: set = set()
-    deduped: list[dict] = []
-    for a in all_high_alerts:
-        k = (a.get("account"), a.get("type"), a.get("customer"), a.get("chatTime"), a.get("window_start"))
-        if k not in seen_keys:
-            seen_keys.add(k)
-            deduped.append(a)
-    all_high_alerts = deduped
+    all_high_alerts = _dedup_high_alerts(all_high_alerts)
 
     output = {
-        "date": date_str,
-        "seats": results,
+        "date":             date_str,
+        "seats":            results,
         "high_alert_count": len(all_high_alerts),
-        "high_alerts": all_high_alerts,
+        "high_alerts":      all_high_alerts,
     }
     out = report_path(date_str, "guard_results.json")
     out.write_text(json.dumps(output, ensure_ascii=False, indent=2), encoding="utf-8")
@@ -297,9 +303,7 @@ def run_guard(data: dict) -> dict:
             f"[{date_str}] 高风险预警 {len(all_high_alerts)} 条: "
             + "; ".join(f"{a['type']}({a['account']})" for a in all_high_alerts[:5]),
         )
-
     return output
-
 
 if __name__ == "__main__":
     date_arg = sys.argv[1] if len(sys.argv) > 1 else None

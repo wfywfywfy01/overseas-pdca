@@ -176,14 +176,21 @@ def run_scoring(data: dict) -> dict:
     out.write_text(json.dumps(output, ensure_ascii=False, indent=2), encoding="utf-8")
     print(f"[QualityScorer] 金牌案例 {len(gold_cases)} | 问题案例 {len(problem_cases)} | 已保存 → {out}")
 
-    # Update MEMORY.md
+    _update_scoring_memory(date_str, gold_cases, memory_updates)
+    return output
+
+
+def _update_scoring_memory(
+    date_str: str, gold_cases: list[dict], memory_updates: list[str],
+) -> None:
+    """Persist gold cases and new findings to MEMORY.md."""
     if gold_cases:
-        for i, c in enumerate(gold_cases, 1):
+        for c in gold_cases:
             append_memory(
                 "quality-scorer",
                 "金牌案例库",
                 f"[{date_str}] 坐席:{c.get('account')} | 综合{c.get('overall_score')}分\n"
-                f"亮点: {'; '.join(c.get('highlights', []))}\n→ 待主管确认收录",
+                f"亮点: {';'.join(c.get('highlights', []))}\n→ 待主管确认收录",
             )
     if memory_updates:
         append_memory(
@@ -191,8 +198,6 @@ def run_scoring(data: dict) -> dict:
             "待主管确认的新发现",
             "\n".join(memory_updates),
         )
-
-    return output
 
 
 if __name__ == "__main__":

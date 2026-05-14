@@ -3,12 +3,12 @@ PDCA API — 海外私域 PDCA 操作台后端
 FastAPI + asyncpg, 直连 Odoo PostgreSQL
 
 环境变量:
-  DATABASE_URL  postgresql://odoo:pass@localhost:5432/odoo17
+  DATABASE_URL  postgresql://user:pass@host:5432/dbname  (必填)
   USD_TO_CNY    汇率 (默认 7.2)
   TARGETS_FILE  目标配置路径 (默认 ./targets.json)
 """
 
-import asyncio
+import logging
 import json
 import math
 import os
@@ -21,8 +21,14 @@ import asyncpg
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s %(name)s %(levelname)s %(message)s")
+
 # ── config ──────────────────────────────────────────────────────────────────
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://odoo:odoo@localhost:5432/odoo17")
+DATABASE_URL = os.environ.get("DATABASE_URL")
+if not DATABASE_URL:
+    raise RuntimeError("DATABASE_URL environment variable is required")
+
 USD_TO_CNY   = float(os.getenv("USD_TO_CNY", "7.2"))
 TARGETS_FILE = os.getenv("TARGETS_FILE", str(Path(__file__).parent / "targets.json"))
 
@@ -36,13 +42,13 @@ pool: asyncpg.Pool | None = None
 
 # ── lifecycle ────────────────────────────────────────────────────────────────
 @app.on_event("startup")
-async def startup():
+async def startup() -> None:
     global pool
     pool = await asyncpg.create_pool(DATABASE_URL, min_size=2, max_size=10)
 
 
 @app.on_event("shutdown")
-async def shutdown():
+async def shutdown() -> None:
     if pool:
         await pool.close()
 
@@ -52,7 +58,7 @@ def to_cny(amount: float, currency_id: int) -> float:
     """Convert any currency amount to CNY."""
     if currency_id == 1:   # USD
         return amount * USD_TO_CNY
-    return float(amount)   # CNY (currency_id=6) or others treated as CNY
+    return float(amount)
 
 
 def wan(cny: float) -> float:
@@ -66,11 +72,15 @@ def pct(done: float, target: float) -> int:
     return min(int(done / target * 100), 100)
 
 
-def load_targets() -> dict:
+def load_targets() -> dict[str, Any]:
     try:
         with open(TARGETS_FILE, encoding="utf-8") as f:
             return json.load(f)
+    except FileNotFoundError:
+        logger.warning("targets file not found: %s — using empty config", TARGETS_FILE)
+        return {}
     except Exception:
+        logger.exception("failed to load targets file: %s", TARGETS_FILE)
         return {}
 
 
@@ -105,7 +115,7 @@ async def _user_name(uid: int) -> str:
         return row["name"] if row else str(uid)
 
 
-async def _sales_cny(con: asyncpg.Connection, where: str, args: list) -> float:
+async def _sales_cny(con: asyncpg.Connection, where: str, args: list[Any]) -> float:
     """Sum sales converted to CNY with given WHERE clause."""
     sql = f"""
         SELECT COALESCE(SUM(
@@ -120,7 +130,7 @@ async def _sales_cny(con: asyncpg.Connection, where: str, args: list) -> float:
     return float(row["total"])
 
 
-async def _order_count(con: asyncpg.Connection, where: str, args: list) -> int:
+async def _order_count(con: asyncpg.Connection, where: str, args: list[Any]) -> int:
     sql = f"""
         SELECT COUNT(*) AS cnt
         FROM sale_order
@@ -131,7 +141,7 @@ async def _order_count(con: asyncpg.Connection, where: str, args: list) -> int:
     return int(row["cnt"])
 
 
-async def _team_members(team_id: int) -> list[dict]:
+async def _team_members(team_id: int) -> list[dict[str, Any]]:
     """Return list of {id, name} for members of the given sales team."""
     async with pool.acquire() as con:
         rows = await con.fetch(
@@ -169,21 +179,150 @@ async def _member_sales_cny(con: asyncpg.Connection, user_ids: list[int],
     return {r["user_id"]: float(r["total"]) for r in rows}
 
 
+async def _team_sales_cny(con: asyncpg.Connection, team_id: int,
+                           start: str, end: str) -> float:
+    """Sum sales for all active members of a sales team (fully parameterized)."""
+    row = await con.fetchrow(
+        f"""SELECT COALESCE(SUM(
+               CASE WHEN so.currency_id = 1 THEN so.amount_total * {USD_TO_CNY}
+                    ELSE so.amount_total END
+            ), 0) AS total
+            FROM sale_order so
+            WHERE so.state = ANY($1)
+              AND so.amount_total > 0
+              AND so.user_id IN (
+                  SELECT id FROM res_users WHERE sale_team_id = $2 AND active = true
+              )
+              AND so.date_order AT TIME ZONE 'Asia/Shanghai' >= $3
+              AND so.date_order AT TIME ZONE 'Asia/Shanghai' <  $4""",
+        list(CONFIRMED_STATES), team_id, start, end,
+    )
+    return float(row["total"])
+
+
+# ── staff helpers ─────────────────────────────────────────────────────────────
+def _build_staff_kpi(
+    today_cny: float, month_cny: float, month_orders: int,
+    day_target_cny: float, month_target_cny: float,
+    today: date, days_in_month: int,
+) -> dict[str, Any]:
+    remaining = days_in_month - today.day
+    gap = month_target_cny - month_cny
+    return {
+        "today_target_wan": wan(day_target_cny),
+        "today_done_wan":   wan(today_cny),
+        "today_pct":        pct(today_cny, day_target_cny),
+        "month_target_wan": wan(month_target_cny),
+        "month_done_wan":   wan(month_cny),
+        "month_pct":        pct(month_cny, month_target_cny),
+        "month_orders":     month_orders,
+        "remaining_days":   remaining,
+        "daily_needed_wan": wan(gap / remaining) if remaining > 0 else 0,
+    }
+
+
+async def _build_weekly_breakdown(
+    con: asyncpg.Connection, user_id: int, today: date,
+    days_in_month: int, month_target_cny: float,
+) -> list[dict[str, Any]]:
+    week_starts = []
+    d = date(today.year, today.month, 1)
+    while d.month == today.month:
+        week_starts.append(d)
+        d += timedelta(days=7)
+
+    week_data = []
+    for i, ws in enumerate(week_starts):
+        we = min(ws + timedelta(days=6), date(today.year, today.month, days_in_month))
+        we_excl = we + timedelta(days=1)
+        w_target = month_target_cny / len(week_starts)
+        if we < today:
+            status = "done"
+        elif ws <= today <= we:
+            status = "current"
+        else:
+            status = "future"
+        if status in ("done", "current"):
+            w_cny = await _sales_cny(
+                con,
+                "user_id = $2 AND date_order AT TIME ZONE 'Asia/Shanghai' >= $3 AND date_order AT TIME ZONE 'Asia/Shanghai' < $4",
+                [user_id, ws.isoformat(), we_excl.isoformat()],
+            )
+        else:
+            w_cny = 0.0
+        week_data.append({
+            "label":      f"W{i+1} · {ws.strftime('%m/%d')}–{we.strftime('%d')}",
+            "target_wan": wan(w_target),
+            "done_wan":   wan(w_cny),
+            "pct":        pct(w_cny, w_target),
+            "status":     status,
+        })
+    return week_data
+
+
+async def _build_user_month_series(
+    con: asyncpg.Connection, user_id: int, today: date,
+    year_target_cny: float, month_targets: dict[str, Any],
+) -> list[dict[str, Any]]:
+    monthly = []
+    for m in range(1, today.month + 1):
+        ms, me = month_bounds(today.year, m)
+        m_target = month_targets.get(f"{today.year}-{m:02d}", year_target_cny // 12)
+        m_cny: float | None = None
+        if date(today.year, m, 1) <= today:
+            m_cny = await _sales_cny(
+                con,
+                "user_id = $2 AND date_order AT TIME ZONE 'Asia/Shanghai' >= $3 AND date_order AT TIME ZONE 'Asia/Shanghai' < $4",
+                [user_id, ms, me],
+            )
+        monthly.append({
+            "month":      m,
+            "quarter":    (m - 1) // 3 + 1,
+            "target_wan": wan(m_target),
+            "done_wan":   wan(m_cny) if m_cny is not None else None,
+            "pct":        pct(m_cny, m_target) if m_cny is not None else None,
+            "status":     "current" if m == today.month else ("done" if m < today.month else "future"),
+        })
+    for m in range(today.month + 1, 13):
+        m_target = month_targets.get(f"{today.year}-{m:02d}", year_target_cny // 12)
+        monthly.append({
+            "month": m, "quarter": (m - 1) // 3 + 1,
+            "target_wan": wan(m_target), "done_wan": None, "pct": None, "status": "future",
+        })
+    return monthly
+
+
+def _build_quarter_summaries(monthly: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    quarters = []
+    for q in range(1, 5):
+        months_q = [x for x in monthly if x["quarter"] == q]
+        q_target = sum(x["target_wan"] for x in months_q)
+        q_done   = sum(x["done_wan"] for x in months_q if x["done_wan"] is not None)
+        q_status = (
+            "done" if all(x["status"] == "done" for x in months_q)
+            else "current" if any(x["status"] == "current" for x in months_q)
+            else "future"
+        )
+        quarters.append({
+            "q": q, "target_wan": round(q_target, 2),
+            "done_wan": round(q_done, 2), "pct": pct(q_done, q_target),
+            "status": q_status,
+        })
+    return quarters
+
+
 # ── staff endpoints ──────────────────────────────────────────────────────────
 @app.get("/api/pdca/staff/{user_id}/day")
-async def staff_day(user_id: int):
+async def staff_day(user_id: int) -> dict[str, Any]:
     today = today_cn()
-    tod_start = today.isoformat()
-    tod_end   = (today + timedelta(days=1)).isoformat()
+    tod_start, tod_end = today.isoformat(), (today + timedelta(days=1)).isoformat()
     mon_start, mon_end = month_bounds(today.year, today.month)
+    _, days_in_month = monthrange(today.year, today.month)
 
     targets = load_targets()
-    staff_t  = targets.get("staff", {}).get(str(user_id), {})
-    mon_key  = today.strftime("%Y-%m")
+    staff_t = targets.get("staff", {}).get(str(user_id), {})
+    mon_key = today.strftime("%Y-%m")
     month_target_cny = staff_t.get("months", {}).get(mon_key, staff_t.get("month_default", 250_000))
-    year_target_cny  = staff_t.get("year_target", 3_470_000)
-
-    _, days_in_month = monthrange(today.year, today.month)
     day_target_cny   = month_target_cny / days_in_month
 
     async with pool.acquire() as con:
@@ -202,11 +341,8 @@ async def staff_day(user_id: int):
             "user_id = $2 AND date_order AT TIME ZONE 'Asia/Shanghai' >= $3 AND date_order AT TIME ZONE 'Asia/Shanghai' < $4",
             [user_id, mon_start, mon_end],
         )
-
-        # Team ranking today & month
         rank_rows = await con.fetch(
-            f"""SELECT so.user_id,
-                   rp.name,
+            f"""SELECT so.user_id, rp.name,
                    COALESCE(SUM(
                      CASE WHEN so.currency_id = 1 THEN so.amount_total * {USD_TO_CNY}
                           ELSE so.amount_total END
@@ -227,35 +363,21 @@ async def staff_day(user_id: int):
 
     name = await _user_name(user_id)
     perf_rank = [
-        {"user_id": r["user_id"], "name": r["name"], "is_me": r["user_id"] == user_id,
-         "val_wan": wan(r["total"])}
+        {"user_id": r["user_id"], "name": r["name"],
+         "is_me": r["user_id"] == user_id, "val_wan": wan(r["total"])}
         for r in rank_rows
     ]
-
-    remaining_days = days_in_month - today.day
-    gap_cny = month_target_cny - month_cny
-    month_pct = pct(month_cny, month_target_cny)
-
     return {
-        "user": {"id": user_id, "name": name},
-        "date": today.isoformat(),
-        "kpi": {
-            "today_target_wan": wan(day_target_cny),
-            "today_done_wan":   wan(today_cny),
-            "today_pct":        pct(today_cny, day_target_cny),
-            "month_target_wan": wan(month_target_cny),
-            "month_done_wan":   wan(month_cny),
-            "month_pct":        month_pct,
-            "month_orders":     month_orders,
-            "remaining_days":   remaining_days,
-            "daily_needed_wan": wan(gap_cny / remaining_days) if remaining_days > 0 else 0,
-        },
+        "user":    {"id": user_id, "name": name},
+        "date":    today.isoformat(),
+        "kpi":     _build_staff_kpi(today_cny, month_cny, month_orders,
+                                    day_target_cny, month_target_cny, today, days_in_month),
         "ranking": {"perf": perf_rank},
     }
 
 
 @app.get("/api/pdca/staff/{user_id}/month")
-async def staff_month(user_id: int):
+async def staff_month(user_id: int) -> dict[str, Any]:
     today = today_cn()
     _, days_in_month = monthrange(today.year, today.month)
     mon_start, mon_end = month_bounds(today.year, today.month)
@@ -276,42 +398,7 @@ async def staff_month(user_id: int):
             "user_id = $2 AND date_order AT TIME ZONE 'Asia/Shanghai' >= $3 AND date_order AT TIME ZONE 'Asia/Shanghai' < $4",
             [user_id, mon_start, mon_end],
         )
-
-        # Weekly breakdown
-        week_data = []
-        week_starts = []
-        d = date(today.year, today.month, 1)
-        while d.month == today.month:
-            week_starts.append(d)
-            d += timedelta(days=7)
-
-        for i, ws in enumerate(week_starts):
-            we = min(ws + timedelta(days=6), date(today.year, today.month, days_in_month))
-            we_excl = we + timedelta(days=1)
-            w_target = month_target_cny / len(week_starts)
-            if we < today:
-                status = "done"
-            elif ws <= today <= we:
-                status = "current"
-            else:
-                status = "future"
-            if status in ("done", "current"):
-                w_cny = await _sales_cny(
-                    con,
-                    "user_id = $2 AND date_order AT TIME ZONE 'Asia/Shanghai' >= $3 AND date_order AT TIME ZONE 'Asia/Shanghai' < $4",
-                    [user_id, ws.isoformat(), we_excl.isoformat()],
-                )
-            else:
-                w_cny = 0.0
-            week_data.append({
-                "label":  f"W{i+1} · {ws.strftime('%m/%d')}–{we.strftime('%d')}",
-                "target_wan": wan(w_target),
-                "done_wan":   wan(w_cny),
-                "pct":        pct(w_cny, w_target),
-                "status":     status,
-            })
-
-        # Team ranking this month
+        week_data = await _build_weekly_breakdown(con, user_id, today, days_in_month, month_target_cny)
         rank_rows = await con.fetch(
             f"""SELECT so.user_id, rp.name,
                    COALESCE(SUM(
@@ -334,7 +421,6 @@ async def staff_month(user_id: int):
 
     remaining = days_in_month - today.day
     gap = month_target_cny - month_cny
-
     return {
         "month": today.strftime("%Y-%m"),
         "kpi": {
@@ -345,7 +431,7 @@ async def staff_month(user_id: int):
             "remaining_days":   remaining,
             "daily_needed_wan": wan(gap / remaining) if remaining > 0 else 0,
         },
-        "weeks": week_data,
+        "weeks":   week_data,
         "ranking": [
             {"user_id": r["user_id"], "name": r["name"],
              "is_me": r["user_id"] == user_id, "val_wan": wan(r["total"])}
@@ -355,69 +441,25 @@ async def staff_month(user_id: int):
 
 
 @app.get("/api/pdca/staff/{user_id}/year")
-async def staff_year(user_id: int):
+async def staff_year(user_id: int) -> dict[str, Any]:
     today = today_cn()
     targets = load_targets()
     staff_t = targets.get("staff", {}).get(str(user_id), {})
     year_target_cny = staff_t.get("year_target", 3_470_000)
     month_targets   = staff_t.get("months", {})
+    ytd_start = f"{today.year}-01-01"
+    ytd_end   = f"{today.year + 1}-01-01"
 
     async with pool.acquire() as con:
-        # YTD total
         ytd_cny = await _sales_cny(
             con,
-            f"user_id = $2 AND date_order AT TIME ZONE 'Asia/Shanghai' >= '{today.year}-01-01' AND date_order AT TIME ZONE 'Asia/Shanghai' < '{today.year+1}-01-01'",
-            [user_id],
+            "user_id = $2 AND date_order AT TIME ZONE 'Asia/Shanghai' >= $3 AND date_order AT TIME ZONE 'Asia/Shanghai' < $4",
+            [user_id, ytd_start, ytd_end],
         )
+        monthly = await _build_user_month_series(con, user_id, today, year_target_cny, month_targets)
 
-        # Monthly actuals Jan–current month
-        monthly = []
-        for m in range(1, today.month + 1):
-            ms, me = month_bounds(today.year, m)
-            m_target = month_targets.get(f"{today.year}-{m:02d}",
-                                         year_target_cny // 12)
-            if date(today.year, m, 1) <= today:
-                m_cny = await _sales_cny(
-                    con,
-                    "user_id = $2 AND date_order AT TIME ZONE 'Asia/Shanghai' >= $3 AND date_order AT TIME ZONE 'Asia/Shanghai' < $4",
-                    [user_id, ms, me],
-                )
-            else:
-                m_cny = None
-            monthly.append({
-                "month": m,
-                "quarter": (m - 1) // 3 + 1,
-                "target_wan": wan(m_target),
-                "done_wan":   wan(m_cny) if m_cny is not None else None,
-                "pct": pct(m_cny, m_target) if m_cny is not None else None,
-                "status": "current" if m == today.month else ("done" if m < today.month else "future"),
-            })
-        # Add future months
-        for m in range(today.month + 1, 13):
-            m_target = month_targets.get(f"{today.year}-{m:02d}", year_target_cny // 12)
-            monthly.append({
-                "month": m, "quarter": (m - 1) // 3 + 1,
-                "target_wan": wan(m_target), "done_wan": None, "pct": None, "status": "future",
-            })
-
-    # Quarter summaries
-    quarters = []
-    for q in range(1, 5):
-        months_q = [x for x in monthly if x["quarter"] == q]
-        q_target = sum(x["target_wan"] for x in months_q)
-        q_done   = sum(x["done_wan"] for x in months_q if x["done_wan"] is not None)
-        q_status = "done" if all(x["status"] == "done" for x in months_q) \
-                   else "current" if any(x["status"] == "current" for x in months_q) \
-                   else "future"
-        quarters.append({
-            "q": q, "target_wan": round(q_target, 2),
-            "done_wan": round(q_done, 2), "pct": pct(q_done, q_target),
-            "status": q_status,
-        })
-
-    day_of_year = today.timetuple().tm_yday
+    day_of_year  = today.timetuple().tm_yday
     expected_pct = int(day_of_year / 365 * 100)
-
     return {
         "year": today.year,
         "kpi": {
@@ -426,17 +468,16 @@ async def staff_year(user_id: int):
             "ytd_pct":         pct(ytd_cny, year_target_cny),
             "expected_pct":    expected_pct,
         },
-        "quarters": quarters,
+        "quarters": _build_quarter_summaries(monthly),
         "monthly":  monthly,
     }
 
 
 # ── manager endpoints ─────────────────────────────────────────────────────────
 @app.get("/api/pdca/manager/{team_id}/day")
-async def manager_day(team_id: int):
+async def manager_day(team_id: int) -> dict[str, Any]:
     today = today_cn()
-    tod_start = today.isoformat()
-    tod_end   = (today + timedelta(days=1)).isoformat()
+    tod_start, tod_end = today.isoformat(), (today + timedelta(days=1)).isoformat()
 
     members = await _team_members(team_id)
     if not members:
@@ -450,9 +491,9 @@ async def manager_day(team_id: int):
     day_target_cny   = month_target_cny / days_in_month
 
     uids = [m["id"] for m in members]
+    mon_start, mon_end = month_bounds(today.year, today.month)
     async with pool.acquire() as con:
         today_map = await _member_sales_cny(con, uids, tod_start, tod_end)
-        mon_start, mon_end = month_bounds(today.year, today.month)
         month_map = await _member_sales_cny(con, uids, mon_start, mon_end)
 
     member_cards = []
@@ -464,24 +505,23 @@ async def manager_day(team_id: int):
         today_cny = today_map.get(uid, 0.0)
         month_cny = month_map.get(uid, 0.0)
         member_cards.append({
-            "user_id":      uid,
-            "name":         m["name"],
-            "today_wan":    wan(today_cny),
+            "user_id":          uid,
+            "name":             m["name"],
+            "today_wan":        wan(today_cny),
             "today_target_wan": wan(d_target),
-            "today_pct":    pct(today_cny, d_target),
-            "month_wan":    wan(month_cny),
+            "today_pct":        pct(today_cny, d_target),
+            "month_wan":        wan(month_cny),
             "month_target_wan": wan(m_target),
-            "month_pct":    pct(month_cny, m_target),
-            "warn":         pct(today_cny, d_target) < 40,
+            "month_pct":        pct(month_cny, m_target),
+            "warn":             pct(today_cny, d_target) < 40,
         })
 
     member_cards.sort(key=lambda x: -x["today_wan"])
     team_today = sum(c["today_wan"] for c in member_cards)
-
     return {
-        "team_id": team_id,
+        "team_id":   team_id,
         "team_name": team_t.get("name", f"Team {team_id}"),
-        "date": today.isoformat(),
+        "date":      today.isoformat(),
         "kpi": {
             "day_target_wan":  wan(day_target_cny),
             "today_total_wan": team_today,
@@ -492,7 +532,7 @@ async def manager_day(team_id: int):
 
 
 @app.get("/api/pdca/manager/{team_id}/month")
-async def manager_month(team_id: int):
+async def manager_month(team_id: int) -> dict[str, Any]:
     today = today_cn()
     mon_start, mon_end = month_bounds(today.year, today.month)
     _, days_in_month = monthrange(today.year, today.month)
@@ -506,7 +546,7 @@ async def manager_month(team_id: int):
     month_target_cny = team_t.get("months", {}).get(mon_key, team_t.get("month_default", 1_220_000))
 
     async with pool.acquire() as con:
-        month_map = await _member_sales_cny(con, uids, mon_start, mon_end)
+        month_map      = await _member_sales_cny(con, uids, mon_start, mon_end)
         team_month_cny = await _sales_cny(
             con,
             "user_id = ANY($2) AND date_order AT TIME ZONE 'Asia/Shanghai' >= $3 AND date_order AT TIME ZONE 'Asia/Shanghai' < $4",
@@ -515,7 +555,7 @@ async def manager_month(team_id: int):
 
     member_rows = []
     for m in members:
-        uid = m["id"]
+        uid      = m["id"]
         staff_t  = targets.get("staff", {}).get(str(uid), {})
         m_target = staff_t.get("months", {}).get(mon_key, staff_t.get("month_default", 250_000))
         m_cny    = month_map.get(uid, 0.0)
@@ -530,41 +570,40 @@ async def manager_month(team_id: int):
 
     remaining = days_in_month - today.day
     gap = month_target_cny - team_month_cny
-    month_pct = pct(team_month_cny, month_target_cny)
-
     return {
         "month":   today.strftime("%Y-%m"),
         "team_id": team_id,
         "kpi": {
-            "month_target_wan":  wan(month_target_cny),
-            "month_done_wan":    wan(team_month_cny),
-            "month_pct":         month_pct,
-            "remaining_days":    remaining,
-            "daily_needed_wan":  wan(gap / remaining) if remaining > 0 else 0,
-            "member_count":      len(members),
+            "month_target_wan": wan(month_target_cny),
+            "month_done_wan":   wan(team_month_cny),
+            "month_pct":        pct(team_month_cny, month_target_cny),
+            "remaining_days":   remaining,
+            "daily_needed_wan": wan(gap / remaining) if remaining > 0 else 0,
+            "member_count":     len(members),
         },
         "members": member_rows,
     }
 
 
 @app.get("/api/pdca/manager/{team_id}/year")
-async def manager_year(team_id: int):
+async def manager_year(team_id: int) -> dict[str, Any]:
     today   = today_cn()
     members = await _team_members(team_id)
     uids    = [m["id"] for m in members]
+    ytd_start = f"{today.year}-01-01"
+    ytd_end   = f"{today.year + 1}-01-01"
 
     targets = load_targets()
     team_t  = targets.get("teams", {}).get(str(team_id), {})
     year_target_cny = team_t.get("year_target", 15_950_000)
-    month_targets   = team_t.get("months", {})
 
     async with pool.acquire() as con:
-        ytd_cny = await _sales_cny(
+        ytd_cny    = await _sales_cny(
             con,
-            f"user_id = ANY($2) AND date_order AT TIME ZONE 'Asia/Shanghai' >= '{today.year}-01-01' AND date_order AT TIME ZONE 'Asia/Shanghai' < '{today.year+1}-01-01'",
-            [uids],
+            "user_id = ANY($2) AND date_order AT TIME ZONE 'Asia/Shanghai' >= $3 AND date_order AT TIME ZONE 'Asia/Shanghai' < $4",
+            [uids, ytd_start, ytd_end],
         )
-        member_ytd = await _member_sales_cny(con, uids, f"{today.year}-01-01", f"{today.year+1}-01-01")
+        member_ytd = await _member_sales_cny(con, uids, ytd_start, ytd_end)
 
     member_rows = []
     for m in members:
@@ -573,17 +612,16 @@ async def manager_year(team_id: int):
         m_year  = staff_t.get("year_target", year_target_cny // len(members))
         m_cny   = member_ytd.get(uid, 0.0)
         member_rows.append({
-            "user_id":       uid,
-            "name":          m["name"],
-            "ytd_wan":       wan(m_cny),
+            "user_id":         uid,
+            "name":            m["name"],
+            "ytd_wan":         wan(m_cny),
             "year_target_wan": wan(m_year),
-            "pct":           pct(m_cny, m_year),
+            "pct":             pct(m_cny, m_year),
         })
     member_rows.sort(key=lambda x: -x["ytd_wan"])
 
     day_of_year  = today.timetuple().tm_yday
     expected_pct = int(day_of_year / 365 * 100)
-
     return {
         "year":    today.year,
         "team_id": team_id,
@@ -599,7 +637,7 @@ async def manager_year(team_id: int):
 
 # ── director endpoints ────────────────────────────────────────────────────────
 @app.get("/api/pdca/director/day")
-async def director_day():
+async def director_day() -> dict[str, Any]:
     today     = today_cn()
     tod_start = today.isoformat()
     tod_end   = (today + timedelta(days=1)).isoformat()
@@ -615,23 +653,17 @@ async def director_day():
     groups = []
     async with pool.acquire() as con:
         for tid_str, tt in team_targets.items():
-            today_cny = await _sales_cny(
-                con,
-                f"""user_id IN (SELECT id FROM res_users WHERE sale_team_id = {int(tid_str)} AND active)
-                    AND date_order AT TIME ZONE 'Asia/Shanghai' >= $2
-                    AND date_order AT TIME ZONE 'Asia/Shanghai' <  $3""",
-                [tod_start, tod_end],
-            )
+            today_cny = await _team_sales_cny(con, int(tid_str), tod_start, tod_end)
             t_day = tt.get("months", {}).get(mon_key, tt.get("month_default", 1_220_000)) / days_in_month
+            today_pct = pct(today_cny, t_day)
             groups.append({
-                "team_id":   int(tid_str),
-                "name":      tt.get("name", f"Group {tid_str}"),
-                "today_wan": wan(today_cny),
+                "team_id":        int(tid_str),
+                "name":           tt.get("name", f"Group {tid_str}"),
+                "today_wan":      wan(today_cny),
                 "day_target_wan": wan(t_day),
-                "today_pct": pct(today_cny, t_day),
-                "status":    "ok" if pct(today_cny, t_day) >= 80 else ("warn" if pct(today_cny, t_day) >= 50 else "behind"),
+                "today_pct":      today_pct,
+                "status":         "ok" if today_pct >= 80 else ("warn" if today_pct >= 50 else "behind"),
             })
-
         dept_today = await _sales_cny(
             con,
             "date_order AT TIME ZONE 'Asia/Shanghai' >= $2 AND date_order AT TIME ZONE 'Asia/Shanghai' < $3",
@@ -650,7 +682,7 @@ async def director_day():
 
 
 @app.get("/api/pdca/director/month")
-async def director_month():
+async def director_month() -> dict[str, Any]:
     today     = today_cn()
     mon_start, mon_end = month_bounds(today.year, today.month)
     _, days_in_month   = monthrange(today.year, today.month)
@@ -669,13 +701,7 @@ async def director_month():
             [mon_start, mon_end],
         )
         for tid_str, tt in team_targets.items():
-            m_cny = await _sales_cny(
-                con,
-                f"""user_id IN (SELECT id FROM res_users WHERE sale_team_id = {int(tid_str)} AND active)
-                    AND date_order AT TIME ZONE 'Asia/Shanghai' >= $2
-                    AND date_order AT TIME ZONE 'Asia/Shanghai' <  $3""",
-                [mon_start, mon_end],
-            )
+            m_cny   = await _team_sales_cny(con, int(tid_str), mon_start, mon_end)
             t_month = tt.get("months", {}).get(mon_key, tt.get("month_default", 1_220_000))
             groups.append({
                 "team_id":    int(tid_str),
@@ -687,71 +713,39 @@ async def director_month():
 
     remaining = days_in_month - today.day
     gap = month_target_cny - dept_month_cny
-
     return {
-        "month":  today.strftime("%Y-%m"),
+        "month": today.strftime("%Y-%m"),
         "kpi": {
-            "month_target_wan":  wan(month_target_cny),
-            "month_done_wan":    wan(dept_month_cny),
-            "month_pct":         pct(dept_month_cny, month_target_cny),
-            "remaining_days":    remaining,
-            "daily_needed_wan":  wan(gap / remaining) if remaining > 0 else 0,
+            "month_target_wan": wan(month_target_cny),
+            "month_done_wan":   wan(dept_month_cny),
+            "month_pct":        pct(dept_month_cny, month_target_cny),
+            "remaining_days":   remaining,
+            "daily_needed_wan": wan(gap / remaining) if remaining > 0 else 0,
         },
         "groups": groups,
     }
 
 
 @app.get("/api/pdca/director/year")
-async def director_year():
+async def director_year() -> dict[str, Any]:
     today = today_cn()
     targets = load_targets()
     dept_t  = targets.get("dept", {})
     year_target_cny = dept_t.get("year_target", 40_000_000)
     month_targets   = dept_t.get("months", {})
+    ytd_start = f"{today.year}-01-01"
+    ytd_end   = f"{today.year + 1}-01-01"
 
     async with pool.acquire() as con:
         ytd_cny = await _sales_cny(
             con,
-            f"date_order AT TIME ZONE 'Asia/Shanghai' >= '{today.year}-01-01' AND date_order AT TIME ZONE 'Asia/Shanghai' < '{today.year+1}-01-01'",
-            [],
+            "date_order AT TIME ZONE 'Asia/Shanghai' >= $2 AND date_order AT TIME ZONE 'Asia/Shanghai' < $3",
+            [ytd_start, ytd_end],
         )
-        monthly = []
-        for m in range(1, 13):
-            m_key = f"{today.year}-{m:02d}"
-            m_target = month_targets.get(m_key, year_target_cny // 12)
-            if date(today.year, m, 1) <= today:
-                ms, me = month_bounds(today.year, m)
-                m_cny = await _sales_cny(
-                    con,
-                    "date_order AT TIME ZONE 'Asia/Shanghai' >= $2 AND date_order AT TIME ZONE 'Asia/Shanghai' < $3",
-                    [ms, me],
-                )
-                monthly.append({
-                    "month": m, "quarter": (m - 1) // 3 + 1,
-                    "target_wan": wan(m_target), "done_wan": wan(m_cny),
-                    "pct": pct(m_cny, m_target),
-                    "status": "current" if m == today.month else "done",
-                })
-            else:
-                monthly.append({
-                    "month": m, "quarter": (m - 1) // 3 + 1,
-                    "target_wan": wan(m_target), "done_wan": None, "pct": None, "status": "future",
-                })
-
-    quarters = []
-    for q in range(1, 5):
-        mq = [x for x in monthly if x["quarter"] == q]
-        q_target = sum(x["target_wan"] for x in mq)
-        q_done   = sum(x["done_wan"] for x in mq if x["done_wan"] is not None)
-        q_status = "done" if all(x["status"] == "done" for x in mq) \
-                   else "current" if any(x["status"] == "current" for x in mq) \
-                   else "future"
-        quarters.append({"q": q, "target_wan": round(q_target, 2),
-                          "done_wan": round(q_done, 2), "status": q_status})
+        monthly = await _build_dept_month_series(con, today, year_target_cny, month_targets)
 
     day_of_year  = today.timetuple().tm_yday
     expected_pct = int(day_of_year / 365 * 100)
-
     return {
         "year": today.year,
         "kpi": {
@@ -760,14 +754,43 @@ async def director_year():
             "ytd_pct":         pct(ytd_cny, year_target_cny),
             "expected_pct":    expected_pct,
         },
-        "quarters": quarters,
+        "quarters": _build_quarter_summaries(monthly),
         "monthly":  monthly,
     }
 
 
+async def _build_dept_month_series(
+    con: asyncpg.Connection, today: date,
+    year_target_cny: float, month_targets: dict[str, Any],
+) -> list[dict[str, Any]]:
+    monthly = []
+    for m in range(1, 13):
+        m_key    = f"{today.year}-{m:02d}"
+        m_target = month_targets.get(m_key, year_target_cny // 12)
+        if date(today.year, m, 1) <= today:
+            ms, me = month_bounds(today.year, m)
+            m_cny = await _sales_cny(
+                con,
+                "date_order AT TIME ZONE 'Asia/Shanghai' >= $2 AND date_order AT TIME ZONE 'Asia/Shanghai' < $3",
+                [ms, me],
+            )
+            monthly.append({
+                "month": m, "quarter": (m - 1) // 3 + 1,
+                "target_wan": wan(m_target), "done_wan": wan(m_cny),
+                "pct":    pct(m_cny, m_target),
+                "status": "current" if m == today.month else "done",
+            })
+        else:
+            monthly.append({
+                "month": m, "quarter": (m - 1) // 3 + 1,
+                "target_wan": wan(m_target), "done_wan": None, "pct": None, "status": "future",
+            })
+    return monthly
+
+
 # ── utility ──────────────────────────────────────────────────────────────────
 @app.get("/api/pdca/users")
-async def list_users():
+async def list_users() -> list[dict[str, Any]]:
     """Helper: list all active sales users with their team."""
     async with pool.acquire() as con:
         rows = await con.fetch(
@@ -784,7 +807,7 @@ async def list_users():
 
 
 @app.get("/api/pdca/health")
-async def health():
+async def health() -> dict[str, str]:
     async with pool.acquire() as con:
         ver = await con.fetchval("SELECT version()")
     return {"status": "ok", "db": ver[:40]}

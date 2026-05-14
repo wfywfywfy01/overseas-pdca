@@ -63,37 +63,14 @@ def score_to_grade(score: float) -> str:
     return "需关注"
 
 
-def generate_report(date_str: str, sop: dict, guard: dict, scores: dict,
-                    narrative: str = "") -> str:
-    now = datetime.now().strftime("%Y-%m-%d %H:%M")
+def _format_sop_table(sop: dict, seat_meta: dict) -> list[str]:
+    """Render the SOP metrics table rows."""
     lines = [
-        f"# Vertu 私域质检日报 — {date_str}",
-        f"生成时间：{now}  |  CONFIDENTIAL · 仅供内部使用",
-        "",
-    ]
-    if narrative:
-        lines += [
-            "## 🧠 管理摘要（Nous Hermes）",
-            "",
-            narrative,
-            "",
-        ]
-    lines += [
-        "---",
-        "",
         "## 一、SOP硬指标汇总",
         "",
         "| 坐席 | 首回时长 | 私发数 | 老客激活 | 三方私信 | WA动态 | SOP分 |",
         "|------|---------|-------|---------|---------|-------|------|",
     ]
-
-    # 从 data.json 取坐席元数据（用于显示中文名）
-    seat_meta = {}
-    data_path = report_path(date_str, "data.json")
-    if data_path.exists():
-        raw_data = json.loads(data_path.read_text(encoding="utf-8"))
-        seat_meta = raw_data.get("seats", {})
-
     seat_rows = []
     for account, s in sop.get("seats", {}).items():
         fr = s.get("first_response", {})
@@ -102,13 +79,12 @@ def generate_report(date_str: str, sop: dict, guard: dict, scores: dict,
         tp = s.get("third_party_dms", {})
         wa = s.get("wa_dynamics", {})
         sop_score = s.get("sop_score", 0)
-
-        label = seat_display(account, seat_meta.get(account, {}))
-        avg_s = fr.get("avg_seconds")
-        fr_str = f"{avg_s:.0f}s {GRADE_EMOJI.get(fr.get('grade',''), '')}" if avg_s else "N/A"
+        label     = seat_display(account, seat_meta.get(account, {}))
+        avg_s     = fr.get("avg_seconds")
+        fr_str    = f"{avg_s:.0f}s {GRADE_EMOJI.get(fr.get('grade',''), '')}" if avg_s else "N/A"
         seat_rows.append((sop_score, label, fr_str, ds, oc, tp, wa))
 
-    seat_rows.sort(key=lambda x: -x[0])  # sort by SOP score desc
+    seat_rows.sort(key=lambda x: -x[0])
     for sop_score, account, fr_str, ds, oc, tp, wa in seat_rows:
         lines.append(
             f"| {account} | {fr_str} | "
@@ -118,22 +94,20 @@ def generate_report(date_str: str, sop: dict, guard: dict, scores: dict,
             f"{'✅' if wa.get('reached') else '❌'}{wa.get('count',0)} | "
             f"**{sop_score}** |"
         )
+    return lines
 
-    lines += [
-        "",
-        "---",
-        "",
-        "## 二、异常行为预警",
-        "",
-    ]
 
+def _format_guard_section(guard: dict, seat_meta: dict) -> list[str]:
+    """Render the anomaly-guard section."""
+    lines: list[str] = ["## 二、异常行为预警", ""]
     high_alerts = guard.get("high_alerts", [])
     if high_alerts:
         lines.append(f"### 🚨 高风险预警（{len(high_alerts)} 条）")
         for a in high_alerts:
-            ts_ms = a.get("window_start") or a.get("query_time") or a.get("unanswered_since") or a.get("chatTime")
-            ts = datetime.fromtimestamp(ts_ms / 1000).strftime("%H:%M") if ts_ms else "?"
-            acct = a.get("account", "?")
+            ts_ms = (a.get("window_start") or a.get("query_time")
+                     or a.get("unanswered_since") or a.get("chatTime"))
+            ts    = datetime.fromtimestamp(ts_ms / 1000).strftime("%H:%M") if ts_ms else "?"
+            acct  = a.get("account", "?")
             label = seat_display(acct, seat_meta.get(acct, {}))
             lines.append(
                 f"- **{label}** | {a['type']} | "
@@ -143,7 +117,6 @@ def generate_report(date_str: str, sop: dict, guard: dict, scores: dict,
     else:
         lines.append("✅ 今日无高风险预警")
 
-    # Medium risks by seat
     medium_counts: dict[str, int] = {}
     for account, alerts in guard.get("seats", {}).items():
         mid = [a for a in alerts if a.get("risk") == "中"]
@@ -154,40 +127,58 @@ def generate_report(date_str: str, sop: dict, guard: dict, scores: dict,
         for account, cnt in sorted(medium_counts.items(), key=lambda x: -x[1]):
             label = seat_display(account, seat_meta.get(account, {}))
             lines.append(f"- {label}: {cnt} 项")
+    return lines
 
-    lines += [
-        "",
-        "---",
-        "",
+
+def _format_scoring_table(scores: dict, seat_meta: dict) -> list[str]:
+    """Render the AI scoring table."""
+    lines = [
         "## 三、AI话术评分",
         "",
         "| 坐席 | 专业度 | 品牌调性 | 转化引导 | 综合分 | 等级 |",
         "|------|-------|---------|---------|-------|-----|",
     ]
-
     for account, seat_scores in scores.get("seats", {}).items():
         if not seat_scores:
             continue
-        label = seat_display(account, seat_meta.get(account, {}))
-        avg_pro = sum(s.get("professionalism_score", 0) for s in seat_scores) / len(seat_scores)
-        avg_brand = sum(s.get("brand_tone_score", 0) for s in seat_scores) / len(seat_scores)
-        avg_conv = sum(s.get("conversion_score", 0) for s in seat_scores) / len(seat_scores)
-        avg_overall = sum(s.get("overall_score", 0) for s in seat_scores) / len(seat_scores)
-        grade = score_to_grade(avg_overall)
+        label       = seat_display(account, seat_meta.get(account, {}))
+        avg_pro     = sum(s.get("professionalism_score", 0) for s in seat_scores) / len(seat_scores)
+        avg_brand   = sum(s.get("brand_tone_score",      0) for s in seat_scores) / len(seat_scores)
+        avg_conv    = sum(s.get("conversion_score",       0) for s in seat_scores) / len(seat_scores)
+        avg_overall = sum(s.get("overall_score",          0) for s in seat_scores) / len(seat_scores)
+        grade       = score_to_grade(avg_overall)
         lines.append(
             f"| {label} | {avg_pro:.0f} | {avg_brand:.0f} | {avg_conv:.0f} | "
             f"**{avg_overall:.1f}** | {GRADE_EMOJI.get(grade,'')} {grade} |"
         )
-
-    gold = scores.get("gold_case_count", 0)
+    gold    = scores.get("gold_case_count", 0)
     problem = scores.get("problem_case_count", 0)
     if gold or problem:
         lines += [
             "",
             f"🥇 金牌案例 **{gold}** 个  |  ⚠️ 问题案例 **{problem}** 个  ← 详见 score_results.json",
         ]
+    return lines
 
-    lines += [
+
+def generate_report(date_str: str, sop: dict, guard: dict, scores: dict,
+                    narrative: str = "") -> str:
+    now      = datetime.now().strftime("%Y-%m-%d %H:%M")
+    data_path = report_path(date_str, "data.json")
+    seat_meta: dict = {}
+    if data_path.exists():
+        raw_data  = json.loads(data_path.read_text(encoding="utf-8"))
+        seat_meta = raw_data.get("seats", {})
+
+    header = [
+        f"# Vertu 私域质检日报 — {date_str}",
+        f"生成时间：{now}  |  CONFIDENTIAL · 仅供内部使用",
+        "",
+    ]
+    narrative_block = (
+        ["## 🧠 管理摘要（Nous Hermes）", "", narrative, ""] if narrative else []
+    )
+    footer = [
         "",
         "---",
         "",
@@ -205,10 +196,21 @@ def generate_report(date_str: str, sop: dict, guard: dict, scores: dict,
         f"*Vertu 私域质检 · 自进化Agent框架 V2.1 (Nous Hermes) · {now}*",
     ]
 
-    return "\n".join(lines)
+    sections = (
+        header
+        + narrative_block
+        + ["---", ""]
+        + _format_sop_table(sop, seat_meta)
+        + ["", "---", ""]
+        + _format_guard_section(guard, seat_meta)
+        + ["", "---", ""]
+        + _format_scoring_table(scores, seat_meta)
+        + footer
+    )
+    return "\n".join(sections)
 
 
-def run(date_str: str | None = None):
+def run(date_str: str | None = None) -> str | None:
     date_str = date_str or yesterday_str()
     start_t = time.time()
     print(f"\n{'='*60}")
