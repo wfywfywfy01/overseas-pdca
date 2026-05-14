@@ -207,6 +207,24 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .month-table tr.m-future td{color:var(--muted)}
 .month-table tr:last-child td{border-bottom:none}
 
+/* ── WA / SOCIAL ── */
+.wa-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.wa-stat{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;text-align:center}
+.wa-stat-val{font-size:22px;font-weight:700;margin:4px 0 2px}
+.wa-stat-label{font-size:11px;color:var(--muted)}
+.wa-stat.bad .wa-stat-val{color:var(--red)}
+.wa-stat.ok  .wa-stat-val{color:var(--green)}
+.social-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.social-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px}
+.social-icon{font-size:18px;margin-bottom:4px}
+.social-platform{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
+.social-main{font-size:20px;font-weight:700}
+.social-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.social-prog{height:4px;background:var(--bg2);border-radius:2px;margin-top:8px;overflow:hidden}
+.social-fill{height:100%;border-radius:2px;transition:width .4s}
+.social-detail{display:flex;gap:10px;margin-top:6px;font-size:11px;color:var(--muted)}
+.social-detail span{display:flex;align-items:center;gap:3px}
+
 .toast{position:fixed;bottom:24px;right:24px;background:#111827;color:#fff;padding:11px 18px;border-radius:var(--radius);font-size:13px;box-shadow:var(--shadow2);z-index:999;opacity:0;transform:translateY(8px);transition:all .25s;pointer-events:none}
 .toast.show{opacity:1;transform:translateY(0)}
 </style>
@@ -386,6 +404,47 @@ function logout(){ localStorage.removeItem('pdca_session'); window.location.href
         </div>
       </div>
 
+      <!-- 部门账号数据 -->
+      <div>
+        <div class="section-label">
+          <div class="step-badge" style="background:var(--green)">WA</div>
+          <div class="step-name">部门账号数据<span class="step-sub">全部门 WA · 意向客户 · 人产</span></div>
+        </div>
+        <div class="wa-grid" style="margin-bottom:12px">
+          <div class="wa-stat ok"><div class="wa-stat-val" id="dept-wa-total">42</div><div class="wa-stat-label">WA 账号总数</div></div>
+          <div class="wa-stat ok"><div class="wa-stat-val" id="dept-wa-avg">3.0</div><div class="wa-stat-label">人均账号数</div></div>
+          <div class="wa-stat ok"><div class="wa-stat-val" id="dept-wa-normal">41</div><div class="wa-stat-label">正常使用</div></div>
+          <div class="wa-stat" id="dept-wa-banned-card"><div class="wa-stat-val" id="dept-wa-banned">1</div><div class="wa-stat-label">被封/受限</div></div>
+        </div>
+        <div class="card card-sm">
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;text-align:center;margin-bottom:14px">
+            <div>
+              <div style="font-size:24px;font-weight:700;color:var(--orange)" id="dept-intent-count">31</div>
+              <div style="font-size:11px;color:var(--muted)">部门意向客户</div>
+            </div>
+            <div>
+              <div style="font-size:18px;font-weight:700;color:var(--green)" id="dept-intent-amount">¥52.4万</div>
+              <div style="font-size:11px;color:var(--muted)">预计收款</div>
+            </div>
+            <div>
+              <div style="font-size:24px;font-weight:700" id="dept-daily-prod">0.30万</div>
+              <div style="font-size:11px;color:var(--muted)">今日人产均值</div>
+            </div>
+          </div>
+          <!-- by team -->
+          <div style="border-top:1px solid var(--border);padding-top:10px" id="dept-team-breakdown"></div>
+        </div>
+      </div>
+
+      <!-- 部门社媒表现 -->
+      <div>
+        <div class="section-label">
+          <div class="step-badge" style="background:var(--purple)">媒</div>
+          <div class="step-name">部门社媒表现<span class="step-sub">INS · TK · YouTube</span></div>
+        </div>
+        <div class="social-grid" id="dept-social-grid"></div>
+      </div>
+
     </div><!-- /left -->
 
     <div class="right-col">
@@ -423,6 +482,21 @@ function logout(){ localStorage.removeItem('pdca_session'); window.location.href
         <div class="hermes-actions">
           <button class="hermes-btn primary" onclick="showToast('已记录处理意见')">记录处理意见</button>
           <button class="hermes-btn" onclick="showToast('已转发给主管')">转发主管</button>
+        </div>
+      </div>
+
+      <!-- 部门意向跟进提醒 -->
+      <div class="card card-sm">
+        <div class="card-title">今日部门意向跟进</div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div style="padding:9px 10px;border:1px solid var(--red-border);border-radius:var(--radius);background:var(--red-bg);font-size:12px">
+            <div style="font-weight:600;color:var(--red)">何川组 · 陈玉霞 → Sarah</div>
+            <div style="color:var(--muted);margin-top:2px">今日 15:00 · ¥2.3万</div>
+          </div>
+          <div style="padding:9px 10px;border:1px solid var(--orange-border);border-radius:var(--radius);background:var(--orange-bg);font-size:12px">
+            <div style="font-weight:600;color:var(--orange)">夏欢组 · 肖映 → Maria G.</div>
+            <div style="color:var(--muted);margin-top:2px">今日 17:00 · ¥5.1万</div>
+          </div>
         </div>
       </div>
 
@@ -944,6 +1018,76 @@ function showToast(msg){
   el.textContent=msg; el.classList.add('show');
   setTimeout(()=>el.classList.remove('show'),2500);
 }
+
+// ===== DEPT WA / INTENT / SOCIAL =====
+const DEPT_TEAMS_WA = [
+  {name:'何川组',   members:5, wa:15, normal:14, banned:1, intent:12, intent_cny:186200, today_wan:2.67},
+  {name:'夏欢组',   members:5, wa:15, normal:15, banned:0, intent:11, intent_cny:172000, today_wan:1.80},
+  {name:'向俞金组', members:4, wa:12, normal:12, banned:0, intent:8,  intent_cny:166000, today_wan:0},
+];
+
+const DEPT_SOCIAL_DATA = [
+  {platform:'INS',     icon:'📸', month_target:180, month_done:104, today:14, engagement:{likes:5640, views:128000, comments:432}, color:'#7c3aed'},
+  {platform:'TikTok',  icon:'🎵', month_target:180, month_done:128, today:22, engagement:{likes:9820, views:374000, comments:891}, color:'#dc2626'},
+  {platform:'YouTube', icon:'▶️', month_target:60,  month_done:33,  today:6,  engagement:{likes:1680, views:85200, comments:263}, color:'#dc2626'},
+];
+
+function renderDeptWA() {
+  const teams = DEPT_TEAMS_WA;
+  const totalWA  = teams.reduce((s,t)=>s+t.wa,0);
+  const normalWA = teams.reduce((s,t)=>s+t.normal,0);
+  const bannedWA = teams.reduce((s,t)=>s+t.banned,0);
+  const totalMembers = teams.reduce((s,t)=>s+t.members,0);
+  const totalIntent  = teams.reduce((s,t)=>s+t.intent,0);
+  const totalCNY     = teams.reduce((s,t)=>s+t.intent_cny,0);
+  const totalToday   = teams.reduce((s,t)=>s+t.today_wan,0);
+  const dailyProd    = (totalToday/totalMembers).toFixed(2);
+
+  const set = (id,v) => { const e=document.getElementById(id); if(e) e.textContent=v; };
+  set('dept-wa-total',  totalWA);
+  set('dept-wa-avg',    (totalWA/totalMembers).toFixed(1));
+  set('dept-wa-normal', normalWA);
+  set('dept-wa-banned', bannedWA);
+  const bc = document.getElementById('dept-wa-banned-card');
+  if(bc) bc.className = 'wa-stat'+(bannedWA>0?' bad':'');
+  set('dept-intent-count',  totalIntent);
+  set('dept-intent-amount', '¥'+(totalCNY/10000).toFixed(1)+'万');
+  set('dept-daily-prod',    dailyProd+'万');
+
+  const brk = document.getElementById('dept-team-breakdown');
+  if(brk) brk.innerHTML = teams.map(t => `
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px">
+      <div style="width:64px;font-weight:500;flex-shrink:0">${t.name}</div>
+      <div style="flex:1;color:var(--muted)">WA ${t.wa} · 正常 ${t.normal}${t.banned>0?` <span style="color:var(--red)">·封${t.banned}</span>`:''}</div>
+      <div style="color:var(--orange);font-weight:600;width:44px;text-align:right">${t.intent}意向</div>
+      <div style="color:var(--green);width:52px;text-align:right">¥${(t.intent_cny/10000).toFixed(1)}万</div>
+    </div>`).join('');
+}
+
+function renderDeptSocial() {
+  const el = document.getElementById('dept-social-grid');
+  if(!el) return;
+  const fmt = n => n>=10000?(n/10000).toFixed(1)+'万':n.toString();
+  el.innerHTML = DEPT_SOCIAL_DATA.map(s => {
+    const pct = Math.min(Math.round(s.month_done/s.month_target*100),100);
+    const rem = s.month_target - s.month_done;
+    return `<div class="social-card">
+      <div class="social-icon">${s.icon}</div>
+      <div class="social-platform">${s.platform}</div>
+      <div class="social-main">${s.month_done}<span style="font-size:11px;font-weight:400;color:var(--muted)">/${s.month_target}</span></div>
+      <div class="social-sub">还差 <b style="color:${rem<=5?'var(--green)':'var(--orange)'}">${rem}</b> 条</div>
+      <div class="social-prog"><div class="social-fill" style="width:${pct}%;background:${s.color}"></div></div>
+      <div class="social-detail">
+        <span>❤ ${fmt(s.engagement.likes)}</span>
+        <span>👁 ${fmt(s.engagement.views)}</span>
+        <span>💬 ${s.engagement.comments}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+renderDeptWA();
+renderDeptSocial();
 </script>
 </body>
 </html>

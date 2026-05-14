@@ -213,6 +213,67 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .source-fill-zz{height:100%;background:var(--blue);border-radius:4px 0 0 4px;display:inline-block;transition:width .4s}
 .source-fill-zl{height:100%;background:var(--purple);border-radius:0 4px 4px 0;display:inline-block;transition:width .4s}
 .source-nums{font-size:11px;color:var(--muted);display:flex;justify-content:space-between}
+
+/* ── WA ACCOUNTS ── */
+.wa-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.wa-stat{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;text-align:center}
+.wa-stat-val{font-size:22px;font-weight:700;margin:4px 0 2px}
+.wa-stat-label{font-size:11px;color:var(--muted)}
+.wa-stat.warn .wa-stat-val{color:var(--orange)}
+.wa-stat.bad  .wa-stat-val{color:var(--red)}
+.wa-stat.ok   .wa-stat-val{color:var(--green)}
+.ctype-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.ctype-row:last-child{margin-bottom:0}
+.ctype-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.ctype-label{font-size:13px;width:60px}
+.ctype-track{flex:1;height:6px;background:var(--bg2);border-radius:3px;overflow:hidden}
+.ctype-fill{height:100%;border-radius:3px;transition:width .4s}
+.ctype-num{font-size:12px;color:var(--muted);width:50px;text-align:right;font-variant-numeric:tabular-nums}
+
+/* ── INTENT CUSTOMERS ── */
+.intent-list{display:flex;flex-direction:column;gap:8px}
+.intent-item{border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;cursor:pointer;transition:all .15s;position:relative}
+.intent-item:hover{border-color:var(--blue);box-shadow:var(--shadow)}
+.intent-item.hot{border-left:3px solid var(--red)}
+.intent-item.warm{border-left:3px solid var(--orange)}
+.intent-item.cool{border-left:3px solid var(--blue)}
+.intent-head{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.intent-name{font-size:13px;font-weight:600;flex:1}
+.intent-amount{font-size:14px;font-weight:700;color:var(--green)}
+.intent-meta{display:flex;gap:14px;font-size:12px;color:var(--muted)}
+.intent-remind{display:flex;align-items:center;gap:6px;margin-top:6px;padding:5px 8px;background:var(--gold-bg);border:1px solid var(--gold-border);border-radius:6px;font-size:11px;color:var(--gold)}
+.intent-last{font-size:11px;color:var(--muted);margin-top:4px;line-height:1.5;padding:6px 8px;background:var(--bg2);border-radius:5px}
+
+/* ── SOCIAL MEDIA ── */
+.social-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.social-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px}
+.social-icon{font-size:18px;margin-bottom:6px}
+.social-platform{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px}
+.social-main{font-size:20px;font-weight:700}
+.social-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.social-prog{height:4px;background:var(--bg2);border-radius:2px;margin-top:8px;overflow:hidden}
+.social-fill{height:100%;border-radius:2px;background:var(--blue);transition:width .4s}
+.social-detail{display:flex;gap:10px;margin-top:6px;font-size:11px;color:var(--muted)}
+.social-detail span{display:flex;align-items:center;gap:3px}
+
+/* ── CHAT MODAL ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;display:none;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.open{display:flex}
+.chat-window{background:var(--card);border-radius:12px;width:100%;max-width:520px;max-height:80vh;display:flex;flex-direction:column;box-shadow:0 8px 40px rgba(0,0,0,.2)}
+.chat-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.chat-close{margin-left:auto;background:none;border:none;font-size:18px;cursor:pointer;color:var(--muted);line-height:1}
+.chat-body{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px}
+.chat-msg{display:flex;flex-direction:column;max-width:80%}
+.chat-msg.me{align-self:flex-end;align-items:flex-end}
+.chat-msg.them{align-self:flex-start}
+.chat-bubble{padding:9px 13px;border-radius:12px;font-size:13px;line-height:1.5}
+.chat-msg.me .chat-bubble{background:#111827;color:#fff;border-radius:12px 12px 2px 12px}
+.chat-msg.them .chat-bubble{background:var(--bg2);color:var(--text);border-radius:12px 12px 12px 2px}
+.chat-time{font-size:10px;color:var(--muted);margin-top:3px}
+.chat-info{padding:12px 20px;border-top:1px solid var(--border);display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px}
+.chat-info-item{display:flex;flex-direction:column;gap:2px}
+.chat-info-label{color:var(--muted);font-size:11px}
+.chat-info-val{font-weight:600}
 </style>
 </head>
 <body>
@@ -383,6 +444,70 @@ function logout() {
         </div>
       </div>
 
+      <!-- 5. WA ACCOUNTS -->
+      <div>
+        <div class="section-label">
+          <div class="step-badge" style="background:var(--green)">WA</div>
+          <div class="step-name">WA 账号 & 客户<span class="step-sub">账号状态 · 客户分类</span></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <!-- 账号数 -->
+          <div class="wa-grid" id="wa-account-stats">
+            <div class="wa-stat ok"><div class="wa-stat-val">3</div><div class="wa-stat-label">WA 账号数</div></div>
+            <div class="wa-stat ok"><div class="wa-stat-val">3</div><div class="wa-stat-label">正常使用</div></div>
+            <div class="wa-stat"><div class="wa-stat-val">0</div><div class="wa-stat-label">被封/受限</div></div>
+            <div class="wa-stat"><div class="wa-stat-val">15</div><div class="wa-stat-label">本月被拉黑</div></div>
+          </div>
+          <!-- 客户分类 -->
+          <div class="card card-sm">
+            <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px">
+              <div style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em">WA客户分类</div>
+              <div style="font-size:13px"><b id="wa-total">3,637</b> 人 <span style="font-size:11px;color:var(--green);margin-left:4px">+100 今日</span></div>
+            </div>
+            <div id="wa-ctype-bars">
+              <div class="ctype-row"><div class="ctype-dot" style="background:#dc2626"></div><div class="ctype-label">S 类</div><div class="ctype-track"><div class="ctype-fill" style="width:2.97%;background:#dc2626"></div></div><div class="ctype-num">108 人</div></div>
+              <div class="ctype-row"><div class="ctype-dot" style="background:#ea580c"></div><div class="ctype-label">A 类</div><div class="ctype-track"><div class="ctype-fill" style="width:0.05%;background:#ea580c"></div></div><div class="ctype-num">2 人</div></div>
+              <div class="ctype-row"><div class="ctype-dot" style="background:#2563eb"></div><div class="ctype-label">B 类</div><div class="ctype-track"><div class="ctype-fill" style="width:0.11%;background:#2563eb"></div></div><div class="ctype-num">4 人</div></div>
+              <div class="ctype-row"><div class="ctype-dot" style="background:var(--border2)"></div><div class="ctype-label">CD 类</div><div class="ctype-track"><div class="ctype-fill" style="width:94.5%;background:var(--border2)"></div></div><div class="ctype-num">3,438 人</div></div>
+            </div>
+            <div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border);display:grid;grid-template-columns:repeat(3,1fr);gap:8px;font-size:11px;color:var(--muted)">
+              <div><div style="font-weight:600;color:var(--text);font-size:13px" id="wa-src-old">1,531</div>老客户</div>
+              <div><div style="font-weight:600;color:var(--text);font-size:13px" id="wa-src-web">659</div>官网询盘</div>
+              <div><div style="font-weight:600;color:var(--text);font-size:13px" id="wa-src-tk">325</div>TK来源</div>
+              <div><div style="font-weight:600;color:var(--text);font-size:13px" id="wa-src-ins">989</div>INS自拓</div>
+              <div><div style="font-weight:600;color:var(--text);font-size:13px" id="wa-reach">380</div>月累触达</div>
+              <div><div style="font-weight:600;color:var(--text);font-size:13px" id="wa-moments">449</div>月发动态</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6. INTENT CUSTOMERS -->
+      <div>
+        <div class="section-label">
+          <div class="step-badge" style="background:var(--orange)">意</div>
+          <div class="step-name">意向客户<span class="step-sub">点击查看聊天记录 · 跟进提醒</span></div>
+        </div>
+        <div class="card card-sm" style="padding:14px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+            <div style="font-size:12px;color:var(--muted)">共 <b id="intent-total" style="color:var(--text)">4</b> 位意向客户 · 预计收款 <b id="intent-total-amount" style="color:var(--green)">¥60,000</b></div>
+            <button class="btn-sm" style="font-size:11px" onclick="showToast('新增意向客户')">+ 新增</button>
+          </div>
+          <div class="intent-list" id="intent-list"></div>
+        </div>
+      </div>
+
+      <!-- 7. SOCIAL MEDIA -->
+      <div>
+        <div class="section-label">
+          <div class="step-badge" style="background:var(--purple)">媒</div>
+          <div class="step-name">社媒表现<span class="step-sub">INS · TK · YouTube</span></div>
+        </div>
+        <div class="social-grid" id="social-grid">
+          <!-- rendered by JS -->
+        </div>
+      </div>
+
     </div><!-- /left-col -->
 
     <!-- RIGHT COL -->
@@ -392,6 +517,12 @@ function logout() {
       <div class="card card-sm">
         <div class="card-title">今日进度小结</div>
         <div style="display:flex;flex-direction:column;gap:10px" id="daily-summary"></div>
+      </div>
+
+      <!-- 意向跟进提醒 -->
+      <div class="card card-sm" id="intent-remind-card">
+        <div class="card-title">今日跟进提醒</div>
+        <div style="display:flex;flex-direction:column;gap:8px" id="intent-reminders"></div>
       </div>
 
       <!-- 排行榜 -->
@@ -1447,11 +1578,180 @@ async function loadYearData() {
   }
 }
 
+// ===== INTENT CUSTOMERS DATA =====
+// 实际数据应来自 Odoo CRM / VPS 意向客户系统
+const INTENT_DATA = [
+  {
+    id:1, name:'Sarah L.', country:'🇺🇸 美国', level:'hot',
+    amount: 3200, currency:'USD', cny: 23040,
+    predict_date:'2026-05-20', next_followup:'今日 15:00',
+    last_note:'确认了配色和尺寸，要求提供追踪号，对发货时效有顾虑',
+    wa: '+1 310-xxx-xxxx',
+    chats:[
+      {role:'them', text:'Hi, I want to confirm the color for my order. Is silver still available?', time:'今日 09:15'},
+      {role:'me', text:'Yes! Silver is in stock and will ship within 3 business days 🎉', time:'今日 09:18'},
+      {role:'them', text:'Perfect. What's the tracking process after payment?', time:'今日 09:20'},
+      {role:'me', text:'Once payment confirmed, you'll receive tracking within 24h via WhatsApp & email.', time:'今日 09:22'},
+      {role:'them', text:'OK let me check with my wife and get back to you today', time:'今日 09:25'},
+    ]
+  },
+  {
+    id:2, name:'Mohammed A.', country:'🇸🇦 沙特', level:'hot',
+    amount: 5600, currency:'USD', cny: 40320,
+    predict_date:'2026-05-18', next_followup:'明日 10:00',
+    last_note:'问过分期付款，公司不支持，改推荐3个月免息信用卡',
+    wa: '+966 5x-xxx-xxxx',
+    chats:[
+      {role:'them', text:'Do you accept installment payments?', time:'昨日 16:00'},
+      {role:'me', text:'We don\'t offer installments directly, but you can use a 3-month 0% interest credit card!', time:'昨日 16:05'},
+      {role:'them', text:'Which cards work?', time:'昨日 16:08'},
+      {role:'me', text:'VISA/MC issued by most GCC banks. I can send you a payment link now if you\'re ready.', time:'昨日 16:10'},
+    ]
+  },
+  {
+    id:3, name:'Kumar S.', country:'🇮🇳 印度', level:'warm',
+    amount: 2800, currency:'USD', cny: 20160,
+    predict_date:'2026-05-25', next_followup:'05-16 下午',
+    last_note:'对价格比较敏感，发了促销价格后还在考虑，需要再推一次限时优惠',
+    wa: '+91 98xxx-xxxxx',
+    chats:[
+      {role:'me', text:'Kumar, special price valid till May 16 only! 🔥', time:'05-12 14:00'},
+      {role:'them', text:'Thanks. I will think about it', time:'05-12 18:30'},
+      {role:'me', text:'No problem! Let me know if you have questions. I can hold the price for you 😊', time:'05-12 18:35'},
+    ]
+  },
+  {
+    id:4, name:'Elena V.', country:'🇷🇺 俄罗斯', level:'cool',
+    amount: 1500, currency:'USD', cny: 10800,
+    predict_date:'2026-06-01', next_followup:'05-20',
+    last_note:'初次询价，感兴趣但问了物流到俄罗斯的方式，需要确认可以发货',
+    wa: '+7 9xx-xxx-xxxx',
+    chats:[
+      {role:'them', text:'Hello, can you ship to Russia?', time:'05-11 10:00'},
+      {role:'me', text:'Yes! We ship to Russia via EMS/DHL. Delivery 10-15 days.', time:'05-11 10:05'},
+      {role:'them', text:'OK I will look at your catalog and come back', time:'05-11 10:10'},
+    ]
+  },
+];
+
+// ===== SOCIAL MEDIA DATA =====
+const SOCIAL_DATA = [
+  {
+    platform:'INS', icon:'📸',
+    month_target:12, month_done:7,
+    today_done:1,
+    engagement:{likes:342, views:8200, comments:28},
+    color:'var(--purple)',
+  },
+  {
+    platform:'TikTok', icon:'🎵',
+    month_target:20, month_done:11,
+    today_done:1,
+    engagement:{likes:1240, views:52000, comments:89},
+    color:'#111827',
+  },
+  {
+    platform:'YouTube', icon:'▶',
+    month_target:4, month_done:2,
+    today_done:0,
+    engagement:{likes:87, views:3100, comments:12},
+    color:'var(--red)',
+  },
+];
+
+// ===== RENDER INTENT CUSTOMERS =====
+function renderIntentList() {
+  const el = document.getElementById('intent-list');
+  if (!el) return;
+  const totalCNY = INTENT_DATA.reduce((s,i)=>s+i.cny,0);
+  const ta = document.getElementById('intent-total-amount');
+  if (ta) ta.textContent = '¥' + totalCNY.toLocaleString();
+  const tt = document.getElementById('intent-total');
+  if (tt) tt.textContent = INTENT_DATA.length;
+
+  el.innerHTML = INTENT_DATA.map(c => {
+    const levelLabel = c.level==='hot'?'🔴 热意向':c.level==='warm'?'🟡 温意向':'🔵 冷意向';
+    return `<div class="intent-item ${c.level}" onclick="openChat(${c.id})">
+      <div class="intent-head">
+        <div class="intent-name">${c.name} <span style="font-size:11px;color:var(--muted)">${c.country}</span></div>
+        <div class="intent-amount">${c.currency} ${c.amount.toLocaleString()}</div>
+        <span class="tag" style="font-size:10px">${levelLabel}</span>
+      </div>
+      <div class="intent-meta">
+        <span>预计成交 ${c.predict_date}</span>
+        <span>WA ${c.wa}</span>
+      </div>
+      <div class="intent-last">${c.last_note}</div>
+      <div class="intent-remind">⏰ 下次跟进：${c.next_followup}</div>
+    </div>`;
+  }).join('');
+}
+
+// ===== RENDER INTENT REMINDERS (right sidebar) =====
+function renderIntentReminders() {
+  const el = document.getElementById('intent-reminders');
+  if (!el) return;
+  const today = INTENT_DATA.filter(c => c.next_followup.includes('今日') || c.next_followup.includes('明日'));
+  if (!today.length) { el.innerHTML = '<div style="font-size:12px;color:var(--muted)">今日无待跟进意向客户 ✓</div>'; return; }
+  el.innerHTML = today.map(c => `
+    <div style="padding:9px 10px;border:1px solid var(--${c.level==='hot'?'red':'orange'}-border);border-radius:var(--radius);background:var(--${c.level==='hot'?'red':'orange'}-bg);cursor:pointer" onclick="openChat(${c.id})">
+      <div style="display:flex;justify-content:space-between;margin-bottom:2px">
+        <span style="font-size:13px;font-weight:600">${c.name}</span>
+        <span style="font-size:12px;font-weight:600;color:var(--green)">${c.currency} ${c.amount.toLocaleString()}</span>
+      </div>
+      <div style="font-size:11px;color:var(--muted)">⏰ ${c.next_followup}</div>
+    </div>`).join('');
+}
+
+// ===== RENDER SOCIAL MEDIA =====
+function renderSocialGrid() {
+  const el = document.getElementById('social-grid');
+  if (!el) return;
+  el.innerHTML = SOCIAL_DATA.map(s => {
+    const pct = Math.round(s.month_done / s.month_target * 100);
+    const remaining = s.month_target - s.month_done;
+    return `<div class="social-card">
+      <div class="social-icon">${s.icon}</div>
+      <div class="social-platform">${s.platform}</div>
+      <div class="social-main" style="color:${s.color}">${s.month_done}<span style="font-size:13px;font-weight:400;color:var(--muted)">/${s.month_target}条</span></div>
+      <div class="social-sub">还差 <b style="color:${remaining>0?'var(--red)':'var(--green)'}">${remaining}</b> 条达标</div>
+      <div class="social-prog"><div class="social-fill" style="width:${pct}%;background:${s.color}"></div></div>
+      <div class="social-detail">
+        <span>👍 ${s.engagement.likes.toLocaleString()}</span>
+        <span>▶ ${s.engagement.views >= 1000 ? (s.engagement.views/1000).toFixed(1)+'k' : s.engagement.views}</span>
+        <span>💬 ${s.engagement.comments}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ===== CHAT MODAL =====
+function openChat(intentId) {
+  const c = INTENT_DATA.find(x => x.id === intentId);
+  if (!c) return;
+  const modal = document.getElementById('chat-modal');
+  document.getElementById('chat-modal-name').textContent = c.name + ' · ' + c.country;
+  document.getElementById('chat-modal-wa').textContent = c.wa;
+  document.getElementById('chat-amount').textContent = c.currency + ' ' + c.amount.toLocaleString();
+  document.getElementById('chat-predict').textContent = c.predict_date;
+  document.getElementById('chat-next').textContent = c.next_followup;
+  document.getElementById('chat-body').innerHTML = c.chats.map(m => `
+    <div class="chat-msg ${m.role === 'me' ? 'me' : 'them'}">
+      <div class="chat-bubble">${m.text}</div>
+      <div class="chat-time">${m.time}</div>
+    </div>`).join('');
+  modal.classList.add('open');
+}
+function closeChat() { document.getElementById('chat-modal').classList.remove('open'); }
+
 // ===== INIT =====
 renderKPI();
 renderSOP();
 renderCheckBars();
 renderDailySummary();
+renderIntentList();
+renderIntentReminders();
+renderSocialGrid();
 
 // Async API load
 loadDayData();
@@ -1459,8 +1759,30 @@ loadMonthData();
 loadYearData();
 
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') resetReport();
+  if (e.key === 'Escape') { resetReport(); closeChat(); }
 });
 </script>
+
+<!-- CHAT MODAL -->
+<div class="modal-overlay" id="chat-modal" onclick="if(event.target===this)closeChat()">
+  <div class="chat-window">
+    <div class="chat-header">
+      <div style="width:36px;height:36px;background:#25d366;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px">💬</div>
+      <div>
+        <div style="font-size:14px;font-weight:600" id="chat-modal-name">Sarah L.</div>
+        <div style="font-size:11px;color:var(--muted)" id="chat-modal-wa">+1 310-xxx</div>
+      </div>
+      <button class="chat-close" onclick="closeChat()">✕</button>
+    </div>
+    <div class="chat-body" id="chat-body"></div>
+    <div class="chat-info">
+      <div class="chat-info-item"><div class="chat-info-label">预计金额</div><div class="chat-info-val" id="chat-amount" style="color:var(--green)">USD 3,200</div></div>
+      <div class="chat-info-item"><div class="chat-info-label">预计收款</div><div class="chat-info-val" id="chat-predict">2026-05-20</div></div>
+      <div class="chat-info-item"><div class="chat-info-label">下次跟进</div><div class="chat-info-val" id="chat-next">今日 15:00</div></div>
+      <div class="chat-info-item"><div style="display:flex;gap:6px;margin-top:4px"><button class="btn-sm dark" style="flex:1;font-size:11px" onclick="showToast('已记录跟进');closeChat()">记录跟进</button><button class="btn-sm" style="font-size:11px" onclick="showToast('已标记成交');closeChat()">标记成交</button></div></div>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
