@@ -1513,8 +1513,6 @@ async function loadDayData() {
   const st = (TARGETS.staff || {})[uid] || {};
   const monKey = raw.year + '-' + String(raw.month).padStart(2,'0');
   const monthTarget = (st.months || {})[monKey] || st.month_default || 250000;
-  const _, daysInMonth = [0,31,28,29,31,30,31,30,31,31,30,31,30,31][raw.month];
-  // simple days
   const daysInM = new Date(raw.year, raw.month, 0).getDate();
   const dayTarget = monthTarget / daysInM;
   const remaining = daysInM - new Date().getDate();
@@ -1761,8 +1759,8 @@ const INTENT_DATA = [
     chats:[
       {role:'them', text:'Hi, I want to confirm the color for my order. Is silver still available?', time:'今日 09:15'},
       {role:'me', text:'Yes! Silver is in stock and will ship within 3 business days 🎉', time:'今日 09:18'},
-      {role:'them', text:'Perfect. What's the tracking process after payment?', time:'今日 09:20'},
-      {role:'me', text:'Once payment confirmed, you'll receive tracking within 24h via WhatsApp & email.', time:'今日 09:22'},
+      {role:'them', text:"Perfect. What's the tracking process after payment?", time:'今日 09:20'},
+      {role:'me', text:"Once payment confirmed, you'll receive tracking within 24h via WhatsApp & email.", time:'今日 09:22'},
       {role:'them', text:'OK let me check with my wife and get back to you today', time:'今日 09:25'},
     ]
   },
