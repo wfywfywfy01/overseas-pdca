@@ -1453,12 +1453,10 @@ function switchTime(dim, el) {
 function submitReport() {
   const txt = document.getElementById('report-text').value.trim();
   if (txt.length < 20) { showToast('请填写至少 20 字'); return; }
-  const loading = document.getElementById('report-loading');
   const score = document.getElementById('report-score');
-  loading.style.display = 'flex';
   score.style.display = 'none';
+  showToast('提交中，AI 评分中…');
   setTimeout(() => {
-    loading.style.display = 'none';
     score.style.display = 'block';
     showToast('日报提交成功，AI 评分：82 分');
   }, 2500);
@@ -1542,26 +1540,6 @@ async function loadDayData() {
       <span class="rank-name">${r.name}${r.user_id===uid?' (我)':''}</span>
       <span class="rank-val">${r.wan}万</span>
     </div>`).join('');
-}
-  KPI_DATA[0] = {label:'今日目标',    value:k.today_target_wan, unit:'万', sub:`月度日均拆解`,                        cur:k.today_target_wan, max:k.today_target_wan, cls:'neutral'};
-  KPI_DATA[1] = {label:'今日已完成',  value:k.today_done_wan,   unit:'万', sub:`${k.today_pct}% · 还需 ${(k.today_target_wan-k.today_done_wan).toFixed(2)} 万`, cur:k.today_done_wan, max:k.today_target_wan, cls:kpiStatus(k.today_pct)};
-  KPI_DATA[2] = {label:'本月完成',    value:k.month_done_wan,   unit:'万', sub:`月目标 ${k.month_target_wan} 万 · ${k.month_pct}%`, cur:k.month_done_wan, max:k.month_target_wan, cls:kpiStatus(k.month_pct)};
-  KPI_DATA[3] = {label:'本月成单',    value:k.month_orders,     unit:'单', sub:`剩 ${k.remaining_days} 天 · 需日均 ${k.daily_needed_wan} 万`, cur:k.month_orders, max:Math.max(k.month_orders,9), cls:'ok'};
-  renderKPI();
-
-  // Update daily summary real perf
-  renderDailySummary(k);
-
-  // Rankings — perf
-  if (d.ranking && d.ranking.perf && d.ranking.perf.length) {
-    const el = document.getElementById('rank-perf');
-    if (el) el.innerHTML = d.ranking.perf.map((r,i)=>`
-      <div class="rank-item${r.is_me?' me':''}">
-        <span class="rank-num${i<2?' top':''}">${i+1}</span>
-        <span class="rank-name">${r.name}${r.is_me?' (我)':''}</span>
-        <span class="rank-val">${r.val_wan}万</span>
-      </div>`).join('');
-  }
 }
 
 async function loadMonthData() {
@@ -1657,71 +1635,6 @@ async function loadMonthData() {
     }).join('');
   }
 
-  // UNUSED variable k suppression (keep the original logic)
-  const k = {month_done_wan: monthWan, month_target_wan: monthTarget/10000, month_pct: monthPct,
-              remaining_days: remaining, daily_needed_wan: remaining>0?(gap/remaining).toFixed(2):0};
-
-  // Month KPI cards
-  const strip = document.getElementById('month-kpi-strip');
-  if (strip) {
-    const remaining_pct = Math.round((k.remaining_days / 31) * 100);
-    strip.innerHTML = `
-      <div class="kpi-card neutral">
-        <div class="kc-label">月度目标</div>
-        <div class="kc-value">${(k.month_target_wan/10).toFixed(0)}<span style="font-size:13px;font-weight:400;color:var(--muted)">万</span></div>
-        <div class="kc-sub">已过 ${31-k.remaining_days}/31 天</div>
-        <div class="kc-prog"><div class="kc-fill" style="width:100%;background:#111827"></div></div>
-      </div>
-      <div class="kpi-card ${kpiStatus(k.month_pct)}">
-        <div class="kc-label">已完成</div>
-        <div class="kc-value">${k.month_done_wan}<span style="font-size:13px;font-weight:400;color:var(--muted)">万</span></div>
-        <div class="kc-sub">${k.month_pct}% · 缺口 ${(k.month_target_wan-k.month_done_wan).toFixed(1)} 万</div>
-        <div class="kc-prog"><div class="kc-fill" style="width:${k.month_pct}%;background:var(--orange)"></div></div>
-      </div>
-      <div class="kpi-card behind">
-        <div class="kc-label">剩余天数</div>
-        <div class="kc-value">${k.remaining_days}<span style="font-size:13px;font-weight:400;color:var(--muted)">天</span></div>
-        <div class="kc-sub">需日均 ${k.daily_needed_wan} 万</div>
-        <div class="kc-prog"><div class="kc-fill" style="width:${remaining_pct}%;background:var(--red)"></div></div>
-      </div>
-      <div class="kpi-card ok">
-        <div class="kc-label">本月排行</div>
-        <div class="kc-value">${(d.ranking||[]).findIndex(r=>r.is_me)+1||'?'}<span style="font-size:13px;font-weight:400;color:var(--muted)">名</span></div>
-        <div class="kc-sub">共 ${(d.ranking||[]).length} 人</div>
-        <div class="kc-prog"><div class="kc-fill" style="width:80%;background:var(--green)"></div></div>
-      </div>`;
-  }
-
-  // Week grid
-  if (d.weeks) {
-    const wg = document.getElementById('week-grid-month');
-    if (wg) wg.innerHTML = d.weeks.map(w=>{
-      const cls = w.status === 'done' ? 'wk-done' : w.status === 'current' ? 'wk-current' : 'wk-future';
-      const badge = w.status === 'done' ? '<span class="tag green" style="font-size:10px">已完成</span>'
-                  : w.status === 'current' ? '<span class="tag blue" style="font-size:10px">进行中</span>'
-                  : '<span style="font-size:10px;color:var(--muted2)">待开始</span>';
-      const actual = w.status !== 'future'
-        ? `<div class="wk-actual" style="color:var(--blue)">已完成 ${w.done_wan} 万 <span style="font-size:11px;color:var(--muted)">(${w.pct}%)</span></div>`
-        : `<div class="wk-actual" style="color:var(--muted2)">待开始</div>`;
-      return `<div class="week-card ${cls}">
-        <div class="wk-label"><span>${w.label}</span>${badge}</div>
-        <div class="wk-plan">${w.target_wan}<span class="wk-unit">万</span></div>
-        ${actual}
-        <div class="wk-prog"><div class="wk-fill" style="width:${w.pct||0}%;background:var(--blue)"></div></div>
-      </div>`;
-    }).join('');
-  }
-
-  // Month ranking
-  if (d.ranking && d.ranking.length) {
-    const el = document.getElementById('rank-month-list');
-    if (el) el.innerHTML = d.ranking.map((r,i)=>`
-      <div class="rank-item${r.is_me?' me':''}">
-        <span class="rank-num${i<2?' top':''}">${i+1}</span>
-        <span class="rank-name">${r.name}${r.is_me?' (我)':''}</span>
-        <span class="rank-val">${r.val_wan}万</span>
-      </div>`).join('');
-  }
 }
 
 async function loadYearData() {
