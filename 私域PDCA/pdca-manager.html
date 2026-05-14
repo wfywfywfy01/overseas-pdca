@@ -512,6 +512,7 @@ function logout(){ localStorage.removeItem('pdca_session'); window.location.href
       <div class="nav-lbl">月视图</div>
       <div class="nav-item active" onclick="showSec('month-kpi',this)"><span class="nav-icon">📊</span>月度 KPI</div>
       <div class="nav-item" onclick="showSec('month-members',this)"><span class="nav-icon">👥</span>成员进度</div>
+      <div class="nav-item" onclick="showSec('month-wa',this)"><span class="nav-icon">📱</span>WA运营</div>
       <div class="nav-item" onclick="showSec('month-source',this)"><span class="nav-icon">💰</span>来源分析</div>
       <div class="nav-divider"></div>
       <a href="https://admin.vertu.cn/odoo/sales" target="_blank" class="nav-item nav-ext"><span class="nav-icon">🔗</span>Odoo</a>
@@ -586,6 +587,33 @@ function logout(){ localStorage.removeItem('pdca_session'); window.location.href
                 </div>
               </div>
             </div>
+            <!-- WA月度概览 -->
+            <div>
+              <div class="section-label">
+                <div class="step-badge" style="background:#0ea5e9;color:#fff">WA</div>
+                <div class="step-name">组WA月度概览<span class="step-sub">存量 · 新增 · 触达</span></div>
+              </div>
+              <div class="kpi-strip">
+                <div class="kpi-card ok">
+                  <div class="kc-label">组WA总客户</div>
+                  <div class="kc-value">2.4<span style="font-size:13px;font-weight:400;color:var(--muted)">万</span></div>
+                  <div class="kc-sub">12账号 · 月新增980人</div>
+                  <div class="kc-prog"><div class="kc-fill" style="width:30%;background:#0ea5e9"></div></div>
+                </div>
+                <div class="kpi-card warn">
+                  <div class="kc-label">日均触达/人</div>
+                  <div class="kc-value">48.2<span style="font-size:13px;font-weight:400;color:var(--muted)">人</span></div>
+                  <div class="kc-sub">目标80人 · 60.3%</div>
+                  <div class="kc-prog"><div class="kc-fill" style="width:60.3%;background:var(--orange)"></div></div>
+                </div>
+                <div class="kpi-card ok">
+                  <div class="kc-label">组月度人产</div>
+                  <div class="kc-value">8.46<span style="font-size:13px;font-weight:400;color:var(--muted)">万</span></div>
+                  <div class="kc-sub">目标20万 · 42.3%</div>
+                  <div class="kc-prog"><div class="kc-fill" style="width:42.3%;background:#2563eb"></div></div>
+                </div>
+              </div>
+            </div>
           </div><!-- /left -->
           <div class="sec-stack">
             <div class="card card-sm">
@@ -634,9 +662,170 @@ function logout(){ localStorage.removeItem('pdca_session'); window.location.href
             <div class="step-badge dark">人</div>
             <div class="step-name">成员月度进度<span class="step-sub">各成员本月目标 vs 实际</span></div>
           </div>
-          <div class="card card-sm" id="month-member-bars"></div>
+          <div class="card card-sm" id="month-member-bars">
+            <div style="display:flex;flex-direction:column;gap:16px">
+              <!-- 陈莉 -->
+              <div style="border-bottom:1px solid var(--border);padding-bottom:14px">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+                  <div style="display:flex;align-items:center;gap:8px">
+                    <span class="rank-num top" style="width:22px;height:22px;font-size:11px;display:inline-flex;align-items:center;justify-content:center">1</span>
+                    <span style="font-weight:600;font-size:14px">陈莉</span><span class="tag gold" style="font-size:10px">300W</span>
+                  </div>
+                  <div style="font-size:13px;font-weight:700;color:var(--green)">9.2万 <span style="font-weight:400;color:var(--muted);font-size:11px">/ 25万</span></div>
+                </div>
+                <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px">
+                  <span style="font-size:11px;color:var(--muted)">WA客户 <b style="color:var(--text)">5,840</b></span>
+                  <span style="font-size:11px;color:var(--muted)">月新增 <b style="color:var(--green)">+248</b></span>
+                  <span style="font-size:11px;color:var(--muted)">日触达 <b>52人</b></span>
+                  <span style="font-size:11px;color:var(--muted)">日报 <b style="color:var(--green)">88分</b></span>
+                </div>
+                <div style="height:8px;background:var(--bg2);border-radius:4px;overflow:hidden">
+                  <div style="height:100%;width:36.8%;background:var(--green);border-radius:4px"></div>
+                </div>
+                <div style="display:flex;justify-content:space-between;margin-top:4px;font-size:11px;color:var(--muted)">
+                  <span>36.8% 完成</span><span>预计月末 ~20.4万 ✓</span>
+                </div>
+              </div>
+              <!-- 郑丽苹 -->
+              <div style="border-bottom:1px solid var(--border);padding-bottom:14px">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+                  <div style="display:flex;align-items:center;gap:8px">
+                    <span class="rank-num top" style="width:22px;height:22px;font-size:11px;display:inline-flex;align-items:center;justify-content:center">2</span>
+                    <span style="font-weight:600;font-size:14px">郑丽苹</span><span class="tag gold" style="font-size:10px">300W</span>
+                  </div>
+                  <div style="font-size:13px;font-weight:700;color:var(--blue)">8.4万 <span style="font-weight:400;color:var(--muted);font-size:11px">/ 25万</span></div>
+                </div>
+                <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px">
+                  <span style="font-size:11px;color:var(--muted)">WA客户 <b style="color:var(--text)">4,920</b></span>
+                  <span style="font-size:11px;color:var(--muted)">月新增 <b style="color:var(--green)">+212</b></span>
+                  <span style="font-size:11px;color:var(--muted)">日触达 <b>49人</b></span>
+                  <span style="font-size:11px;color:var(--muted)">日报 <b style="color:var(--blue)">85分</b></span>
+                </div>
+                <div style="height:8px;background:var(--bg2);border-radius:4px;overflow:hidden">
+                  <div style="height:100%;width:33.6%;background:var(--blue);border-radius:4px"></div>
+                </div>
+                <div style="display:flex;justify-content:space-between;margin-top:4px;font-size:11px;color:var(--muted)">
+                  <span>33.6% 完成</span><span>预计月末 ~18.6万</span>
+                </div>
+              </div>
+              <!-- 陈玉霞 -->
+              <div style="border-bottom:1px solid var(--border);padding-bottom:14px">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+                  <div style="display:flex;align-items:center;gap:8px">
+                    <span class="rank-num" style="width:22px;height:22px;font-size:11px;display:inline-flex;align-items:center;justify-content:center">3</span>
+                    <span style="font-weight:600;font-size:14px">陈玉霞</span><span class="tag gold" style="font-size:10px">300W</span>
+                  </div>
+                  <div style="font-size:13px;font-weight:700;color:var(--orange)">7.8万 <span style="font-weight:400;color:var(--muted);font-size:11px">/ 25万</span></div>
+                </div>
+                <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px">
+                  <span style="font-size:11px;color:var(--muted)">WA客户 <b style="color:var(--text)">4,560</b></span>
+                  <span style="font-size:11px;color:var(--muted)">月新增 <b style="color:var(--orange)">+195</b></span>
+                  <span style="font-size:11px;color:var(--muted)">日触达 <b>46人</b></span>
+                  <span style="font-size:11px;color:var(--muted)">日报 <b style="color:var(--orange)">82分</b></span>
+                </div>
+                <div style="height:8px;background:var(--bg2);border-radius:4px;overflow:hidden">
+                  <div style="height:100%;width:31.2%;background:var(--orange);border-radius:4px"></div>
+                </div>
+                <div style="display:flex;justify-content:space-between;margin-top:4px;font-size:11px;color:var(--muted)">
+                  <span>31.2% 完成</span><span>预计月末 ~17.3万</span>
+                </div>
+              </div>
+              <!-- 刘佳鑫 -->
+              <div style="border-bottom:1px solid var(--border);padding-bottom:14px">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+                  <div style="display:flex;align-items:center;gap:8px">
+                    <span class="rank-num" style="width:22px;height:22px;font-size:11px;display:inline-flex;align-items:center;justify-content:center">4</span>
+                    <span style="font-weight:600;font-size:14px">刘佳鑫</span><span class="tag silver" style="font-size:10px">200W</span>
+                  </div>
+                  <div style="font-size:13px;font-weight:700;color:var(--orange)">7.6万 <span style="font-weight:400;color:var(--muted);font-size:11px">/ 20万</span></div>
+                </div>
+                <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px">
+                  <span style="font-size:11px;color:var(--muted)">WA客户 <b style="color:var(--text)">3,810</b></span>
+                  <span style="font-size:11px;color:var(--muted)">月新增 <b style="color:var(--orange)">+178</b></span>
+                  <span style="font-size:11px;color:var(--muted)">日触达 <b>45人</b></span>
+                  <span style="font-size:11px;color:var(--muted)">日报 <b>79分</b></span>
+                </div>
+                <div style="height:8px;background:var(--bg2);border-radius:4px;overflow:hidden">
+                  <div style="height:100%;width:38%;background:var(--orange);border-radius:4px"></div>
+                </div>
+                <div style="display:flex;justify-content:space-between;margin-top:4px;font-size:11px;color:var(--muted)">
+                  <span>38% 完成</span><span>预计月末 ~16.8万 ✓ 达标</span>
+                </div>
+              </div>
+              <!-- 毛涵 -->
+              <div style="background:var(--red-bg);border-radius:var(--radius);padding:12px">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+                  <div style="display:flex;align-items:center;gap:8px">
+                    <span style="width:22px;height:22px;font-size:11px;display:inline-flex;align-items:center;justify-content:center;background:var(--red);color:#fff;border-radius:50%">5</span>
+                    <span style="font-weight:600;font-size:14px;color:var(--red)">毛涵</span><span class="tag silver" style="font-size:10px">200W</span>
+                    <span style="font-size:10px;padding:2px 6px;background:var(--red);color:#fff;border-radius:10px">⚠ 需介入</span>
+                  </div>
+                  <div style="font-size:13px;font-weight:700;color:var(--red)">4.8万 <span style="font-weight:400;color:var(--muted);font-size:11px">/ 20万</span></div>
+                </div>
+                <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px">
+                  <span style="font-size:11px;color:var(--muted)">WA客户 <b style="color:var(--red)">2,410</b></span>
+                  <span style="font-size:11px;color:var(--muted)">月新增 <b style="color:var(--red)">+87</b></span>
+                  <span style="font-size:11px;color:var(--muted)">日触达 <b style="color:var(--red)">29人</b></span>
+                  <span style="font-size:11px;color:var(--muted)">日报 <b style="color:var(--red)">68分</b></span>
+                </div>
+                <div style="height:8px;background:rgba(0,0,0,0.08);border-radius:4px;overflow:hidden">
+                  <div style="height:100%;width:24%;background:var(--red);border-radius:4px"></div>
+                </div>
+                <div style="display:flex;justify-content:space-between;margin-top:4px;font-size:11px">
+                  <span style="color:var(--red)">24% 完成 · 严重落后</span><span style="color:var(--muted)">预计月末 ~10.6万 · 缺口 9.4万</span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div><!-- /month-members -->
+
+      <!-- ─ WA运营 ─ -->
+      <div id="month-wa" class="sec-panel">
+        <div style="padding:24px;max-width:860px">
+          <div class="section-label"><div class="step-badge" style="background:#0ea5e9;color:#fff">WA</div><div class="step-name">组WA账号运营<span class="step-sub">5月存量 · 新增 · 触达分析</span></div></div>
+          <div class="kpi-strip" style="margin-bottom:20px">
+            <div class="kpi-card ok">
+              <div class="kc-label">组WA总客户</div>
+              <div class="kc-value">2.4<span style="font-size:13px;font-weight:400;color:var(--muted)">万</span></div>
+              <div class="kc-sub">12个账号 · 月新增980人</div>
+              <div class="kc-prog"><div class="kc-fill" style="width:30%;background:#0ea5e9"></div></div>
+            </div>
+            <div class="kpi-card warn">
+              <div class="kc-label">日均触达/人</div>
+              <div class="kc-value">48.2<span style="font-size:13px;font-weight:400;color:var(--muted)">人</span></div>
+              <div class="kc-sub">目标80人 · 60.3%</div>
+              <div class="kc-prog"><div class="kc-fill" style="width:60.3%;background:var(--orange)"></div></div>
+            </div>
+            <div class="kpi-card behind">
+              <div class="kc-label">月新增拉群率</div>
+              <div class="kc-value">34<span style="font-size:13px;font-weight:400;color:var(--muted)">%</span></div>
+              <div class="kc-sub">980人中332人进群</div>
+              <div class="kc-prog"><div class="kc-fill" style="width:34%;background:var(--red)"></div></div>
+            </div>
+            <div class="kpi-card ok">
+              <div class="kc-label">WA来源成单</div>
+              <div class="kc-value">17<span style="font-size:13px;font-weight:400;color:var(--muted)">单</span></div>
+              <div class="kc-sub">占组总单量 40.5%</div>
+              <div class="kc-prog"><div class="kc-fill" style="width:40.5%;background:var(--green)"></div></div>
+            </div>
+          </div>
+          <div class="section-label"><div class="step-badge dark">人</div><div class="step-name">成员WA触达明细<span class="step-sub">账号 · 存量 · 月新增 · 日触达 · 拉群 · WA成单</span></div></div>
+          <div class="card card-sm" style="padding:0;overflow:hidden">
+            <table class="cross-table">
+              <thead><tr><th>成员</th><th>账号数</th><th>存量客户</th><th>月新增</th><th>日均触达</th><th>拉群率</th><th>WA成单</th></tr></thead>
+              <tbody>
+                <tr><td>陈莉</td><td>3个</td><td style="color:var(--green)">5,840</td><td style="color:var(--green)">+248</td><td style="color:var(--green)">52人</td><td>38%</td><td>4单</td></tr>
+                <tr><td>郑丽苹</td><td>2个</td><td>4,920</td><td>+212</td><td>49人</td><td>35%</td><td>3单</td></tr>
+                <tr><td>陈玉霞</td><td>3个</td><td>4,560</td><td style="color:var(--orange)">+195</td><td>46人</td><td>33%</td><td>4单</td></tr>
+                <tr><td>刘佳鑫</td><td>2个</td><td>3,810</td><td style="color:var(--orange)">+178</td><td>45人</td><td>31%</td><td>4单</td></tr>
+                <tr style="background:var(--red-bg)"><td style="color:var(--red)">毛涵 ⚠</td><td>2个</td><td style="color:var(--red)">2,410</td><td style="color:var(--red)">+87</td><td style="color:var(--red)">29人</td><td style="color:var(--red)">18%</td><td style="color:var(--red)">2单</td></tr>
+                <tr style="background:var(--bg2);font-weight:600"><td>合计/均值</td><td>12个</td><td>21,540</td><td>+920</td><td>44.2人</td><td>31%</td><td>17单</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div><!-- /month-wa -->
 
       <!-- ─ 来源分析 ─ -->
       <div id="month-source" class="sec-panel">

@@ -512,6 +512,7 @@ function logout(){ localStorage.removeItem('pdca_session'); window.location.href
     <nav class="left-nav">
       <div class="nav-lbl">月视图</div>
       <div class="nav-item active" onclick="showSec('month-kpi',this)"><span class="nav-icon">📊</span>月度 KPI</div>
+      <div class="nav-item" onclick="showSec('month-wa',this)"><span class="nav-icon">📱</span>WA & 人产</div>
       <div class="nav-item" onclick="showSec('month-source',this)"><span class="nav-icon">💰</span>来源&跨组</div>
       <div class="nav-divider"></div>
       <a href="https://admin.vertu.cn/odoo/sales" target="_blank" class="nav-item nav-ext"><span class="nav-icon">🔗</span>Odoo</a>
@@ -596,6 +597,79 @@ function logout(){ localStorage.removeItem('pdca_session'); window.location.href
           </div><!-- /right -->
         </div><!-- /sec-grid -->
       </div><!-- /month-kpi -->
+
+      <!-- ─ WA & 人产 ─ -->
+      <div id="month-wa" class="sec-panel">
+        <div style="padding:24px;max-width:960px">
+          <div class="section-label"><div class="step-badge" style="background:#0ea5e9;color:#fff">WA</div><div class="step-name">部门WA客户总数<span class="step-sub">5月存量 · 新增 · 触达</span></div></div>
+          <div class="kpi-strip" style="margin-bottom:20px">
+            <div class="kpi-card ok">
+              <div class="kc-label">WA存量客户</div>
+              <div class="kc-value">5.8<span style="font-size:13px;font-weight:400;color:var(--muted)">万</span></div>
+              <div class="kc-sub">目标8万 · 完成72.5%</div>
+              <div class="kc-prog"><div class="kc-fill" style="width:72.5%;background:#0ea5e9"></div></div>
+            </div>
+            <div class="kpi-card warn">
+              <div class="kc-label">本月WA新增</div>
+              <div class="kc-value">2,340<span style="font-size:13px;font-weight:400;color:var(--muted)">人</span></div>
+              <div class="kc-sub">月目标3,000 · 进度78%</div>
+              <div class="kc-prog"><div class="kc-fill" style="width:78%;background:var(--orange)"></div></div>
+            </div>
+            <div class="kpi-card warn">
+              <div class="kc-label">日均触达客户</div>
+              <div class="kc-value">43.5<span style="font-size:13px;font-weight:400;color:var(--muted)">人</span></div>
+              <div class="kc-sub">目标80人 · 54.4%</div>
+              <div class="kc-prog"><div class="kc-fill" style="width:54.4%;background:var(--orange)"></div></div>
+            </div>
+            <div class="kpi-card neutral">
+              <div class="kc-label">部门月度人产均值</div>
+              <div class="kc-value">7.04<span style="font-size:13px;font-weight:400;color:var(--muted)">万</span></div>
+              <div class="kc-sub">目标20万/人 · 35%</div>
+              <div class="kc-prog"><div class="kc-fill" style="width:35%;background:#7c3aed"></div></div>
+            </div>
+          </div>
+          <div class="section-label"><div class="step-badge dark">≈</div><div class="step-name">各组WA & 人产对比<span class="step-sub">月度横向对比</span></div></div>
+          <div class="card card-sm" style="padding:0;overflow:hidden;margin-bottom:20px">
+            <table class="cross-table">
+              <thead><tr><th>指标</th><th>何川组(5人)</th><th>夏欢组(6人)</th><th>向俞金组(3人)</th><th>部门合计/均</th></tr></thead>
+              <tbody>
+                <tr><td>WA账号数</td><td>12个</td><td>15个</td><td>8个</td><td>35个</td></tr>
+                <tr><td>WA存量客户</td><td style="color:var(--green)">2.4万</td><td>2.1万</td><td style="color:var(--red)">1.3万</td><td>5.8万</td></tr>
+                <tr><td>本月WA新增</td><td style="color:var(--green)">980人</td><td>890人</td><td style="color:var(--red)">470人</td><td>2,340人</td></tr>
+                <tr><td>日均触达/人</td><td style="color:var(--green)">48.2人</td><td>44.5人</td><td style="color:var(--red)">37.8人</td><td>43.5人</td></tr>
+                <tr><td>月度人产</td><td style="color:var(--orange)">8.46万</td><td>6.42万</td><td style="color:var(--red)">5.93万</td><td>7.04万(均)</td></tr>
+                <tr><td>人产目标达成率</td><td style="color:var(--orange)">42%</td><td>32%</td><td style="color:var(--red)">30%</td><td>35%</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="section-label"><div class="step-badge" style="background:#7c3aed;color:#fff">趋</div><div class="step-name">月度人产趋势<span class="step-sub">近4月 · 部门均值 · 年度目标20万</span></div></div>
+          <div class="card card-sm">
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px">
+              <div style="text-align:center">
+                <div style="font-size:11px;color:var(--muted);margin-bottom:6px">2月</div>
+                <div style="font-size:22px;font-weight:700;color:var(--muted)">6.1<span style="font-size:12px">万</span></div>
+                <div style="height:4px;background:var(--bg2);border-radius:2px;margin-top:8px"><div style="height:100%;width:30.5%;background:var(--muted2);border-radius:2px"></div></div>
+              </div>
+              <div style="text-align:center">
+                <div style="font-size:11px;color:var(--muted);margin-bottom:6px">3月</div>
+                <div style="font-size:22px;font-weight:700;color:var(--muted)">7.8<span style="font-size:12px">万</span></div>
+                <div style="height:4px;background:var(--bg2);border-radius:2px;margin-top:8px"><div style="height:100%;width:39%;background:#7c3aed;border-radius:2px"></div></div>
+              </div>
+              <div style="text-align:center">
+                <div style="font-size:11px;color:var(--muted);margin-bottom:6px">4月</div>
+                <div style="font-size:22px;font-weight:700;color:var(--orange)">8.3<span style="font-size:12px">万</span></div>
+                <div style="height:4px;background:var(--bg2);border-radius:2px;margin-top:8px"><div style="height:100%;width:41.5%;background:var(--orange);border-radius:2px"></div></div>
+              </div>
+              <div style="text-align:center">
+                <div style="font-size:11px;color:#0ea5e9;margin-bottom:6px">5月(进行中)</div>
+                <div style="font-size:22px;font-weight:700;color:#0ea5e9">7.0<span style="font-size:12px">万</span></div>
+                <div style="height:4px;background:var(--bg2);border-radius:2px;margin-top:8px"><div style="height:100%;width:35%;background:#0ea5e9;border-radius:2px"></div></div>
+              </div>
+            </div>
+            <div style="font-size:12px;color:var(--muted);padding-top:10px;border-top:1px solid var(--border)">年度目标：人产稳定20万门槛，新品发布月突破30万 · 当前均值 <span style="color:var(--red);font-weight:600">7.0万</span>，需持续提升至少 <b>2.5×</b></div>
+          </div>
+        </div>
+      </div><!-- /month-wa -->
 
       <!-- ─ 来源&跨组 ─ -->
       <div id="month-source" class="sec-panel">

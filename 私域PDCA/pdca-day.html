@@ -611,6 +611,7 @@ function logout() {
     <nav class="left-nav">
       <div class="nav-lbl">月视图</div>
       <div class="nav-item active" onclick="showSec('month-kpi',this)"><span class="nav-icon">📊</span>月度 KPI</div>
+      <div class="nav-item" onclick="showSec('month-wa',this)"><span class="nav-icon">📱</span>WA账号</div>
       <div class="nav-item" onclick="showSec('month-source',this)"><span class="nav-icon">💰</span>来源分析</div>
       <div class="nav-item" onclick="showSec('month-clients',this)"><span class="nav-icon">👥</span>客户跟进</div>
       <div class="nav-divider"></div>
@@ -691,6 +692,34 @@ function logout() {
               </div>
             </div>
 
+            <!-- WA账号运营 -->
+            <div>
+              <div class="section-label">
+                <div class="step-badge" style="background:#0ea5e9;color:#fff">WA</div>
+                <div class="step-name">WA账号运营<span class="step-sub">本月私域触达概览</span></div>
+              </div>
+              <div class="kpi-strip">
+                <div class="kpi-card neutral">
+                  <div class="kc-label">管理账号</div>
+                  <div class="kc-value">2<span style="font-size:13px;font-weight:400;color:var(--muted)">个</span></div>
+                  <div class="kc-sub">主账号 + 副账号</div>
+                  <div class="kc-prog"><div class="kc-fill" style="width:100%;background:#111827"></div></div>
+                </div>
+                <div class="kpi-card ok">
+                  <div class="kc-label">WA客户总数</div>
+                  <div class="kc-value">4,920<span style="font-size:13px;font-weight:400;color:var(--muted)">人</span></div>
+                  <div class="kc-sub">月新增 +212 ↑</div>
+                  <div class="kc-prog"><div class="kc-fill" style="width:61.5%;background:#0ea5e9"></div></div>
+                </div>
+                <div class="kpi-card warn">
+                  <div class="kc-label">日均触达</div>
+                  <div class="kc-value">49<span style="font-size:13px;font-weight:400;color:var(--muted)">人</span></div>
+                  <div class="kc-sub">目标80人 · 61.3%</div>
+                  <div class="kc-prog"><div class="kc-fill" style="width:61.3%;background:var(--orange)"></div></div>
+                </div>
+              </div>
+            </div>
+
           </div><!-- /sec-stack left -->
 
           <div class="sec-stack">
@@ -727,6 +756,40 @@ function logout() {
               </div>
             </div>
 
+            <!-- SOP月度达标率 -->
+            <div class="card card-sm">
+              <div class="card-title">本月SOP达标率</div>
+              <div style="display:flex;flex-direction:column;gap:8px;margin-top:4px">
+                <div>
+                  <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
+                    <span style="color:var(--muted)">日报提交率</span><span style="font-weight:600;color:var(--green)">93% ✓</span>
+                  </div>
+                  <div style="height:5px;background:var(--bg2);border-radius:3px"><div style="height:100%;width:93%;background:var(--green);border-radius:3px"></div></div>
+                </div>
+                <div>
+                  <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
+                    <span style="color:var(--muted)">日均私信量</span><span style="font-weight:600;color:var(--green)">38.4条 ✓</span>
+                  </div>
+                  <div style="height:5px;background:var(--bg2);border-radius:3px"><div style="height:100%;width:77%;background:var(--green);border-radius:3px"></div></div>
+                </div>
+                <div>
+                  <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
+                    <span style="color:var(--muted)">社媒发帖/日</span><span style="font-weight:600;color:var(--orange)">7.2条 ⚠</span>
+                  </div>
+                  <div style="height:5px;background:var(--bg2);border-radius:3px"><div style="height:100%;width:72%;background:var(--orange);border-radius:3px"></div></div>
+                </div>
+                <div>
+                  <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
+                    <span style="color:var(--muted)">询盘响应≤1h</span><span style="font-weight:600;color:var(--green)">89% ✓</span>
+                  </div>
+                  <div style="height:5px;background:var(--bg2);border-radius:3px"><div style="height:100%;width:89%;background:var(--green);border-radius:3px"></div></div>
+                </div>
+                <div style="border-top:1px solid var(--border);padding-top:6px;display:flex;justify-content:space-between;font-size:12px">
+                  <span style="color:var(--muted)">综合评分</span><span style="font-weight:700;color:var(--green)">85分 ✓</span>
+                </div>
+              </div>
+            </div>
+
             <!-- Hermes 月度建议 -->
             <div class="hermes-card">
               <div class="hermes-header">
@@ -746,6 +809,112 @@ function logout() {
           </div><!-- /sec-stack right -->
         </div><!-- /sec-grid -->
       </div><!-- /month-kpi -->
+
+      <!-- ─ WA账号 ─ -->
+      <div id="month-wa" class="sec-panel">
+        <div style="padding:24px;max-width:780px">
+          <div class="section-label">
+            <div class="step-badge" style="background:#0ea5e9;color:#fff">WA</div>
+            <div class="step-name">我的WA账号详情<span class="step-sub">2账号 · 私域客户池运营</span></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px">
+            <div class="card card-sm">
+              <div class="card-title">主账号 WA-主</div>
+              <div style="display:flex;flex-direction:column;gap:8px;margin-top:4px">
+                <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:var(--muted)">存量客户</span><span style="font-weight:600">3,240人</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:var(--muted)">本月新增</span><span style="font-weight:600;color:var(--green)">+148人 ↑</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:var(--muted)">日均触达</span><span style="font-weight:600">32人</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:var(--muted)">群聊数</span><span style="font-weight:600">12个</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:var(--muted)">本月成单</span><span style="font-weight:600;color:var(--green)">2单</span></div>
+              </div>
+            </div>
+            <div class="card card-sm">
+              <div class="card-title">副账号 WA-副</div>
+              <div style="display:flex;flex-direction:column;gap:8px;margin-top:4px">
+                <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:var(--muted)">存量客户</span><span style="font-weight:600">1,680人</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:var(--muted)">本月新增</span><span style="font-weight:600;color:var(--green)">+64人 ↑</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:var(--muted)">日均触达</span><span style="font-weight:600">17人</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:var(--muted)">群聊数</span><span style="font-weight:600">6个</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:var(--muted)">本月成单</span><span style="font-weight:600;color:var(--green)">1单</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="section-label">
+            <div class="step-badge dark">趋</div>
+            <div class="step-name">WA新增周趋势<span class="step-sub">近4周新增人数</span></div>
+          </div>
+          <div class="card card-sm" style="margin-bottom:20px">
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px">
+              <div style="text-align:center">
+                <div style="font-size:11px;color:var(--muted);margin-bottom:6px">W1 5/1–7</div>
+                <div style="font-size:22px;font-weight:700;color:var(--muted)">48<span style="font-size:12px">人</span></div>
+                <div style="height:40px;display:flex;align-items:flex-end;justify-content:center;margin:6px 0">
+                  <div style="width:28px;height:40px;background:var(--bg2);border-radius:4px;overflow:hidden;display:flex;align-items:flex-end">
+                    <div style="width:100%;height:67%;background:#0ea5e9;border-radius:4px"></div>
+                  </div>
+                </div>
+              </div>
+              <div style="text-align:center">
+                <div style="font-size:11px;color:#0ea5e9;margin-bottom:6px">W2 5/8–14</div>
+                <div style="font-size:22px;font-weight:700;color:#0ea5e9">56<span style="font-size:12px">人</span></div>
+                <div style="height:40px;display:flex;align-items:flex-end;justify-content:center;margin:6px 0">
+                  <div style="width:28px;height:40px;background:var(--bg2);border-radius:4px;overflow:hidden;display:flex;align-items:flex-end">
+                    <div style="width:100%;height:80%;background:#0ea5e9;border-radius:4px"></div>
+                  </div>
+                </div>
+              </div>
+              <div style="text-align:center;opacity:0.4">
+                <div style="font-size:11px;color:var(--muted);margin-bottom:6px">W3 待开始</div>
+                <div style="font-size:22px;font-weight:700;color:var(--muted)">—</div>
+                <div style="height:40px;display:flex;align-items:flex-end;justify-content:center;margin:6px 0">
+                  <div style="width:28px;height:40px;background:var(--bg2);border-radius:4px"></div>
+                </div>
+              </div>
+              <div style="text-align:center;opacity:0.4">
+                <div style="font-size:11px;color:var(--muted);margin-bottom:6px">W4 待开始</div>
+                <div style="font-size:22px;font-weight:700;color:var(--muted)">—</div>
+                <div style="height:40px;display:flex;align-items:flex-end;justify-content:center;margin:6px 0">
+                  <div style="width:28px;height:40px;background:var(--bg2);border-radius:4px"></div>
+                </div>
+              </div>
+            </div>
+            <div style="border-top:1px solid var(--border);padding-top:8px;margin-top:8px;font-size:12px;color:var(--muted)">
+              前两周累计新增 <b style="color:var(--text)">104人</b> · 月目标250人 · 进度 <span style="color:var(--orange)">41.6%</span>，W3/W4 需每周补 73人+
+            </div>
+          </div>
+          <div class="section-label">
+            <div class="step-badge dark">月</div>
+            <div class="step-name">个人月度人产趋势<span class="step-sub">近4月业绩 · 目标20万门槛</span></div>
+          </div>
+          <div class="card card-sm">
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px">
+              <div style="text-align:center">
+                <div style="font-size:11px;color:var(--muted);margin-bottom:6px">2月</div>
+                <div style="font-size:22px;font-weight:700;color:var(--muted)">6.2<span style="font-size:12px">万</span></div>
+                <div style="height:4px;background:var(--bg2);border-radius:2px;margin-top:8px"><div style="height:100%;width:31%;background:var(--muted2);border-radius:2px"></div></div>
+              </div>
+              <div style="text-align:center">
+                <div style="font-size:11px;color:var(--muted);margin-bottom:6px">3月</div>
+                <div style="font-size:22px;font-weight:700;color:var(--green)">18.4<span style="font-size:12px">万</span></div>
+                <div style="height:4px;background:var(--bg2);border-radius:2px;margin-top:8px"><div style="height:100%;width:74%;background:var(--green);border-radius:2px"></div></div>
+              </div>
+              <div style="text-align:center">
+                <div style="font-size:11px;color:var(--muted);margin-bottom:6px">4月 ✓</div>
+                <div style="font-size:22px;font-weight:700;color:var(--green)">22.1<span style="font-size:12px">万</span></div>
+                <div style="height:4px;background:var(--bg2);border-radius:2px;margin-top:8px"><div style="height:100%;width:88%;background:var(--green);border-radius:2px"></div></div>
+              </div>
+              <div style="text-align:center">
+                <div style="font-size:11px;color:#0ea5e9;margin-bottom:6px">5月(进行中)</div>
+                <div style="font-size:22px;font-weight:700;color:#0ea5e9">8.4<span style="font-size:12px">万</span></div>
+                <div style="height:4px;background:var(--bg2);border-radius:2px;margin-top:8px"><div style="height:100%;width:34%;background:#0ea5e9;border-radius:2px"></div></div>
+              </div>
+            </div>
+            <div style="border-top:1px solid var(--border);padding-top:8px;margin-top:12px;font-size:12px;color:var(--muted)">
+              4月已达稳定20万门槛 <span style="color:var(--green)">✓</span> · 5月预计 ~18.6万，W3/W4 需加速 2万以上确保达标
+            </div>
+          </div>
+        </div>
+      </div><!-- /month-wa -->
 
       <!-- ─ 来源分析 ─ -->
       <div id="month-source" class="sec-panel">
