@@ -307,31 +307,13 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 </head>
 <body>
 <script>
-// Session guard — redirect to login if no valid session
+// Session check — demo mode, no redirect; header populated after DOM is ready
 (function(){
-  const TODAY_STR = new Date().toLocaleDateString('zh-CN',{year:'numeric',month:'2-digit',day:'2-digit'}).replace(/\//g,'-');
-  const WEEKDAYS  = ['日','一','二','三','四','五','六'];
   const sess = JSON.parse(localStorage.getItem('pdca_session') || 'null');
-  if (!sess || Date.now() - sess.ts > 8 * 3600 * 1000) {
-    // No session — check URL param fallback
-    const uid = new URLSearchParams(location.search).get('uid');
-    if (!uid) { window.location.href = 'pdca-login.html'; return; }
-    // Allow URL-param access without login (dev mode)
-  }
-  // Populate header from session
-  if (sess) {
-    const av   = document.getElementById('hdr-av');
-    const name = document.getElementById('hdr-name');
-    const meta = document.getElementById('hdr-meta');
-    if (av)   av.textContent  = sess.name[0];
-    if (name) name.innerHTML  = `${sess.name} <span class="tag">${sess.team || '海外私域'}</span>`;
-    if (meta) {
-      const d = new Date();
-      meta.textContent = `今日 ${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}（周${WEEKDAYS[d.getDay()]}）`;
-    }
+  if (sess && Date.now() - sess.ts > 8 * 3600 * 1000) {
+    localStorage.removeItem('pdca_session');
   }
 })();
-
 function logout() {
   localStorage.removeItem('pdca_session');
   window.location.href = 'pdca-login.html';
@@ -1251,6 +1233,19 @@ function logout() {
 <div class="toast" id="toast"></div>
 
 <script>
+// ===== USER REGISTRY =====
+const ALL_USERS = {
+  12865: {name:'陈莉',   av:'陈', team:'何川组', todayDone:1.40, dayTarget:1.22, monthDone:11.2, monthTarget:25, rank:1},
+  12849: {name:'郑丽苹', av:'郑', team:'何川组', todayDone:0.48, dayTarget:1.19, monthDone:8.4,  monthTarget:25, rank:3},
+  12862: {name:'陈玉霞', av:'陈', team:'何川组', todayDone:0.56, dayTarget:1.22, monthDone:9.8,  monthTarget:22, rank:2},
+  12549: {name:'刘佳鑫', av:'刘', team:'何川组', todayDone:0.41, dayTarget:1.00, monthDone:8.3,  monthTarget:22, rank:4},
+  13431: {name:'毛涵',   av:'毛', team:'何川组', todayDone:0.00, dayTarget:0.90, monthDone:4.6,  monthTarget:20, rank:5},
+};
+const _sess = JSON.parse(localStorage.getItem('pdca_session') || 'null');
+const _urlUid = parseInt(new URLSearchParams(location.search).get('uid') || 0);
+const CURRENT_USER_ID = _urlUid || _sess?.uid || 12849;
+const ME = ALL_USERS[CURRENT_USER_ID] || ALL_USERS[12849];
+
 // ===== DATA =====
 const SOP_DATA = [
   {time:'09:00–09:10', module:'公司早会', desc:'同步今日重点，接收主管指令', status:'done',
@@ -1292,11 +1287,24 @@ const CHECK_DATA = [
   {label:'WA 动态', cur:3, max:3},
 ];
 
+const _dM   = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate();
+const _rem  = _dM - new Date().getDate();
+const _tPct = Math.round(ME.todayDone / ME.dayTarget * 100);
+const _mPct = Math.round(ME.monthDone / ME.monthTarget * 100);
 const KPI_DATA = [
-  {label:'今日目标', value:'1.19', unit:'万', sub:'月度日均拆解', cur:1.19, max:1.19, cls:'neutral'},
-  {label:'今日已完成', value:'0.48', unit:'万', sub:'40% · 还需 0.71 万', cur:0.48, max:1.19, cls:'behind'},
-  {label:'本月完成', value:'8.4', unit:'万', sub:'月目标 25 万 · 33.6%', cur:8.4, max:25, cls:'warn'},
-  {label:'日报连续达标', value:'3', unit:'天', sub:'昨日 78 分 · 合格', cur:3, max:7, cls:'ok'},
+  {label:'今日目标',   value:ME.dayTarget.toFixed(2), unit:'万', sub:'月度日均拆解',
+   cur:ME.dayTarget, max:ME.dayTarget, cls:'neutral'},
+  {label:'今日已完成', value:ME.todayDone.toFixed(2), unit:'万',
+   sub:`${_tPct}% · 还需 ${Math.max(0, ME.dayTarget - ME.todayDone).toFixed(2)} 万`,
+   cur:ME.todayDone, max:ME.dayTarget,
+   cls:_tPct>=80?'ok':_tPct>=40?'warn':'behind'},
+  {label:'本月完成',   value:ME.monthDone.toFixed(1), unit:'万',
+   sub:`月目标 ${ME.monthTarget} 万 · ${_mPct}%`,
+   cur:ME.monthDone, max:ME.monthTarget,
+   cls:_mPct>=80?'ok':_mPct>=40?'warn':'behind'},
+  {label:'团队排名',   value:ME.rank, unit:'名',
+   sub:'共 5 人 · 本月实时',
+   cur:6 - ME.rank, max:5, cls:'ok'},
 ];
 
 // ===== RENDER KPI STRIP =====
@@ -1476,8 +1484,6 @@ function showToast(msg) {
 
 // ===== CONFIG =====
 // uid 优先从 session 读，其次 URL 参数，最后默认值
-const _sess = JSON.parse(localStorage.getItem('pdca_session') || 'null');
-const CURRENT_USER_ID = _sess?.uid || parseInt(new URLSearchParams(location.search).get('uid') || 12865);
 const DATA_SRC = new URLSearchParams(location.search).get('data') || 'pdca_data.json';
 
 let _DATA = null;
@@ -1914,6 +1920,57 @@ function openChat(intentId) {
 function closeChat() { document.getElementById('chat-modal').classList.remove('open'); }
 
 // ===== INIT =====
+
+// Populate header from user registry
+(function(){
+  const av   = document.getElementById('hdr-av');
+  const name = document.getElementById('hdr-name');
+  const meta = document.getElementById('hdr-meta');
+  if (av)   av.textContent = ME.av;
+  if (name) name.innerHTML = `${ME.name} <span class="tag">${ME.team}</span>`;
+  if (meta) {
+    const d = new Date(), WD = ['日','一','二','三','四','五','六'];
+    meta.textContent = `今日 ${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}（周${WD[d.getDay()]}）`;
+  }
+})();
+
+// Fallback month KPI strip from static user data (overridden by loadMonthData when API available)
+(function(){
+  const strip = document.getElementById('month-kpi-strip');
+  if (!strip) return;
+  const daysPassed = new Date().getDate();
+  const daysInM    = _dM;
+  const remaining  = _rem;
+  const pct  = _mPct;
+  const gap  = +(ME.monthTarget - ME.monthDone).toFixed(1);
+  const cls  = pct >= 80 ? 'ok' : pct >= 40 ? 'warn' : 'behind';
+  strip.innerHTML = `
+    <div class="kpi-card neutral">
+      <div class="kc-label">月度目标</div>
+      <div class="kc-value">${ME.monthTarget}<span style="font-size:13px;font-weight:400;color:var(--muted)">万</span></div>
+      <div class="kc-sub">已过 ${daysPassed}/${daysInM} 天</div>
+      <div class="kc-prog"><div class="kc-fill" style="width:100%;background:#111827"></div></div>
+    </div>
+    <div class="kpi-card ${cls}">
+      <div class="kc-label">已完成</div>
+      <div class="kc-value">${ME.monthDone}<span style="font-size:13px;font-weight:400;color:var(--muted)">万</span></div>
+      <div class="kc-sub">${pct}% · 缺口 ${gap} 万</div>
+      <div class="kc-prog"><div class="kc-fill" style="width:${pct}%;background:var(--orange)"></div></div>
+    </div>
+    <div class="kpi-card behind">
+      <div class="kc-label">剩余天数</div>
+      <div class="kc-value">${remaining}<span style="font-size:13px;font-weight:400;color:var(--muted)">天</span></div>
+      <div class="kc-sub">需日均 ${remaining > 0 ? (gap / remaining).toFixed(2) : 0} 万</div>
+      <div class="kc-prog"><div class="kc-fill" style="width:${Math.round(remaining/daysInM*100)}%;background:var(--red)"></div></div>
+    </div>
+    <div class="kpi-card ok">
+      <div class="kc-label">团队排名</div>
+      <div class="kc-value">${ME.rank}<span style="font-size:13px;font-weight:400;color:var(--muted)">名</span></div>
+      <div class="kc-sub">共 5 人 · 本月实时</div>
+      <div class="kc-prog"><div class="kc-fill" style="width:${Math.round((6-ME.rank)/5*100)}%;background:var(--green)"></div></div>
+    </div>`;
+})();
+
 renderKPI();
 renderSOP();
 renderCheckBars();
