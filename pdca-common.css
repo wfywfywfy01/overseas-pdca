@@ -1,0 +1,254 @@
+/* ═══════════════════════════════════════════════════════════════
+   pdca-common.css — Shared visual refinements + responsive
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Design-token overrides ──────────────────────────────────── */
+:root {
+  --radius:    12px;
+  --radius-sm: 8px;
+  --shadow:    0 1px 3px rgba(0,0,0,.05), 0 4px 14px rgba(0,0,0,.07);
+  --shadow2:   0 8px 28px rgba(0,0,0,.14);
+  --shadow-hover: 0 4px 20px rgba(0,0,0,.1);
+  --nav-accent: #2563eb;   /* override per page: director uses #7c3aed */
+}
+
+/* ── Scrollbar (desktop) ─────────────────────────────────────── */
+::-webkit-scrollbar            { width:5px; height:5px }
+::-webkit-scrollbar-track      { background:transparent }
+::-webkit-scrollbar-thumb      { background:var(--border2); border-radius:3px }
+::-webkit-scrollbar-thumb:hover{ background:var(--muted2) }
+
+/* ── Global selection colour ─────────────────────────────────── */
+::selection{ background:var(--blue-bg); color:var(--text) }
+
+/* ── Header: shadow replaces hard border ─────────────────────── */
+.app-header {
+  border-bottom: none;
+  box-shadow: 0 1px 0 var(--border), 0 2px 8px rgba(0,0,0,.05);
+}
+
+/* ── Time nav: always scrollable ─────────────────────────────── */
+.time-nav {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  flex-wrap: nowrap;
+  gap: 8px;
+}
+.time-nav::-webkit-scrollbar { display: none }
+.time-tab { white-space: nowrap; flex-shrink: 0; border-radius: 20px; font-size: 12px; }
+
+/* ── Cards ───────────────────────────────────────────────────── */
+.card {
+  border-radius: var(--radius);
+  transition: box-shadow .2s ease, border-color .2s ease;
+}
+
+/* ── KPI cards ───────────────────────────────────────────────── */
+.kpi-card { border-radius: var(--radius); }
+.kpi-card::before { height: 4px; border-radius: var(--radius) var(--radius) 0 0; }
+
+/* ── Member cards: lift on hover ─────────────────────────────── */
+.member-card {
+  border-radius: var(--radius);
+  transition: box-shadow .2s, border-color .2s, transform .15s;
+}
+.member-card:hover { transform: translateY(-2px); box-shadow: var(--shadow2); }
+
+/* ── Group cards (director): lift ────────────────────────────── */
+.group-card {
+  border-radius: var(--radius);
+  transition: box-shadow .2s, transform .15s;
+}
+.group-card:hover { transform: translateY(-2px); box-shadow: var(--shadow2); }
+
+/* ── Section badges ─────────────────────────────────────────── */
+.step-badge { width: 24px; height: 24px; font-size: 10px; box-shadow: 0 1px 4px rgba(0,0,0,.15); }
+
+/* ── Anomaly items ───────────────────────────────────────────── */
+.anomaly-item { border-radius: var(--radius-sm); }
+
+/* ── Nav items: pill active state ────────────────────────────── */
+.nav-item {
+  border-radius: 0 8px 8px 0;
+  margin-right: 8px;
+  transition: background .12s ease, color .12s ease;
+}
+.nav-item.active {
+  background: linear-gradient(90deg, var(--blue-bg) 0%, rgba(239,246,255,.3) 100%);
+}
+
+/* ── Drill drawer: rounded left edge ─────────────────────────── */
+.drill-drawer { border-radius: 16px 0 0 16px; }
+
+/* ── Progress bars: gradient ─────────────────────────────────── */
+.prog-fill.ok   { background: linear-gradient(90deg, #15803d, #22c55e) }
+.prog-fill.warn { background: linear-gradient(90deg, #c2410c, #f97316) }
+.prog-fill.bad  { background: linear-gradient(90deg, #b91c1c, #ef4444) }
+.kc-fill        { border-radius: 4px }
+
+/* ── SOP items ───────────────────────────────────────────────── */
+.sop-item { border-radius: var(--radius-sm); }
+
+/* ═══════════════════════════════════════════════════════════════
+   TABLET  768 – 1023 px
+   ═══════════════════════════════════════════════════════════════ */
+@media (max-width: 1023px) {
+  .kpi-strip    { grid-template-columns: repeat(2,1fr) }
+  .quarter-grid { grid-template-columns: repeat(2,1fr) }
+  .week-grid    { grid-template-columns: repeat(2,1fr) }
+  .group-grid   { grid-template-columns: repeat(2,1fr) }
+  .profit-grid  { grid-template-columns: repeat(2,1fr) }
+  .sec-grid     { grid-template-columns: 1fr; gap: 16px }
+  .main-layout  { grid-template-columns: 1fr }
+  .right-col    { display: none }
+  .left-nav     { width: 136px !important }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   MOBILE  < 768 px
+   ═══════════════════════════════════════════════════════════════ */
+@media (max-width: 767px) {
+
+  /* ── Header compact ── */
+  .app-header      { padding: 0 14px; height: 50px }
+  .header-info .meta { display: none }
+  .avatar          { width: 30px; height: 30px; font-size: 11px }
+  .btn-sm          { font-size: 11px; padding: 5px 10px }
+
+  /* ── Time nav ── */
+  .time-nav        { padding: 7px 14px }
+  .time-nav-label  { display: none }
+
+  /* ── Left nav → horizontal scrollable tab strip ── */
+  .outer-layout {
+    flex-direction: column !important;
+    min-height: unset !important;
+  }
+  .left-nav {
+    width: 100% !important;
+    height: auto !important;
+    min-height: unset !important;
+    flex-direction: row !important;
+    flex-shrink: 0;
+    border-right: none !important;
+    border-bottom: 1px solid var(--border) !important;
+    position: sticky !important;
+    top: 50px !important;
+    z-index: 80 !important;
+    overflow-x: auto !important;
+    overflow-y: visible !important;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding: 0 !important;
+  }
+  .left-nav::-webkit-scrollbar { display: none }
+  .nav-lbl     { display: none !important }
+  .nav-divider { display: none !important }
+  .nav-ext     { display: none !important }
+
+  .nav-item {
+    flex-direction: column !important;
+    gap: 2px !important;
+    padding: 8px 16px !important;
+    border-left: none !important;
+    border-bottom: 2.5px solid transparent;
+    border-radius: 0 !important;
+    margin-right: 0 !important;
+    background: none !important;
+    white-space: nowrap;
+    font-size: 11px !important;
+    flex-shrink: 0;
+    min-width: 60px;
+    text-align: center;
+    justify-content: center;
+    color: var(--muted);
+  }
+  .nav-item.active {
+    border-bottom-color: var(--nav-accent) !important;
+    background: none !important;
+    color: var(--nav-accent) !important;
+  }
+  .nav-icon { font-size: 18px !important; width: auto !important; display: block }
+
+  /* ── Grids collapse ── */
+  .kpi-strip    { grid-template-columns: 1fr 1fr; gap: 8px }
+  .wa-grid      { grid-template-columns: 1fr 1fr }
+  .social-grid  { grid-template-columns: 1fr !important }
+  .week-grid    { grid-template-columns: 1fr 1fr }
+  .quarter-grid { grid-template-columns: 1fr 1fr }
+  .group-grid   { grid-template-columns: 1fr }
+  .pheno-grid   { grid-template-columns: 1fr }
+  .profit-grid  { grid-template-columns: 1fr 1fr }
+  .member-grid  { grid-template-columns: 1fr !important }
+  .g3           { grid-template-columns: 1fr !important }
+
+  /* ── Layout ── */
+  .sec-grid     { grid-template-columns: 1fr; padding: 14px; gap: 14px }
+  .main-layout  { grid-template-columns: 1fr }
+  .right-col    { display: none }
+
+  /* ── Drill drawer → bottom sheet ── */
+  .drill-drawer {
+    width: 100%;
+    border-radius: 16px 16px 0 0;
+    top: auto;
+    bottom: 0;
+    height: 90vh;
+    transform: translateY(105%);
+  }
+  .drill-drawer.open { transform: translateY(0) }
+
+  /* ── Cards ── */
+  .card    { padding: 14px; border-radius: 10px }
+  .card-sm { padding: 12px }
+  .kpi-card { padding: 12px 14px }
+  .kc-value { font-size: 18px }
+
+  /* ── Tables: always scrollable ── */
+  .wa-table    { font-size: 11px; min-width: 440px }
+  .wa-table th,
+  .wa-table td { padding: 6px 5px }
+  .month-table,
+  .cross-table,
+  .data-table  { min-width: 480px }
+
+  /* ── Section labels ── */
+  .step-name { font-size: 13px }
+  .step-sub  { display: none }
+
+  /* ── SOP timeline ── */
+  .sop-time { width: 72px; font-size: 10px }
+
+  /* ── Source bars ── */
+  .source-label { width: 64px; font-size: 12px }
+
+  /* ── Panels: reduce padding via attribute selector ── */
+  [style*="padding:24px"] { padding: 14px !important }
+  [style*="padding: 24px"] { padding: 14px !important }
+
+  /* ── Sec grid (2-col left+right) ── */
+  [style*="grid-template-columns:1fr 290px"],
+  [style*="grid-template-columns: 1fr 290px"],
+  [style*="grid-template-columns:1fr 300px"] { grid-template-columns: 1fr !important }
+
+  /* ── 3-col todo rows ── */
+  [style*="grid-template-columns:1fr 1fr 1fr"],
+  [style*="grid-template-columns: 1fr 1fr 1fr"] { grid-template-columns: 1fr !important }
+
+  /* ── 2-col intent summary strip ── */
+  [style*="grid-template-columns:repeat(3,1fr)"] { grid-template-columns: 1fr 1fr !important }
+
+  /* ── Week/quarter grids inlined ── */
+  [style*="grid-template-columns:repeat(4,1fr)"] { grid-template-columns: 1fr 1fr !important }
+
+  /* ── Year KPI summary ── */
+  #mgr-year-kpi,
+  #year-kpi-summary { grid-template-columns: 1fr 1fr !important }
+
+  /* ── Hermes card ── */
+  .hermes-card { border-radius: var(--radius-sm) }
+
+  /* ── Toast ── */
+  .toast { right: 14px; bottom: 16px }
+}

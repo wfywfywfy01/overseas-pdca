@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>海外私域 PDCA · 主管视图</title>
+<link rel="stylesheet" href="pdca-common.css">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
@@ -338,6 +339,7 @@ function logout(){ localStorage.removeItem('pdca_session'); window.location.href
       <div class="nav-item active" onclick="showSec('day-sop',this)"><span class="nav-icon">📋</span>日 SOP</div>
       <div class="nav-item" onclick="showSec('day-members',this)"><span class="nav-icon">👥</span>成员看板</div>
       <div class="nav-item" onclick="showSec('day-intent',this)"><span class="nav-icon">🎯</span>意向 &amp; WA</div>
+      <div class="nav-item" onclick="showSec('day-social',this)"><span class="nav-icon">📱</span>社媒动态</div>
       <div class="nav-item" onclick="showSec('day-anomaly',this)"><span class="nav-icon">⚠️</span>异常监控</div>
       <div class="nav-divider"></div>
       <a href="https://admin.vertu.cn/odoo/sales" target="_blank" class="nav-item nav-ext"><span class="nav-icon">🔗</span>Odoo</a>
@@ -349,7 +351,7 @@ function logout(){ localStorage.removeItem('pdca_session'); window.location.href
         <div style="padding:24px;display:flex;flex-direction:column;gap:18px">
 
           <!-- Row 1: 重要待办 / 跟进事项 / 临时任务 -->
-          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px">
+          <div class="g3" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px">
             <div class="card card-sm">
               <div class="card-title" style="color:var(--red)">🔴 重要待办</div>
               <div id="todo-urgent"></div>
@@ -478,26 +480,35 @@ function logout(){ localStorage.removeItem('pdca_session'); window.location.href
             <div id="intent-member-list" style="display:flex;flex-direction:column;gap:12px"></div>
           </div>
 
-          <!-- 社媒动态 -->
+        </div>
+      </div><!-- /day-intent -->
+
+      <!-- ─ 社媒动态 ─ -->
+      <div id="day-social" class="sec-panel">
+        <div style="padding:24px;display:flex;flex-direction:column;gap:24px">
+          <div class="section-label">
+            <div class="step-badge" style="background:var(--purple)">媒</div>
+            <div class="step-name">组社媒动态<span class="step-sub">INS · TikTok · YouTube · 各员工今日完成</span></div>
+          </div>
+          <!-- 平台汇总 -->
+          <div class="social-grid" id="team-social-grid"></div>
+          <!-- 各员工今日社媒完成 -->
           <div>
-            <div class="section-label">
-              <div class="step-badge" style="background:var(--purple)">媒</div>
-              <div class="step-name">组社媒动态<span class="step-sub">INS · TikTok · YouTube · 各员工今日完成</span></div>
+            <div class="section-label" style="margin-bottom:10px">
+              <div class="step-badge" style="background:var(--blue);font-size:11px">员工</div>
+              <div class="step-name">各员工发帖明细<span class="step-sub">今日 / 本月</span></div>
             </div>
-            <!-- 平台汇总 -->
-            <div class="social-grid" id="team-social-grid" style="margin-bottom:14px"></div>
-            <!-- 各员工今日社媒完成 -->
             <div class="card" style="overflow-x:auto">
               <table class="wa-table">
                 <thead>
                   <tr>
                     <th style="text-align:left">员工</th>
                     <th style="color:var(--purple)">INS今日</th>
-                    <th style="color:var(--purple)">INS本月</th>
+                    <th style="color:var(--muted)">INS本月</th>
                     <th style="color:var(--red)">TK今日</th>
-                    <th style="color:var(--red)">TK本月</th>
+                    <th style="color:var(--muted)">TK本月</th>
                     <th style="color:var(--red)">YT今日</th>
-                    <th style="color:var(--red)">YT本月</th>
+                    <th style="color:var(--muted)">YT本月</th>
                     <th>今日状态</th>
                   </tr>
                 </thead>
@@ -505,9 +516,8 @@ function logout(){ localStorage.removeItem('pdca_session'); window.location.href
               </table>
             </div>
           </div>
-
         </div>
-      </div><!-- /day-intent -->
+      </div><!-- /day-social -->
 
       <!-- ─ 异常监控 ─ -->
       <div id="day-anomaly" class="sec-panel">
@@ -690,7 +700,7 @@ function logout(){ localStorage.removeItem('pdca_session'); window.location.href
         <div style="padding:24px;display:flex;flex-direction:column;gap:18px">
 
           <!-- Row 1: 本月重点 / 持续跟进 / 计划规划 -->
-          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px">
+          <div class="g3" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px">
             <div class="card card-sm">
               <div class="card-title" style="color:var(--red)">🔴 本月重点</div>
               <div id="mtask-priority"></div>
