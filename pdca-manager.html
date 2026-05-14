@@ -262,6 +262,21 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 .social-detail{display:flex;gap:10px;margin-top:6px;font-size:11px;color:var(--muted)}
 .social-detail span{display:flex;align-items:center;gap:3px}
 
+/* TODO ITEMS */
+.todo-item{display:flex;align-items:flex-start;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);cursor:pointer}
+.todo-item:last-child{border-bottom:none}
+.todo-item.done{opacity:.4}
+.todo-check{width:15px;height:15px;border-radius:50%;border:2px solid var(--border2);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;font-size:9px;transition:all .15s}
+.todo-check.checked{background:var(--green);border-color:var(--green);color:#fff}
+.todo-text{flex:1;font-size:12px;line-height:1.4}
+.todo-item.done .todo-text{text-decoration:line-through;color:var(--muted)}
+/* WA TABLE */
+.wa-table{width:100%;border-collapse:collapse;font-size:12px}
+.wa-table th{padding:8px 8px;color:var(--muted);font-weight:600;border-bottom:2px solid var(--border);text-align:center;white-space:nowrap}
+.wa-table td{padding:8px 8px;border-bottom:1px solid var(--border);text-align:center}
+.wa-table tr:last-child td{border-bottom:none}
+.wa-table tbody tr{cursor:pointer;transition:background .1s}
+.wa-table tbody tr:hover{background:var(--bg2)}
 /* TOAST */
 .toast{position:fixed;bottom:24px;right:24px;background:#111827;color:#fff;padding:11px 18px;border-radius:var(--radius);font-size:13px;box-shadow:var(--shadow2);z-index:999;opacity:0;transform:translateY(8px);transition:all .25s;pointer-events:none}
 .toast.show{opacity:1;transform:translateY(0)}
@@ -331,85 +346,55 @@ function logout(){ localStorage.removeItem('pdca_session'); window.location.href
 
       <!-- ─ 日SOP ─ -->
       <div id="day-sop" class="sec-panel active">
-        <div class="sec-grid">
-          <div class="sec-stack">
-            <div>
-              <div class="section-label">
-                <div class="step-badge dark">D</div>
-                <div class="step-name">主管日 SOP<span class="step-sub">今日节奏 · 点击切换状态</span></div>
-              </div>
-              <div class="sop-timeline" id="mgr-sop"></div>
-            </div>
-          </div><!-- /left -->
-          <div class="sec-stack">
-            <!-- 今日组内排行 -->
+        <div style="padding:24px;display:flex;flex-direction:column;gap:18px">
+
+          <!-- Row 1: 重要待办 / 跟进事项 / 临时任务 -->
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px">
             <div class="card card-sm">
-              <div class="card-title">今日组内排行</div>
-              <div class="tabs" style="margin-bottom:10px">
-                <div class="tab active" onclick="switchTab('r','reach',this)">触达</div>
-                <div class="tab" onclick="switchTab('r','perf',this)">业绩</div>
-              </div>
-              <div id="r-reach" class="tab-content active">
-                <div class="rank-list">
-                  <div class="rank-item"><span class="rank-num top">1</span><span class="rank-name">陈莉</span><span class="rank-val">52</span></div>
-                  <div class="rank-item"><span class="rank-num top">2</span><span class="rank-name">陈玉霞</span><span class="rank-val">48</span></div>
-                  <div class="rank-item"><span class="rank-num">3</span><span class="rank-name">郑丽苹</span><span class="rank-val">47</span></div>
-                  <div class="rank-item"><span class="rank-num">4</span><span class="rank-name">刘佳鑫</span><span class="rank-val">41</span></div>
-                  <div class="rank-item" style="background:var(--red-bg)"><span class="rank-num">5</span><span class="rank-name" style="color:var(--red)">毛涵</span><span class="rank-val" style="color:var(--red)">21</span></div>
-                </div>
-              </div>
-              <div id="r-perf" class="tab-content">
-                <div class="rank-list">
-                  <div class="rank-item"><span class="rank-num top">1</span><span class="rank-name">陈莉</span><span class="rank-val">1.4万</span></div>
-                  <div class="rank-item"><span class="rank-num top">2</span><span class="rank-name">郑丽苹</span><span class="rank-val">0.48万</span></div>
-                  <div class="rank-item"><span class="rank-num">3</span><span class="rank-name">刘佳鑫</span><span class="rank-val">0.41万</span></div>
-                  <div class="rank-item"><span class="rank-num">4</span><span class="rank-name">陈玉霞</span><span class="rank-val">0.38万</span></div>
-                  <div class="rank-item" style="background:var(--red-bg)"><span class="rank-num">5</span><span class="rank-name" style="color:var(--red)">毛涵</span><span class="rank-val" style="color:var(--red)">0万</span></div>
-                </div>
-              </div>
+              <div class="card-title" style="color:var(--red)">🔴 重要待办</div>
+              <div id="todo-urgent"></div>
             </div>
-            <!-- Hermes 组级建议 -->
-            <div class="hermes-card">
-              <div class="hermes-header"><div class="hermes-icon">H</div><div class="hermes-title">Hermes · 组级建议</div></div>
-              <div class="hermes-body">本周发现：S 类客户在<b>周三/周四</b>响应率最高（58% vs 周一/二 31%）。<br><br>建议将 S 类优先触达安排在每周三/四上午 10–12 点，预计私信转化率 <b>+18%</b>。</div>
-              <div class="hermes-actions">
-                <button class="hermes-btn primary" onclick="showToast('已写入组记忆')">✓ 写入组记忆</button>
-                <button class="hermes-btn" onclick="showToast('已抽象为 Skill')">⚙ 抽象为 Skill</button>
-                <button class="hermes-btn" onclick="showToast('已拒绝')">✗ 拒绝</button>
-              </div>
-            </div>
-            <!-- 今日意向跟进 -->
             <div class="card card-sm">
-              <div class="card-title">今日意向跟进提醒</div>
-              <div style="display:flex;flex-direction:column;gap:6px">
-                <div style="padding:9px 10px;border:1px solid var(--red-border);border-radius:var(--radius);background:var(--red-bg);font-size:12px">
-                  <div style="font-weight:600;color:var(--red)">陈玉霞 · Sarah L.</div>
-                  <div style="color:var(--muted);margin-top:2px">今日 15:00 · 确认配色尺寸 · ¥2.3万</div>
-                </div>
-                <div style="padding:9px 10px;border:1px solid var(--orange-border);border-radius:var(--radius);background:var(--orange-bg);font-size:12px">
-                  <div style="font-weight:600;color:var(--orange)">陈莉 · Ahmed R.</div>
-                  <div style="color:var(--muted);margin-top:2px">今日 18:00 · 付款截止提醒 · ¥3.8万</div>
-                </div>
-              </div>
+              <div class="card-title" style="color:var(--orange)">🟡 跟进事项</div>
+              <div id="todo-follow"></div>
             </div>
-            <!-- 待审核案例 -->
             <div class="card card-sm">
-              <div class="card-title">待审核日报案例</div>
-              <div style="display:flex;flex-direction:column;gap:8px">
-                <div style="padding:10px;border:1px solid var(--border);border-radius:var(--radius)">
-                  <div style="font-size:13px;font-weight:600">陈玉霞 · 05-13 日报</div>
-                  <div style="font-size:12px;color:var(--muted);margin:4px 0">关键词搜索法 · 评分 96 分</div>
-                  <button class="btn-sm dark" style="font-size:11px;padding:4px 10px" onclick="showToast('已收录为金牌案例')">收录金牌案例</button>
-                </div>
-                <div style="padding:10px;border:1px solid var(--border);border-radius:var(--radius)">
-                  <div style="font-size:13px;font-weight:600">陈莉 · 05-12 日报</div>
-                  <div style="font-size:12px;color:var(--muted);margin:4px 0">S类客户成交话术 · 评分 91 分</div>
-                  <button class="btn-sm dark" style="font-size:11px;padding:4px 10px" onclick="showToast('已收录为金牌案例')">收录金牌案例</button>
-                </div>
+              <div class="card-title">🔵 临时任务</div>
+              <div id="todo-adhoc"></div>
+            </div>
+          </div>
+
+          <!-- Row 2: 昨日团队情况 -->
+          <div class="card card-sm">
+            <div class="card-title" id="yesterday-title">昨日团队情况</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:6px">
+              <div>
+                <div style="font-size:11px;font-weight:600;color:var(--muted);margin-bottom:8px;letter-spacing:.04em">KPI 未达标成员</div>
+                <div id="yesterday-miss"></div>
+              </div>
+              <div>
+                <div style="font-size:11px;font-weight:600;color:var(--muted);margin-bottom:8px;letter-spacing:.04em">异常情况</div>
+                <div id="yesterday-anomaly"></div>
               </div>
             </div>
-          </div><!-- /right -->
-        </div><!-- /sec-grid -->
+          </div>
+
+          <!-- Row 3: 今日目标实时进度 -->
+          <div class="card card-sm">
+            <div class="card-title">今日目标 · 实时完成情况</div>
+            <div id="today-progress" style="display:flex;flex-direction:column;gap:10px;margin-top:8px"></div>
+          </div>
+
+          <!-- Today SOP Timeline -->
+          <div>
+            <div class="section-label">
+              <div class="step-badge dark">SOP</div>
+              <div class="step-name">今日 SOP<span class="step-sub">主管节奏 · 点击切换状态</span></div>
+            </div>
+            <div class="sop-timeline" id="mgr-sop"></div>
+          </div>
+
+        </div>
       </div><!-- /day-sop -->
 
       <!-- ─ 成员看板 ─ -->
@@ -434,43 +419,93 @@ function logout(){ localStorage.removeItem('pdca_session'); window.location.href
 
       <!-- ─ 意向&WA ─ -->
       <div id="day-intent" class="sec-panel">
-        <div style="padding:24px">
+        <div style="padding:24px;display:flex;flex-direction:column;gap:24px">
+
+          <!-- WA 账号汇总 -->
           <div>
             <div class="section-label">
               <div class="step-badge" style="background:var(--green)">WA</div>
-              <div class="step-name">账号数据<span class="step-sub">组 WA · 意向客户 · 人产</span></div>
+              <div class="step-name">WA 账号汇总<span class="step-sub">账号状态 · SABCD 客群 · 老客户 · 点击行进入员工页</span></div>
             </div>
-            <div class="wa-grid" style="margin-bottom:12px">
-              <div class="wa-stat ok"><div class="wa-stat-val" id="team-wa-total">15</div><div class="wa-stat-label">WA 账号数</div></div>
-              <div class="wa-stat ok"><div class="wa-stat-val" id="team-wa-avg">3.0</div><div class="wa-stat-label">人均账号数</div></div>
-              <div class="wa-stat ok"><div class="wa-stat-val" id="team-wa-normal">15</div><div class="wa-stat-label">正常使用</div></div>
-              <div class="wa-stat" id="team-wa-banned-card"><div class="wa-stat-val" id="team-wa-banned">0</div><div class="wa-stat-label">被封/受限</div></div>
+            <div class="wa-grid" style="margin-bottom:14px">
+              <div class="wa-stat ok"><div class="wa-stat-val" id="wa-sum-total">15</div><div class="wa-stat-label">账号总数</div></div>
+              <div class="wa-stat ok"><div class="wa-stat-val" id="wa-sum-normal">12</div><div class="wa-stat-label">正常使用</div></div>
+              <div class="wa-stat" id="wa-sum-blocked-card"><div class="wa-stat-val" id="wa-sum-blocked">—</div><div class="wa-stat-label">被拉黑</div></div>
+              <div class="wa-stat" id="wa-sum-banned-card" ><div class="wa-stat-val" id="wa-sum-banned">—</div><div class="wa-stat-label">被封号</div></div>
             </div>
-            <div class="card card-sm" style="margin-bottom:20px">
-              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;text-align:center;margin-bottom:14px">
-                <div>
-                  <div style="font-size:24px;font-weight:700;color:var(--orange)" id="team-intent-count">12</div>
-                  <div style="font-size:11px;color:var(--muted)">意向客户数</div>
-                </div>
-                <div>
-                  <div style="font-size:18px;font-weight:700;color:var(--green)" id="team-intent-amount">¥18.6万</div>
-                  <div style="font-size:11px;color:var(--muted)">预计收款</div>
-                </div>
-                <div>
-                  <div style="font-size:24px;font-weight:700" id="team-daily-prod">0.54万</div>
-                  <div style="font-size:11px;color:var(--muted)">今日人产均值</div>
-                </div>
-              </div>
-              <div style="border-top:1px solid var(--border);padding-top:10px" id="team-intent-breakdown"></div>
+            <div class="card" style="overflow-x:auto">
+              <table class="wa-table">
+                <thead>
+                  <tr>
+                    <th style="text-align:left;min-width:56px">员工</th>
+                    <th>WA总</th>
+                    <th style="color:var(--green)">正常</th>
+                    <th style="color:var(--orange)">拉黑</th>
+                    <th style="color:var(--red)">封号</th>
+                    <th style="color:var(--purple)">S</th>
+                    <th style="color:var(--blue)">A</th>
+                    <th>B</th>
+                    <th style="color:var(--muted)">C</th>
+                    <th style="color:var(--muted2)">D</th>
+                    <th style="color:var(--green)">老客</th>
+                  </tr>
+                </thead>
+                <tbody id="wa-member-table"></tbody>
+              </table>
             </div>
           </div>
+
+          <!-- 意向客户汇总 -->
+          <div>
+            <div class="section-label">
+              <div class="step-badge" style="background:var(--orange)">意</div>
+              <div class="step-name">意向客户汇总<span class="step-sub">各员工意向单 · 预计收款 · 点击展开员工页</span></div>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px">
+              <div class="card card-sm" style="text-align:center">
+                <div id="intent-total-count" style="font-size:26px;font-weight:700;color:var(--orange)">—</div>
+                <div style="font-size:11px;color:var(--muted)">意向总数</div>
+              </div>
+              <div class="card card-sm" style="text-align:center">
+                <div id="intent-total-amount" style="font-size:20px;font-weight:700;color:var(--green)">—</div>
+                <div style="font-size:11px;color:var(--muted)">预计收款</div>
+              </div>
+              <div class="card card-sm" style="text-align:center">
+                <div id="intent-today-due" style="font-size:26px;font-weight:700;color:var(--red)">—</div>
+                <div style="font-size:11px;color:var(--muted)">今日到期</div>
+              </div>
+            </div>
+            <div id="intent-member-list" style="display:flex;flex-direction:column;gap:12px"></div>
+          </div>
+
+          <!-- 社媒动态 -->
           <div>
             <div class="section-label">
               <div class="step-badge" style="background:var(--purple)">媒</div>
-              <div class="step-name">组社媒表现<span class="step-sub">INS · TK · YouTube</span></div>
+              <div class="step-name">组社媒动态<span class="step-sub">INS · TikTok · YouTube · 各员工今日完成</span></div>
             </div>
-            <div class="social-grid" id="team-social-grid"></div>
+            <!-- 平台汇总 -->
+            <div class="social-grid" id="team-social-grid" style="margin-bottom:14px"></div>
+            <!-- 各员工今日社媒完成 -->
+            <div class="card" style="overflow-x:auto">
+              <table class="wa-table">
+                <thead>
+                  <tr>
+                    <th style="text-align:left">员工</th>
+                    <th style="color:var(--purple)">INS今日</th>
+                    <th style="color:var(--purple)">INS本月</th>
+                    <th style="color:var(--red)">TK今日</th>
+                    <th style="color:var(--red)">TK本月</th>
+                    <th style="color:var(--red)">YT今日</th>
+                    <th style="color:var(--red)">YT本月</th>
+                    <th>今日状态</th>
+                  </tr>
+                </thead>
+                <tbody id="social-member-table"></tbody>
+              </table>
+            </div>
           </div>
+
         </div>
       </div><!-- /day-intent -->
 
@@ -511,8 +546,9 @@ function logout(){ localStorage.removeItem('pdca_session'); window.location.href
     <nav class="left-nav">
       <div class="nav-lbl">月视图</div>
       <div class="nav-item active" onclick="showSec('month-kpi',this)"><span class="nav-icon">📊</span>月度 KPI</div>
+      <div class="nav-item" onclick="showSec('month-tasks',this)"><span class="nav-icon">📋</span>月度任务</div>
       <div class="nav-item" onclick="showSec('month-members',this)"><span class="nav-icon">👥</span>成员进度</div>
-      <div class="nav-item" onclick="showSec('month-wa',this)"><span class="nav-icon">📱</span>WA运营</div>
+      <div class="nav-item" onclick="showSec('month-wa',this)"><span class="nav-icon">🎯</span>意向 &amp; WA</div>
       <div class="nav-item" onclick="showSec('month-source',this)"><span class="nav-icon">💰</span>来源分析</div>
       <div class="nav-divider"></div>
       <a href="https://admin.vertu.cn/odoo/sales" target="_blank" class="nav-item nav-ext"><span class="nav-icon">🔗</span>Odoo</a>
@@ -635,13 +671,7 @@ function logout(){ localStorage.removeItem('pdca_session'); window.location.href
             </div>
             <div class="card card-sm">
               <div class="card-title">成员月度排行</div>
-              <div class="rank-list">
-                <div class="rank-item"><span class="rank-num top">1</span><span class="rank-name">陈莉 <span class="tag gold" style="font-size:10px">300W</span></span><span class="rank-val">9.2万</span></div>
-                <div class="rank-item"><span class="rank-num top">2</span><span class="rank-name">郑丽苹 <span class="tag gold" style="font-size:10px">300W</span></span><span class="rank-val">8.4万</span></div>
-                <div class="rank-item"><span class="rank-num">3</span><span class="rank-name">陈玉霞 <span class="tag gold" style="font-size:10px">300W</span></span><span class="rank-val">7.8万</span></div>
-                <div class="rank-item"><span class="rank-num">4</span><span class="rank-name">刘佳鑫 <span class="tag silver" style="font-size:10px">200W</span></span><span class="rank-val">7.6万</span></div>
-                <div class="rank-item" style="background:var(--red-bg)"><span class="rank-num">5</span><span class="rank-name" style="color:var(--red)">毛涵 <span class="tag silver" style="font-size:10px">200W</span></span><span class="rank-val" style="color:var(--red)">4.8万</span></div>
-              </div>
+              <div class="rank-list" id="month-rank-list"></div>
             </div>
             <div class="hermes-card">
               <div class="hermes-header"><div class="hermes-icon">H</div><div class="hermes-title">Hermes · 月度分析</div></div>
@@ -655,175 +685,126 @@ function logout(){ localStorage.removeItem('pdca_session'); window.location.href
         </div><!-- /sec-grid -->
       </div><!-- /month-kpi -->
 
+      <!-- ─ 月度任务 ─ -->
+      <div id="month-tasks" class="sec-panel">
+        <div style="padding:24px;display:flex;flex-direction:column;gap:18px">
+
+          <!-- Row 1: 本月重点 / 持续跟进 / 计划规划 -->
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px">
+            <div class="card card-sm">
+              <div class="card-title" style="color:var(--red)">🔴 本月重点</div>
+              <div id="mtask-priority"></div>
+            </div>
+            <div class="card card-sm">
+              <div class="card-title" style="color:var(--orange)">🟡 持续跟进</div>
+              <div id="mtask-running"></div>
+            </div>
+            <div class="card card-sm">
+              <div class="card-title">🔵 计划 / 规划</div>
+              <div id="mtask-plan"></div>
+            </div>
+          </div>
+
+          <!-- Row 2: 上月情况 & 本月异常 -->
+          <div class="card card-sm">
+            <div class="card-title" id="last-month-title">上月团队情况</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:6px">
+              <div>
+                <div style="font-size:11px;font-weight:600;color:var(--muted);margin-bottom:8px;letter-spacing:.04em">KPI 未达标</div>
+                <div id="last-month-miss"></div>
+              </div>
+              <div>
+                <div style="font-size:11px;font-weight:600;color:var(--muted);margin-bottom:8px;letter-spacing:.04em">遗留异常</div>
+                <div id="last-month-anomaly"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Row 3: 本月目标进度（成员维度） -->
+          <div class="card card-sm">
+            <div class="card-title">本月目标 · 实时累计进度</div>
+            <div id="month-target-progress" style="display:flex;flex-direction:column;gap:10px;margin-top:8px"></div>
+          </div>
+
+        </div>
+      </div><!-- /month-tasks -->
+
       <!-- ─ 成员进度 ─ -->
       <div id="month-members" class="sec-panel">
         <div style="padding:24px;max-width:780px">
           <div class="section-label">
             <div class="step-badge dark">人</div>
-            <div class="step-name">成员月度进度<span class="step-sub">各成员本月目标 vs 实际</span></div>
+            <div class="step-name">成员月度进度<span class="step-sub">各成员本月目标 vs 实际 · 点击进入员工页</span></div>
           </div>
-          <div class="card card-sm" id="month-member-bars">
-            <div style="display:flex;flex-direction:column;gap:16px">
-              <!-- 陈莉 -->
-              <div style="border-bottom:1px solid var(--border);padding-bottom:14px">
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-                  <div style="display:flex;align-items:center;gap:8px">
-                    <span class="rank-num top" style="width:22px;height:22px;font-size:11px;display:inline-flex;align-items:center;justify-content:center">1</span>
-                    <span style="font-weight:600;font-size:14px">陈莉</span><span class="tag gold" style="font-size:10px">300W</span>
-                  </div>
-                  <div style="font-size:13px;font-weight:700;color:var(--green)">9.2万 <span style="font-weight:400;color:var(--muted);font-size:11px">/ 25万</span></div>
-                </div>
-                <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px">
-                  <span style="font-size:11px;color:var(--muted)">WA客户 <b style="color:var(--text)">5,840</b></span>
-                  <span style="font-size:11px;color:var(--muted)">月新增 <b style="color:var(--green)">+248</b></span>
-                  <span style="font-size:11px;color:var(--muted)">日触达 <b>52人</b></span>
-                  <span style="font-size:11px;color:var(--muted)">日报 <b style="color:var(--green)">88分</b></span>
-                </div>
-                <div style="height:8px;background:var(--bg2);border-radius:4px;overflow:hidden">
-                  <div style="height:100%;width:36.8%;background:var(--green);border-radius:4px"></div>
-                </div>
-                <div style="display:flex;justify-content:space-between;margin-top:4px;font-size:11px;color:var(--muted)">
-                  <span>36.8% 完成</span><span>预计月末 ~20.4万 ✓</span>
-                </div>
-              </div>
-              <!-- 郑丽苹 -->
-              <div style="border-bottom:1px solid var(--border);padding-bottom:14px">
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-                  <div style="display:flex;align-items:center;gap:8px">
-                    <span class="rank-num top" style="width:22px;height:22px;font-size:11px;display:inline-flex;align-items:center;justify-content:center">2</span>
-                    <span style="font-weight:600;font-size:14px">郑丽苹</span><span class="tag gold" style="font-size:10px">300W</span>
-                  </div>
-                  <div style="font-size:13px;font-weight:700;color:var(--blue)">8.4万 <span style="font-weight:400;color:var(--muted);font-size:11px">/ 25万</span></div>
-                </div>
-                <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px">
-                  <span style="font-size:11px;color:var(--muted)">WA客户 <b style="color:var(--text)">4,920</b></span>
-                  <span style="font-size:11px;color:var(--muted)">月新增 <b style="color:var(--green)">+212</b></span>
-                  <span style="font-size:11px;color:var(--muted)">日触达 <b>49人</b></span>
-                  <span style="font-size:11px;color:var(--muted)">日报 <b style="color:var(--blue)">85分</b></span>
-                </div>
-                <div style="height:8px;background:var(--bg2);border-radius:4px;overflow:hidden">
-                  <div style="height:100%;width:33.6%;background:var(--blue);border-radius:4px"></div>
-                </div>
-                <div style="display:flex;justify-content:space-between;margin-top:4px;font-size:11px;color:var(--muted)">
-                  <span>33.6% 完成</span><span>预计月末 ~18.6万</span>
-                </div>
-              </div>
-              <!-- 陈玉霞 -->
-              <div style="border-bottom:1px solid var(--border);padding-bottom:14px">
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-                  <div style="display:flex;align-items:center;gap:8px">
-                    <span class="rank-num" style="width:22px;height:22px;font-size:11px;display:inline-flex;align-items:center;justify-content:center">3</span>
-                    <span style="font-weight:600;font-size:14px">陈玉霞</span><span class="tag gold" style="font-size:10px">300W</span>
-                  </div>
-                  <div style="font-size:13px;font-weight:700;color:var(--orange)">7.8万 <span style="font-weight:400;color:var(--muted);font-size:11px">/ 25万</span></div>
-                </div>
-                <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px">
-                  <span style="font-size:11px;color:var(--muted)">WA客户 <b style="color:var(--text)">4,560</b></span>
-                  <span style="font-size:11px;color:var(--muted)">月新增 <b style="color:var(--orange)">+195</b></span>
-                  <span style="font-size:11px;color:var(--muted)">日触达 <b>46人</b></span>
-                  <span style="font-size:11px;color:var(--muted)">日报 <b style="color:var(--orange)">82分</b></span>
-                </div>
-                <div style="height:8px;background:var(--bg2);border-radius:4px;overflow:hidden">
-                  <div style="height:100%;width:31.2%;background:var(--orange);border-radius:4px"></div>
-                </div>
-                <div style="display:flex;justify-content:space-between;margin-top:4px;font-size:11px;color:var(--muted)">
-                  <span>31.2% 完成</span><span>预计月末 ~17.3万</span>
-                </div>
-              </div>
-              <!-- 刘佳鑫 -->
-              <div style="border-bottom:1px solid var(--border);padding-bottom:14px">
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-                  <div style="display:flex;align-items:center;gap:8px">
-                    <span class="rank-num" style="width:22px;height:22px;font-size:11px;display:inline-flex;align-items:center;justify-content:center">4</span>
-                    <span style="font-weight:600;font-size:14px">刘佳鑫</span><span class="tag silver" style="font-size:10px">200W</span>
-                  </div>
-                  <div style="font-size:13px;font-weight:700;color:var(--orange)">7.6万 <span style="font-weight:400;color:var(--muted);font-size:11px">/ 20万</span></div>
-                </div>
-                <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px">
-                  <span style="font-size:11px;color:var(--muted)">WA客户 <b style="color:var(--text)">3,810</b></span>
-                  <span style="font-size:11px;color:var(--muted)">月新增 <b style="color:var(--orange)">+178</b></span>
-                  <span style="font-size:11px;color:var(--muted)">日触达 <b>45人</b></span>
-                  <span style="font-size:11px;color:var(--muted)">日报 <b>79分</b></span>
-                </div>
-                <div style="height:8px;background:var(--bg2);border-radius:4px;overflow:hidden">
-                  <div style="height:100%;width:38%;background:var(--orange);border-radius:4px"></div>
-                </div>
-                <div style="display:flex;justify-content:space-between;margin-top:4px;font-size:11px;color:var(--muted)">
-                  <span>38% 完成</span><span>预计月末 ~16.8万 ✓ 达标</span>
-                </div>
-              </div>
-              <!-- 毛涵 -->
-              <div style="background:var(--red-bg);border-radius:var(--radius);padding:12px">
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-                  <div style="display:flex;align-items:center;gap:8px">
-                    <span style="width:22px;height:22px;font-size:11px;display:inline-flex;align-items:center;justify-content:center;background:var(--red);color:#fff;border-radius:50%">5</span>
-                    <span style="font-weight:600;font-size:14px;color:var(--red)">毛涵</span><span class="tag silver" style="font-size:10px">200W</span>
-                    <span style="font-size:10px;padding:2px 6px;background:var(--red);color:#fff;border-radius:10px">⚠ 需介入</span>
-                  </div>
-                  <div style="font-size:13px;font-weight:700;color:var(--red)">4.8万 <span style="font-weight:400;color:var(--muted);font-size:11px">/ 20万</span></div>
-                </div>
-                <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px">
-                  <span style="font-size:11px;color:var(--muted)">WA客户 <b style="color:var(--red)">2,410</b></span>
-                  <span style="font-size:11px;color:var(--muted)">月新增 <b style="color:var(--red)">+87</b></span>
-                  <span style="font-size:11px;color:var(--muted)">日触达 <b style="color:var(--red)">29人</b></span>
-                  <span style="font-size:11px;color:var(--muted)">日报 <b style="color:var(--red)">68分</b></span>
-                </div>
-                <div style="height:8px;background:rgba(0,0,0,0.08);border-radius:4px;overflow:hidden">
-                  <div style="height:100%;width:24%;background:var(--red);border-radius:4px"></div>
-                </div>
-                <div style="display:flex;justify-content:space-between;margin-top:4px;font-size:11px">
-                  <span style="color:var(--red)">24% 完成 · 严重落后</span><span style="color:var(--muted)">预计月末 ~10.6万 · 缺口 9.4万</span>
-                </div>
-              </div>
-            </div>
-          </div>
+          <div class="card card-sm" id="month-member-bars"></div>
         </div>
       </div><!-- /month-members -->
 
-      <!-- ─ WA运营 ─ -->
+      <!-- ─ 意向&WA（月度） ─ -->
       <div id="month-wa" class="sec-panel">
-        <div style="padding:24px;max-width:860px">
-          <div class="section-label"><div class="step-badge" style="background:#0ea5e9;color:#fff">WA</div><div class="step-name">组WA账号运营<span class="step-sub">5月存量 · 新增 · 触达分析</span></div></div>
-          <div class="kpi-strip" style="margin-bottom:20px">
-            <div class="kpi-card ok">
-              <div class="kc-label">组WA总客户</div>
-              <div class="kc-value">2.4<span style="font-size:13px;font-weight:400;color:var(--muted)">万</span></div>
-              <div class="kc-sub">12个账号 · 月新增980人</div>
-              <div class="kc-prog"><div class="kc-fill" style="width:30%;background:#0ea5e9"></div></div>
+        <div style="padding:24px;display:flex;flex-direction:column;gap:24px">
+
+          <!-- WA 账号汇总（与日维度口径一致，当前快照） -->
+          <div>
+            <div class="section-label">
+              <div class="step-badge" style="background:var(--green)">WA</div>
+              <div class="step-name">WA 账号汇总<span class="step-sub">账号状态 · SABCD 客群 · 老客存量 · 与日维度口径一致</span></div>
             </div>
-            <div class="kpi-card warn">
-              <div class="kc-label">日均触达/人</div>
-              <div class="kc-value">48.2<span style="font-size:13px;font-weight:400;color:var(--muted)">人</span></div>
-              <div class="kc-sub">目标80人 · 60.3%</div>
-              <div class="kc-prog"><div class="kc-fill" style="width:60.3%;background:var(--orange)"></div></div>
+            <div class="wa-grid" style="margin-bottom:14px">
+              <div class="wa-stat ok"><div class="wa-stat-val" id="mwa-sum-total">15</div><div class="wa-stat-label">账号总数</div></div>
+              <div class="wa-stat ok"><div class="wa-stat-val" id="mwa-sum-normal">12</div><div class="wa-stat-label">正常使用</div></div>
+              <div class="wa-stat" id="mwa-sum-blocked-card"><div class="wa-stat-val" id="mwa-sum-blocked">—</div><div class="wa-stat-label">被拉黑</div></div>
+              <div class="wa-stat" id="mwa-sum-banned-card"><div class="wa-stat-val" id="mwa-sum-banned">—</div><div class="wa-stat-label">被封号</div></div>
             </div>
-            <div class="kpi-card behind">
-              <div class="kc-label">月新增拉群率</div>
-              <div class="kc-value">34<span style="font-size:13px;font-weight:400;color:var(--muted)">%</span></div>
-              <div class="kc-sub">980人中332人进群</div>
-              <div class="kc-prog"><div class="kc-fill" style="width:34%;background:var(--red)"></div></div>
-            </div>
-            <div class="kpi-card ok">
-              <div class="kc-label">WA来源成单</div>
-              <div class="kc-value">17<span style="font-size:13px;font-weight:400;color:var(--muted)">单</span></div>
-              <div class="kc-sub">占组总单量 40.5%</div>
-              <div class="kc-prog"><div class="kc-fill" style="width:40.5%;background:var(--green)"></div></div>
+            <div class="card" style="overflow-x:auto">
+              <table class="wa-table">
+                <thead>
+                  <tr>
+                    <th style="text-align:left;min-width:56px">员工</th>
+                    <th>WA总</th>
+                    <th style="color:var(--green)">正常</th>
+                    <th style="color:var(--orange)">拉黑</th>
+                    <th style="color:var(--red)">封号</th>
+                    <th style="color:var(--purple)">S</th>
+                    <th style="color:var(--blue)">A</th>
+                    <th>B</th>
+                    <th style="color:var(--muted)">C</th>
+                    <th style="color:var(--muted2)">D</th>
+                    <th style="color:var(--green)">老客</th>
+                  </tr>
+                </thead>
+                <tbody id="mwa-member-table"></tbody>
+              </table>
             </div>
           </div>
-          <div class="section-label"><div class="step-badge dark">人</div><div class="step-name">成员WA触达明细<span class="step-sub">账号 · 存量 · 月新增 · 日触达 · 拉群 · WA成单</span></div></div>
-          <div class="card card-sm" style="padding:0;overflow:hidden">
-            <table class="cross-table">
-              <thead><tr><th>成员</th><th>账号数</th><th>存量客户</th><th>月新增</th><th>日均触达</th><th>拉群率</th><th>WA成单</th></tr></thead>
-              <tbody>
-                <tr><td>陈莉</td><td>3个</td><td style="color:var(--green)">5,840</td><td style="color:var(--green)">+248</td><td style="color:var(--green)">52人</td><td>38%</td><td>4单</td></tr>
-                <tr><td>郑丽苹</td><td>2个</td><td>4,920</td><td>+212</td><td>49人</td><td>35%</td><td>3单</td></tr>
-                <tr><td>陈玉霞</td><td>3个</td><td>4,560</td><td style="color:var(--orange)">+195</td><td>46人</td><td>33%</td><td>4单</td></tr>
-                <tr><td>刘佳鑫</td><td>2个</td><td>3,810</td><td style="color:var(--orange)">+178</td><td>45人</td><td>31%</td><td>4单</td></tr>
-                <tr style="background:var(--red-bg)"><td style="color:var(--red)">毛涵 ⚠</td><td>2个</td><td style="color:var(--red)">2,410</td><td style="color:var(--red)">+87</td><td style="color:var(--red)">29人</td><td style="color:var(--red)">18%</td><td style="color:var(--red)">2单</td></tr>
-                <tr style="background:var(--bg2);font-weight:600"><td>合计/均值</td><td>12个</td><td>21,540</td><td>+920</td><td>44.2人</td><td>31%</td><td>17单</td></tr>
-              </tbody>
-            </table>
+
+          <!-- 月度意向 & 成单汇总 -->
+          <div>
+            <div class="section-label">
+              <div class="step-badge" style="background:var(--orange)">意</div>
+              <div class="step-name">月度意向 & 成单汇总<span class="step-sub">本月累计 · 各员工意向转化情况</span></div>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px">
+              <div class="card card-sm" style="text-align:center">
+                <div id="mint-total" style="font-size:24px;font-weight:700;color:var(--orange)">—</div>
+                <div style="font-size:11px;color:var(--muted)">月度意向总数</div>
+              </div>
+              <div class="card card-sm" style="text-align:center">
+                <div id="mint-closed" style="font-size:24px;font-weight:700;color:var(--green)">—</div>
+                <div style="font-size:11px;color:var(--muted)">已成单</div>
+              </div>
+              <div class="card card-sm" style="text-align:center">
+                <div id="mint-pipeline" style="font-size:20px;font-weight:700;color:var(--blue)">—</div>
+                <div style="font-size:11px;color:var(--muted)">在途金额</div>
+              </div>
+              <div class="card card-sm" style="text-align:center">
+                <div id="mint-amount" style="font-size:20px;font-weight:700;color:var(--green)">—</div>
+                <div style="font-size:11px;color:var(--muted)">累计成单额</div>
+              </div>
+            </div>
+            <div id="month-intent-list" style="display:flex;flex-direction:column;gap:10px"></div>
           </div>
+
         </div>
       </div><!-- /month-wa -->
 
@@ -1488,70 +1469,502 @@ async function loadMgrYearData() {
   }
 }
 
-// ===== TEAM WA / INTENT / SOCIAL =====
-const TEAM_MEMBERS_WA = [
-  {name:'陈莉',   wa:3, normal:3, banned:0, intent:3, intent_cny:32400},
-  {name:'郑丽苹', wa:3, normal:3, banned:0, intent:2, intent_cny:28000},
-  {name:'陈玉霞', wa:3, normal:3, banned:0, intent:3, intent_cny:38000},
-  {name:'刘佳鑫', wa:3, normal:3, banned:0, intent:2, intent_cny:25200},
-  {name:'毛涵',   wa:3, normal:2, banned:1, intent:2, intent_cny:63000},
+// ===== TODO DATA =====
+const TODO_URGENT = [
+  {text:'毛涵 停滞订单 #VT-2026-0302 超10天未跟进，客户催款', tag:'立即', tagCls:'red', done:false},
+  {text:'陈玉霞 · Sarah L. 今日 15:00 确认配色尺寸 ¥2.3万', tag:'15:00', tagCls:'red', done:false},
+  {text:'陈莉 · Ahmed R. 今日 18:00 付款截止提醒 ¥3.8万', tag:'18:00', tagCls:'orange', done:false},
+];
+const TODO_FOLLOW = [
+  {text:'毛涵连续4天日报低分，今日安排1对1约谈', tag:'今日', tagCls:'orange', done:false},
+  {text:'刘佳鑫 WA被拉黑1个，协助申诉处理', tag:'跟进', tagCls:'orange', done:false},
+  {text:'郑丽苹 · Fatima K. 今日 20:00 确认型号颜色', tag:'20:00', tagCls:'blue', done:false},
+  {text:'陈玉霞 · Ravi P. 今日 17:00 视频通话介绍', tag:'17:00', tagCls:'blue', done:false},
+];
+const TODO_ADHOC = [
+  {text:'收录金牌话术案例：陈玉霞 05-13 日报（96分）', tag:'本周', tagCls:'', done:false},
+  {text:'物流延迟核查：陈玉霞/刘佳鑫各1单超预期到达', tag:'今日', tagCls:'', done:false},
+  {text:'更新 Q2 组目标拆解与下周计划', tag:'本周', tagCls:'', done:false},
 ];
 
-const TEAM_SOCIAL_DATA = [
-  {platform:'INS',     icon:'📸', month_target:60, month_done:35, today:5, engagement:{likes:1820, views:42600, comments:148}, color:'#7c3aed'},
-  {platform:'TikTok',  icon:'🎵', month_target:60, month_done:42, today:8, engagement:{likes:3240, views:124000, comments:312}, color:'#dc2626'},
-  {platform:'YouTube', icon:'▶️', month_target:20, month_done:11, today:2, engagement:{likes:560,  views:28400, comments:87},  color:'#dc2626'},
+// ===== YESTERDAY =====
+const YESTERDAY = {
+  date: '05-13',
+  miss: [
+    {name:'毛涵', done:0, target:0.9, pct:0},
+  ],
+  achieved: ['陈莉','郑丽苹','陈玉霞','刘佳鑫'],
+  anomalies: [
+    {text:'毛涵 WA被封号1个，触达量断崖下跌至21条', cls:'red'},
+    {text:'毛涵 停滞订单超10天未跟进，客户已催款', cls:'red'},
+    {text:'刘佳鑫 WA被拉黑1个，需申诉处理', cls:'orange'},
+  ],
+};
+
+// ===== WA PER EMPLOYEE =====
+const WA_MEMBERS = [
+  {uid:12865, name:'陈莉',   wa:3, normal:3, blocked:0, banned:0, s:2, a:4, b:5, c:8,  d:12, old:45},
+  {uid:12849, name:'郑丽苹', wa:3, normal:3, blocked:0, banned:0, s:1, a:2, b:4, c:6,  d:10, old:38},
+  {uid:12862, name:'陈玉霞', wa:3, normal:3, blocked:0, banned:0, s:3, a:4, b:6, c:9,  d:14, old:52},
+  {uid:12549, name:'刘佳鑫', wa:3, normal:2, blocked:1, banned:0, s:1, a:2, b:3, c:5,  d:8,  old:31},
+  {uid:13431, name:'毛涵',   wa:3, normal:1, blocked:1, banned:1, s:0, a:1, b:2, c:3,  d:5,  old:18},
 ];
 
-function renderTeamWA() {
-  const all = TEAM_MEMBERS_WA;
-  const totalWA  = all.reduce((s,m)=>s+m.wa,0);
-  const normalWA = all.reduce((s,m)=>s+m.normal,0);
-  const bannedWA = all.reduce((s,m)=>s+m.banned,0);
-  const totalIntent = all.reduce((s,m)=>s+m.intent,0);
-  const totalCNY    = all.reduce((s,m)=>s+m.intent_cny,0);
-  const dailyProd   = (MEMBERS.reduce((s,m)=>s+m.today,0)/MEMBERS.length).toFixed(2);
+// ===== INTENT PER EMPLOYEE =====
+const MEMBER_INTENTS = [
+  {uid:12865, name:'陈莉', intents:[
+    {client:'Ahmed R.',  stage:'S', amount:3.8, due:'今日 18:00', note:'付款截止提醒'},
+    {client:'Liu M.',    stage:'A', amount:1.2, due:'明日',       note:'确认发货地址'},
+    {client:'Park K.',   stage:'B', amount:2.1, due:'本周内',     note:'等待客户决策'},
+  ]},
+  {uid:12849, name:'郑丽苹', intents:[
+    {client:'Fatima K.', stage:'A', amount:2.1, due:'今日 20:00', note:'确认型号颜色'},
+    {client:'James L.',  stage:'B', amount:1.5, due:'明日',       note:'发送产品图册'},
+  ]},
+  {uid:12862, name:'陈玉霞', intents:[
+    {client:'Sarah L.',  stage:'S', amount:2.3, due:'今日 15:00', note:'确认配色尺寸'},
+    {client:'Ravi P.',   stage:'A', amount:1.8, due:'今日 17:00', note:'视频通话介绍'},
+    {client:'Nora W.',   stage:'B', amount:3.2, due:'明日',       note:'等待转账'},
+  ]},
+  {uid:12549, name:'刘佳鑫', intents:[
+    {client:'Chen B.',   stage:'A', amount:1.6, due:'今日',       note:'跟进报价'},
+    {client:'Wei T.',    stage:'C', amount:0.8, due:'本周',       note:'初步意向'},
+  ]},
+  {uid:13431, name:'毛涵', intents:[
+    {client:'Ong L.',    stage:'B', amount:1.1, due:'本周',       note:'等待客户回复'},
+  ]},
+];
 
-  const set = (id,v) => { const e=document.getElementById(id); if(e) e.textContent=v; };
-  set('team-wa-total',  totalWA);
-  set('team-wa-avg',    (totalWA/all.length).toFixed(1));
-  set('team-wa-normal', normalWA);
-  set('team-wa-banned', bannedWA);
-  const bc = document.getElementById('team-wa-banned-card');
-  if(bc) bc.className = 'wa-stat'+(bannedWA>0?' bad':'');
-  set('team-intent-count',  totalIntent);
-  set('team-intent-amount', '¥'+(totalCNY/10000).toFixed(1)+'万');
-  set('team-daily-prod',    dailyProd+'万');
-
-  const brk = document.getElementById('team-intent-breakdown');
-  if(brk) brk.innerHTML = all.map(m => `
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px">
-      <div style="width:52px;font-weight:500;flex-shrink:0">${m.name}</div>
-      <div style="flex:1;color:var(--muted)">WA ${m.wa} · 正常 ${m.normal}${m.banned>0?` <span style="color:var(--red)">·封${m.banned}</span>`:''}</div>
-      <div style="color:var(--orange);font-weight:600;width:44px;text-align:right">${m.intent}意向</div>
-      <div style="color:var(--green);width:48px;text-align:right">¥${(m.intent_cny/10000).toFixed(1)}万</div>
+// ===== RENDER TODO =====
+function renderTodoList(elId, items) {
+  const el = document.getElementById(elId);
+  if (!el) return;
+  el.innerHTML = items.map((t, i) => `
+    <div class="todo-item${t.done?' done':''}" onclick="toggleTodo('${elId}',${i})">
+      <div class="todo-check${t.done?' checked':''}">${t.done?'✓':''}</div>
+      <div class="todo-text">${t.text}</div>
+      ${t.tag?`<span class="tag${t.tagCls?' '+t.tagCls:''}" style="flex-shrink:0;font-size:10px">${t.tag}</span>`:''}
     </div>`).join('');
 }
+const _TODO_MAP = {'todo-urgent':TODO_URGENT,'todo-follow':TODO_FOLLOW,'todo-adhoc':TODO_ADHOC};
+function toggleTodo(elId, i) {
+  if (_TODO_MAP[elId]) { _TODO_MAP[elId][i].done = !_TODO_MAP[elId][i].done; renderTodoList(elId, _TODO_MAP[elId]); }
+}
 
-function renderTeamSocial() {
-  const el = document.getElementById('team-social-grid');
-  if(!el) return;
-  const fmt = n => n>=10000?(n/10000).toFixed(1)+'万':n.toString();
-  el.innerHTML = TEAM_SOCIAL_DATA.map(s => {
-    const pct = Math.min(Math.round(s.month_done/s.month_target*100),100);
-    const rem = s.month_target - s.month_done;
-    return `<div class="social-card">
-      <div class="social-icon">${s.icon}</div>
-      <div class="social-platform">${s.platform}</div>
-      <div class="social-main">${s.month_done}<span style="font-size:11px;font-weight:400;color:var(--muted)">/${s.month_target}</span></div>
-      <div class="social-sub">还差 <b style="color:${rem<=3?'var(--green)':'var(--orange)'}">${rem}</b> 条</div>
-      <div class="social-prog"><div class="social-fill" style="width:${pct}%;background:${s.color}"></div></div>
-      <div class="social-detail">
-        <span>❤ ${fmt(s.engagement.likes)}</span>
-        <span>👁 ${fmt(s.engagement.views)}</span>
-        <span>💬 ${s.engagement.comments}</span>
+// ===== RENDER YESTERDAY =====
+function renderYesterday() {
+  const titleEl = document.getElementById('yesterday-title');
+  if (titleEl) titleEl.textContent = `昨日团队情况 · ${YESTERDAY.date}`;
+
+  const missEl = document.getElementById('yesterday-miss');
+  if (missEl) {
+    missEl.innerHTML = YESTERDAY.miss.map(m => `
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px">
+        <span style="font-weight:600;color:var(--red)">${m.name}</span>
+        <span style="color:var(--muted)">${m.done}/${m.target}万</span>
+        <span class="tag red" style="font-size:10px">${m.pct}%</span>
+      </div>`).join('')
+      + (YESTERDAY.achieved.length
+        ? `<div style="font-size:12px;color:var(--green);margin-top:4px">✓ ${YESTERDAY.achieved.join('、')} 均已达标</div>` : '');
+  }
+
+  const anomEl = document.getElementById('yesterday-anomaly');
+  if (anomEl) {
+    anomEl.innerHTML = YESTERDAY.anomalies.map(a => `
+      <div style="font-size:12px;color:var(--${a.cls});display:flex;align-items:flex-start;gap:5px;margin-bottom:5px">
+        <span style="flex-shrink:0">${a.cls==='red'?'🔴':'🟡'}</span>
+        <span>${a.text}</span>
+      </div>`).join('');
+  }
+}
+
+// ===== RENDER TODAY PROGRESS =====
+function renderTodayProgress() {
+  const el = document.getElementById('today-progress');
+  if (!el) return;
+  el.innerHTML = MEMBERS.map(m => {
+    const pct = Math.min(Math.round(m.today / m.target * 100), 100);
+    const c = pct >= 80 ? 'var(--green)' : pct < 40 ? 'var(--red)' : 'var(--orange)';
+    return `<div style="display:flex;align-items:center;gap:10px;cursor:pointer"
+      onclick="openDrill('pdca-day.html?uid=${m.uid}','${m.name}')">
+      <div style="width:50px;font-size:12px;font-weight:600;flex-shrink:0">${m.name}</div>
+      <div style="flex:1;height:6px;background:var(--bg2);border-radius:3px;overflow:hidden">
+        <div style="height:100%;width:${pct}%;background:${c};border-radius:3px;transition:width .4s"></div>
+      </div>
+      <div style="width:90px;font-size:12px;text-align:right;flex-shrink:0;color:${c};font-weight:600">
+        ${m.today.toFixed(2)} / ${m.target.toFixed(2)} 万
+      </div>
+      <div style="width:34px;font-size:11px;text-align:right;flex-shrink:0;color:${c}">${pct}%</div>
+      <div style="width:14px;flex-shrink:0;font-size:11px">${m.warn?'⚠':''}</div>
+    </div>`;
+  }).join('');
+}
+
+// ===== RENDER WA TABLE =====
+function renderWATable() {
+  const tbody = document.getElementById('wa-member-table');
+  if (!tbody) return;
+
+  const tot = WA_MEMBERS.reduce((a,m) => {
+    a.wa+=m.wa; a.normal+=m.normal; a.blocked+=m.blocked; a.banned+=m.banned; return a;
+  }, {wa:0,normal:0,blocked:0,banned:0});
+
+  const set = (id,v) => { const e=document.getElementById(id); if(e) e.textContent=v; };
+  set('wa-sum-total',  tot.wa);
+  set('wa-sum-normal', tot.normal);
+  set('wa-sum-blocked', tot.blocked || '—');
+  set('wa-sum-banned',  tot.banned  || '—');
+  const bc = document.getElementById('wa-sum-blocked-card');
+  const bn = document.getElementById('wa-sum-banned-card');
+  if (bc) bc.className = 'wa-stat' + (tot.blocked > 0 ? ' bad' : '');
+  if (bn) bn.className = 'wa-stat' + (tot.banned  > 0 ? ' bad' : '');
+
+  tbody.innerHTML = WA_MEMBERS.map(m => {
+    const bad = m.blocked > 0 || m.banned > 0;
+    return `<tr style="${bad?'background:var(--red-bg)':''}"
+      onclick="openDrill('pdca-day.html?uid=${m.uid}','${m.name}')">
+      <td style="text-align:left;padding:8px 10px;font-weight:600">${m.name}${bad?' <span style="color:var(--red);font-size:10px">⚠</span>':''}</td>
+      <td>${m.wa}</td>
+      <td style="color:var(--green);font-weight:600">${m.normal}</td>
+      <td style="color:${m.blocked>0?'var(--orange)':'var(--muted2)'};font-weight:${m.blocked>0?600:400}">${m.blocked||'—'}</td>
+      <td style="color:${m.banned>0?'var(--red)':'var(--muted2)'};font-weight:${m.banned>0?600:400}">${m.banned||'—'}</td>
+      <td style="color:var(--purple);font-weight:${m.s?700:400}">${m.s||'—'}</td>
+      <td style="color:var(--blue)">${m.a||'—'}</td>
+      <td>${m.b||'—'}</td>
+      <td style="color:var(--muted)">${m.c||'—'}</td>
+      <td style="color:var(--muted2)">${m.d||'—'}</td>
+      <td style="color:var(--green);font-weight:600">${m.old}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ===== RENDER INTENT LIST =====
+function renderIntentList() {
+  const el = document.getElementById('intent-member-list');
+  if (!el) return;
+
+  let totalCount = 0, totalAmt = 0, todayDue = 0;
+  const stageColor = {S:'var(--purple)',A:'var(--blue)',B:'var(--text)',C:'var(--muted)',D:'var(--muted2)'};
+
+  el.innerHTML = MEMBER_INTENTS.map(mem => {
+    const cnt = mem.intents.length;
+    const amt = mem.intents.reduce((s,i)=>s+i.amount,0);
+    const due = mem.intents.filter(i=>i.due.includes('今日')).length;
+    totalCount += cnt; totalAmt += amt; todayDue += due;
+    return `<div class="card card-sm" style="cursor:pointer" onclick="openDrill('pdca-day.html?uid=${mem.uid}','${mem.name}')">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <div style="font-size:13px;font-weight:700">${mem.name}</div>
+        <div style="font-size:12px;color:var(--muted)">${cnt} 个意向 · 合计 <b style="color:var(--green)">¥${amt.toFixed(1)}万</b>${due>0?` · <b style="color:var(--red)">${due}今日到期</b>`:''}</div>
+      </div>
+      ${mem.intents.map(i=>`
+        <div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-top:1px solid var(--border);font-size:12px">
+          <span style="color:${stageColor[i.stage]||'var(--text)'};font-weight:700;width:12px">${i.stage}</span>
+          <span style="flex:1;font-weight:600">${i.client}</span>
+          <span style="color:var(--muted);flex:1">${i.note}</span>
+          <span style="color:${i.due.includes('今日')?'var(--red)':'var(--muted)'};font-weight:${i.due.includes('今日')?600:400};white-space:nowrap">${i.due}</span>
+          <span style="color:var(--green);font-weight:700;width:48px;text-align:right">¥${i.amount}万</span>
+        </div>`).join('')}
+    </div>`;
+  }).join('');
+
+  const set = (id,v) => { const e=document.getElementById(id); if(e) e.textContent=v; };
+  set('intent-total-count',  totalCount);
+  set('intent-total-amount', '¥' + totalAmt.toFixed(1) + '万');
+  set('intent-today-due',    todayDue);
+}
+
+// ===== MONTH TASK DATA =====
+const MONTH_TASKS_PRIORITY = [
+  {text:'毛涵帮扶计划 — 主管每日15分钟辅导，本月目标补至12万', tag:'进行中', tagCls:'blue', done:false},
+  {text:'Q2月度OKR复盘 — 对齐缺口原因及下月策略', tag:'本周', tagCls:'orange', done:false},
+  {text:'陈玉霞/刘佳鑫物流延迟客诉跟进处理', tag:'跟进中', tagCls:'orange', done:false},
+];
+const MONTH_TASKS_RUNNING = [
+  {text:'S类客户周三/四集中跟进（转化率 +18%，已验证）', tag:'持续', tagCls:'green', done:false},
+  {text:'每周五金牌话术案例收录，本月已收录 4 个', tag:'4/8', tagCls:'blue', done:false},
+  {text:'毛涵私信模板规范化培训，本月已进行 4 次', tag:'进行中', tagCls:'blue', done:false},
+];
+const MONTH_TASKS_PLAN = [
+  {text:'6月月度目标拆解（各人目标 × 4周节奏）', tag:'月底前', tagCls:'', done:false},
+  {text:'下月S类客户扩池计划 — 目标新增 30 个', tag:'规划中', tagCls:'', done:false},
+  {text:'老客复购激活活动策划（6月主题）', tag:'规划中', tagCls:'', done:false},
+];
+
+// ===== LAST MONTH =====
+const LAST_MONTH = {
+  month: '4月',
+  miss: [
+    {name:'毛涵',   done:8.4,  target:18, pct:47},
+    {name:'刘佳鑫', done:16.2, target:20, pct:81},
+    {name:'郑丽苹', done:21.8, target:25, pct:87},
+  ],
+  achieved: ['陈莉','陈玉霞'],
+  anomalies: [
+    {text:'毛涵连续3周低分，已启动帮扶计划（持续）', cls:'orange'},
+    {text:'刘佳鑫WA账号申诉中，触达量下降（已恢复）', cls:'orange'},
+  ],
+};
+
+// ===== MONTH INTENTS =====
+const MONTH_INTENTS = [
+  {uid:12865, name:'陈莉',   total:18, closed:12, open:6,  pipeline_wan:6.4, closed_wan:21.4},
+  {uid:12849, name:'郑丽苹', total:14, closed:9,  open:5,  pipeline_wan:5.2, closed_wan:16.2},
+  {uid:12862, name:'陈玉霞', total:21, closed:15, open:6,  pipeline_wan:8.6, closed_wan:28.6},
+  {uid:12549, name:'刘佳鑫', total:12, closed:7,  open:5,  pipeline_wan:4.8, closed_wan:13.8},
+  {uid:13431, name:'毛涵',   total:8,  closed:3,  open:5,  pipeline_wan:2.2, closed_wan:7.2},
+];
+
+// ===== RENDER MONTH RANKING =====
+function renderMonthRanking() {
+  const el = document.getElementById('month-rank-list');
+  if (!el) return;
+  const sorted = [...MONTH_MEMBERS].sort((a, b) => b.done - a.done);
+  el.innerHTML = sorted.map((m, i) => {
+    const isAlert = m.done / m.target < 0.4;
+    const tagCls = m.level === '300W' ? 'gold' : 'silver';
+    return `<div class="rank-item${isAlert?' style="background:var(--red-bg)"':''}" style="${isAlert?'background:var(--red-bg)':''}"
+      onclick="openDrill('pdca-day.html?uid=${m.uid}','${m.name}')" style="cursor:pointer">
+      <span class="rank-num${i<2?' top':''}">${i+1}</span>
+      <span class="rank-name${isAlert?' style=""':''}" style="${isAlert?'color:var(--red)':''}">${m.name} <span class="tag ${tagCls}" style="font-size:10px">${m.level}</span></span>
+      <span class="rank-val" style="${isAlert?'color:var(--red)':''}">${m.done}万</span>
+    </div>`;
+  }).join('');
+}
+
+// ===== RENDER MONTH MEMBER DETAIL =====
+function renderMonthMemberBars() {
+  const el = document.getElementById('month-member-bars');
+  if (!el) return;
+  const sorted = [...MONTH_MEMBERS].sort((a, b) => b.done - a.done);
+  const waMap  = Object.fromEntries(WA_MEMBERS.map(m => [m.uid, m]));
+  const dayMap = Object.fromEntries(MEMBERS.map(m => [m.uid, m]));
+  const daysIn = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate();
+  const daysPassed = new Date().getDate();
+
+  el.innerHTML = sorted.map((m, rank) => {
+    const pct = Math.round(m.done / m.target * 100);
+    const color = pct >= 70 ? 'var(--green)' : pct < 40 ? 'var(--red)' : 'var(--orange)';
+    const isAlert = pct < 40;
+    const wa  = waMap[m.uid]  || {};
+    const day = dayMap[m.uid] || {};
+    const expected = +((m.done / daysPassed) * daysIn).toFixed(1);
+    const ok = expected >= m.target;
+    const tagCls = m.level === '300W' ? 'gold' : 'silver';
+
+    return `<div style="${isAlert?'background:var(--red-bg);border-radius:var(--radius);padding:12px':'border-bottom:1px solid var(--border);padding-bottom:14px'};cursor:pointer"
+      onclick="openDrill('pdca-day.html?uid=${m.uid}','${m.name}')">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="width:22px;height:22px;font-size:11px;display:inline-flex;align-items:center;justify-content:center;background:${isAlert?'var(--red)':'var(--bg2)'};color:${isAlert?'#fff':'var(--text)'};border-radius:50%;font-weight:700">${rank+1}</span>
+          <span style="font-weight:600;font-size:14px${isAlert?';color:var(--red)':''}">${m.name}</span>
+          <span class="tag ${tagCls}" style="font-size:10px">${m.level}</span>
+          ${isAlert?'<span style="font-size:10px;padding:2px 6px;background:var(--red);color:#fff;border-radius:10px">⚠ 需介入</span>':''}
+        </div>
+        <div style="font-size:13px;font-weight:700;color:${color}">${m.done}万 <span style="font-weight:400;color:var(--muted);font-size:11px">/ ${m.target}万</span></div>
+      </div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:8px">
+        <span style="font-size:11px;color:var(--muted)">老客 <b style="color:${isAlert?'var(--red)':'var(--text)'}">${wa.old||'—'}</b></span>
+        <span style="font-size:11px;color:var(--muted)">S <b style="color:var(--purple)">${wa.s||0}</b></span>
+        <span style="font-size:11px;color:var(--muted)">A <b style="color:var(--blue)">${wa.a||0}</b></span>
+        <span style="font-size:11px;color:var(--muted)">今日 <b style="color:${day.today>0?'var(--green)':'var(--muted)'}">${day.today||0}万</b></span>
+        <span style="font-size:11px;color:var(--muted)">评分 <b style="color:${(day.score||0)>=85?'var(--green)':(day.score||0)<70?'var(--red)':'var(--orange)'}">${day.score||'—'}分</b></span>
+      </div>
+      <div style="height:8px;background:${isAlert?'rgba(0,0,0,.08)':'var(--bg2)'};border-radius:4px;overflow:hidden">
+        <div style="height:100%;width:${pct}%;background:${color};border-radius:4px"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-top:4px;font-size:11px">
+        <span style="color:${color}">${pct}% 完成${isAlert?' · 严重落后':''}</span>
+        <span style="color:var(--muted)">预计月末 ~${expected}万${ok?' ✓':' · 缺口'+(m.target-expected).toFixed(1)+'万'}</span>
       </div>
     </div>`;
+  }).join('');
+}
+
+// ===== RENDER MONTH TARGET PROGRESS =====
+function renderMonthTargetProgress() {
+  const el = document.getElementById('month-target-progress');
+  if (!el) return;
+  const sorted = [...MONTH_MEMBERS].sort((a, b) => b.done - a.done);
+  el.innerHTML = sorted.map(m => {
+    const pct = Math.min(Math.round(m.done / m.target * 100), 100);
+    const c = pct >= 70 ? 'var(--green)' : pct < 40 ? 'var(--red)' : 'var(--orange)';
+    return `<div style="display:flex;align-items:center;gap:10px;cursor:pointer"
+      onclick="openDrill('pdca-day.html?uid=${m.uid}','${m.name}')">
+      <div style="width:50px;font-size:12px;font-weight:600;flex-shrink:0">${m.name}</div>
+      <div style="flex:1;height:6px;background:var(--bg2);border-radius:3px;overflow:hidden">
+        <div style="height:100%;width:${pct}%;background:${c};border-radius:3px;transition:width .4s"></div>
+      </div>
+      <div style="width:100px;font-size:12px;text-align:right;flex-shrink:0;color:${c};font-weight:600">
+        ${m.done} / ${m.target} 万
+      </div>
+      <div style="width:34px;font-size:11px;text-align:right;flex-shrink:0;color:${c}">${pct}%</div>
+    </div>`;
+  }).join('');
+}
+
+// ===== RENDER LAST MONTH =====
+function renderLastMonth() {
+  const titleEl = document.getElementById('last-month-title');
+  if (titleEl) titleEl.textContent = `上月团队情况 · ${LAST_MONTH.month}`;
+
+  const missEl = document.getElementById('last-month-miss');
+  if (missEl) {
+    missEl.innerHTML = LAST_MONTH.miss.map(m => `
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;font-size:12px">
+        <span style="font-weight:600;color:${m.pct<50?'var(--red)':'var(--orange)'}">${m.name}</span>
+        <span style="color:var(--muted)">${m.done}/${m.target}万</span>
+        <span class="tag ${m.pct<50?'red':'orange'}" style="font-size:10px">${m.pct}%</span>
+      </div>`).join('')
+      + (LAST_MONTH.achieved.length
+        ? `<div style="font-size:12px;color:var(--green);margin-top:4px">✓ ${LAST_MONTH.achieved.join('、')} 已达标</div>` : '');
+  }
+
+  const anomEl = document.getElementById('last-month-anomaly');
+  if (anomEl) {
+    anomEl.innerHTML = LAST_MONTH.anomalies.map(a => `
+      <div style="font-size:12px;color:var(--${a.cls});display:flex;gap:5px;margin-bottom:5px">
+        <span>${a.cls==='red'?'🔴':'🟡'}</span><span>${a.text}</span>
+      </div>`).join('');
+  }
+}
+
+// ===== RENDER MONTH WA TABLE (reuse WA_MEMBERS data) =====
+function renderMonthWATable() {
+  const tbody = document.getElementById('mwa-member-table');
+  if (!tbody) return;
+
+  const tot = WA_MEMBERS.reduce((a,m) => {
+    a.wa+=m.wa; a.normal+=m.normal; a.blocked+=m.blocked; a.banned+=m.banned; return a;
+  }, {wa:0,normal:0,blocked:0,banned:0});
+
+  const set = (id,v) => { const e=document.getElementById(id); if(e) e.textContent=v; };
+  set('mwa-sum-total',  tot.wa);
+  set('mwa-sum-normal', tot.normal);
+  set('mwa-sum-blocked', tot.blocked||'—');
+  set('mwa-sum-banned',  tot.banned||'—');
+  const bc = document.getElementById('mwa-sum-blocked-card');
+  const bn = document.getElementById('mwa-sum-banned-card');
+  if (bc) bc.className = 'wa-stat'+(tot.blocked>0?' bad':'');
+  if (bn) bn.className = 'wa-stat'+(tot.banned>0?' bad':'');
+
+  tbody.innerHTML = WA_MEMBERS.map(m => {
+    const bad = m.blocked>0||m.banned>0;
+    return `<tr style="${bad?'background:var(--red-bg)':''}"
+      onclick="openDrill('pdca-day.html?uid=${m.uid}','${m.name}')">
+      <td style="text-align:left;padding:8px 10px;font-weight:600">${m.name}${bad?' <span style="color:var(--red);font-size:10px">⚠</span>':''}</td>
+      <td>${m.wa}</td>
+      <td style="color:var(--green);font-weight:600">${m.normal}</td>
+      <td style="color:${m.blocked>0?'var(--orange)':'var(--muted2)'};font-weight:${m.blocked>0?600:400}">${m.blocked||'—'}</td>
+      <td style="color:${m.banned>0?'var(--red)':'var(--muted2)'};font-weight:${m.banned>0?600:400}">${m.banned||'—'}</td>
+      <td style="color:var(--purple);font-weight:${m.s?700:400}">${m.s||'—'}</td>
+      <td style="color:var(--blue)">${m.a||'—'}</td>
+      <td>${m.b||'—'}</td>
+      <td style="color:var(--muted)">${m.c||'—'}</td>
+      <td style="color:var(--muted2)">${m.d||'—'}</td>
+      <td style="color:var(--green);font-weight:600">${m.old}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ===== RENDER MONTH INTENTS =====
+function renderMonthIntents() {
+  const el = document.getElementById('month-intent-list');
+  if (!el) return;
+
+  let totTotal=0, totClosed=0, totPipeline=0, totAmount=0;
+  MONTH_INTENTS.forEach(m => {
+    totTotal+=m.total; totClosed+=m.closed;
+    totPipeline+=m.pipeline_wan; totAmount+=m.closed_wan;
+  });
+
+  const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+  set('mint-total',    totTotal);
+  set('mint-closed',   totClosed);
+  set('mint-pipeline', '¥'+totPipeline.toFixed(1)+'万');
+  set('mint-amount',   '¥'+totAmount.toFixed(1)+'万');
+
+  el.innerHTML = MONTH_INTENTS.map(m => {
+    const convRate = m.total>0?Math.round(m.closed/m.total*100):0;
+    const c = convRate>=60?'var(--green)':convRate<30?'var(--red)':'var(--orange)';
+    return `<div class="card card-sm" style="cursor:pointer" onclick="openDrill('pdca-day.html?uid=${m.uid}','${m.name}')">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <div style="font-size:13px;font-weight:700">${m.name}</div>
+        <div style="font-size:12px;color:var(--muted)">${m.total} 意向 · 转化 <b style="color:${c}">${convRate}%</b></div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;text-align:center">
+        <div><div style="font-size:16px;font-weight:700;color:var(--orange)">${m.total}</div><div style="font-size:11px;color:var(--muted)">月度意向</div></div>
+        <div><div style="font-size:16px;font-weight:700;color:var(--green)">${m.closed}</div><div style="font-size:11px;color:var(--muted)">已成单</div></div>
+        <div><div style="font-size:16px;font-weight:700;color:var(--blue)">${m.open}</div><div style="font-size:11px;color:var(--muted)">在途</div></div>
+        <div><div style="font-size:14px;font-weight:700;color:var(--green)">¥${m.closed_wan}万</div><div style="font-size:11px;color:var(--muted)">成单额</div></div>
+      </div>
+      <div style="margin-top:8px;height:5px;background:var(--bg2);border-radius:3px;overflow:hidden">
+        <div style="height:100%;width:${convRate}%;background:${c};border-radius:3px"></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ===== SOCIAL MEDIA DATA =====
+const TEAM_SOCIAL_DATA = [
+  {platform:'INS',     icon:'📸', color:'var(--purple)', target:50, done:43, today:8,  engagement:'4.2%'},
+  {platform:'TikTok',  icon:'🎵', color:'var(--red)',    target:40, done:31, today:6,  engagement:'6.8%'},
+  {platform:'YouTube', icon:'▶️', color:'var(--red)',    target:20, done:14, today:2,  engagement:'3.1%'},
+];
+
+const MEMBER_SOCIAL = [
+  {uid:12865, name:'陈莉',   ins_today:2, ins_month:12, tk_today:2, tk_month:9,  yt_today:1, yt_month:4},
+  {uid:12849, name:'郑丽苹', ins_today:2, ins_month:9,  tk_today:1, tk_month:7,  yt_today:0, yt_month:3},
+  {uid:12862, name:'陈玉霞', ins_today:2, ins_month:11, tk_today:2, tk_month:8,  yt_today:1, yt_month:4},
+  {uid:12549, name:'刘佳鑫', ins_today:1, ins_month:8,  tk_today:1, tk_month:5,  yt_today:0, yt_month:2},
+  {uid:13431, name:'毛涵',   ins_today:1, ins_month:3,  tk_today:0, tk_month:2,  yt_today:0, yt_month:1},
+];
+
+// ===== RENDER TEAM SOCIAL =====
+function renderTeamSocial() {
+  const grid = document.getElementById('team-social-grid');
+  if (!grid) return;
+  grid.innerHTML = TEAM_SOCIAL_DATA.map(p => {
+    const pct = Math.round(p.done / p.target * 100);
+    const cls = pct >= 80 ? 'ok' : pct >= 40 ? 'warn' : 'behind';
+    const clr = cls === 'ok' ? 'var(--green)' : cls === 'warn' ? 'var(--orange)' : 'var(--red)';
+    return `<div class="card" style="flex:1;min-width:140px;padding:14px 16px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+        <span style="font-size:18px">${p.icon}</span>
+        <span style="font-weight:600;color:${p.color}">${p.platform}</span>
+        <span class="tag ${cls}" style="margin-left:auto">${pct}%</span>
+      </div>
+      <div style="font-size:22px;font-weight:700;color:${clr};margin-bottom:2px">${p.done}<span style="font-size:13px;color:var(--muted);font-weight:400"> / ${p.target}</span></div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:8px">本月发帖 &nbsp;·&nbsp; 今日 <b>+${p.today}</b> &nbsp;·&nbsp; 互动率 ${p.engagement}</div>
+      <div style="height:4px;background:var(--bg2);border-radius:2px;overflow:hidden">
+        <div style="height:100%;width:${pct}%;background:${clr};border-radius:2px;transition:width .4s"></div>
+      </div>
+    </div>`;
+  }).join('');
+  grid.style.display = 'flex';
+  grid.style.gap = '12px';
+  grid.style.flexWrap = 'wrap';
+}
+
+// ===== RENDER MEMBER SOCIAL TABLE =====
+function renderMemberSocial() {
+  const tbody = document.getElementById('social-member-table');
+  if (!tbody) return;
+  tbody.innerHTML = MEMBER_SOCIAL.map(m => {
+    const totalToday = m.ins_today + m.tk_today + m.yt_today;
+    const totalMonth = m.ins_month + m.tk_month + m.yt_month;
+    const dayTarget  = 5; // INS2 + TK2 + YT1
+    const cls = totalToday >= dayTarget ? 'ok' : totalToday >= Math.ceil(dayTarget * 0.6) ? 'warn' : 'behind';
+    const label = cls === 'ok' ? '达标' : cls === 'warn' ? '偏低' : '未达标';
+    return `<tr>
+      <td style="font-weight:600">${m.name}</td>
+      <td style="color:var(--purple)">${m.ins_today}</td>
+      <td style="color:var(--muted)">${m.ins_month}</td>
+      <td style="color:var(--red)">${m.tk_today}</td>
+      <td style="color:var(--muted)">${m.tk_month}</td>
+      <td style="color:var(--red)">${m.yt_today}</td>
+      <td style="color:var(--muted)">${m.yt_month}</td>
+      <td><span class="tag ${cls}">${label} ${totalToday}/${dayTarget}</span></td>
+    </tr>`;
   }).join('');
 }
 
@@ -1560,13 +1973,29 @@ renderMgrSOP();
 renderMemberGrid();
 renderMemberBars();
 renderMonthMemberBars();
+renderMonthRanking();
+renderMonthTargetProgress();
+renderLastMonth();
+renderMonthWATable();
+renderMonthIntents();
+
+renderTodoList('todo-urgent', TODO_URGENT);
+renderTodoList('todo-follow', TODO_FOLLOW);
+renderTodoList('todo-adhoc',  TODO_ADHOC);
+renderTodoList('mtask-priority', MONTH_TASKS_PRIORITY);
+renderTodoList('mtask-running',  MONTH_TASKS_RUNNING);
+renderTodoList('mtask-plan',     MONTH_TASKS_PLAN);
+renderYesterday();
+renderTodayProgress();
+
+renderWATable();
+renderIntentList();
+renderTeamSocial();
+renderMemberSocial();
 
 loadMgrDayData();
 loadMgrMonthData();
 loadMgrYearData();
-
-renderTeamWA();
-renderTeamSocial();
 </script>
 </body>
 </html>
