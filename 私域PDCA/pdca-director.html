@@ -656,6 +656,44 @@ function logout(){ localStorage.removeItem('pdca_session'); window.location.href
               </div>
             </div>
             <div>
+              <div class="section-label"><div class="step-badge" style="background:#111827;color:#fff">节</div><div class="step-name">年度大节点<span class="step-sub">四大核心里程碑 · 2026全年</span></div></div>
+              <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px">
+
+                <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;border-top:3px solid #0ea5e9">
+                  <div style="font-size:10px;font-weight:700;color:#0ea5e9;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">WA 私域总量</div>
+                  <div style="font-size:24px;font-weight:700;line-height:1.1">8<span style="font-size:12px;font-weight:400;color:var(--muted)">万客户</span></div>
+                  <div style="margin:8px 0 4px;height:5px;background:var(--bg2);border-radius:3px"><div style="height:5px;background:#0ea5e9;border-radius:3px;width:52%"></div></div>
+                  <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted)"><span>当前 ~4.2万</span><span style="font-weight:600;color:#0ea5e9">52%</span></div>
+                  <div style="font-size:10px;color:var(--muted);margin-top:4px">月新增3000 · 70账号承载</div>
+                </div>
+
+                <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;border-top:3px solid var(--green)">
+                  <div style="font-size:10px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">日人均触达</div>
+                  <div style="font-size:24px;font-weight:700;line-height:1.1">80<span style="font-size:12px;font-weight:400;color:var(--muted)">客/天</span></div>
+                  <div style="margin:8px 0 4px;height:5px;background:var(--bg2);border-radius:3px"><div style="height:5px;background:var(--green);border-radius:3px;width:26%"></div></div>
+                  <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted)"><span>当前均 ~21客</span><span style="font-weight:600;color:var(--red)">26%</span></div>
+                  <div style="font-size:10px;color:var(--muted);margin-top:4px">需自动化触达支撑</div>
+                </div>
+
+                <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;border-top:3px solid var(--blue)">
+                  <div style="font-size:10px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">私域人产</div>
+                  <div style="font-size:24px;font-weight:700;line-height:1.1">20<span style="font-size:12px;font-weight:400;color:var(--muted)">万/月稳定</span></div>
+                  <div style="margin:8px 0 4px;height:5px;background:var(--bg2);border-radius:3px"><div style="height:5px;background:var(--blue);border-radius:3px;width:38%"></div></div>
+                  <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted)"><span>当前均 ~7.6万</span><span style="font-weight:600;color:var(--orange)">38%</span></div>
+                  <div style="font-size:10px;color:var(--muted);margin-top:4px">新品发布月突破 <b style="color:var(--blue)">30万</b></div>
+                </div>
+
+                <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;border-top:3px solid var(--orange)">
+                  <div style="font-size:10px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">自拓体系</div>
+                  <div style="font-size:24px;font-weight:700;line-height:1.1">10<span style="font-size:12px;font-weight:400;color:var(--muted)">万粉账号</span></div>
+                  <div style="margin:8px 0 4px;height:5px;background:var(--bg2);border-radius:3px"><div style="height:5px;background:var(--orange);border-radius:3px;width:80%"></div></div>
+                  <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted)"><span>当前 8个万粉号</span><span style="font-weight:600;color:var(--orange)">80%</span></div>
+                  <div style="font-size:10px;color:var(--muted);margin-top:4px">月600客 · 月业绩稳定 <b style="color:var(--orange)">30万</b></div>
+                </div>
+
+              </div>
+            </div>
+            <div>
               <div class="section-label"><div class="step-badge">Q</div><div class="step-name">季度拆解<span class="step-sub">4000万 → 4 季</span></div></div>
               <div class="quarter-grid">
                 <div class="quarter-card q-done"><div class="qc-label">Q1 · 1–3月 <span class="qc-badge" style="background:var(--orange-bg);color:var(--orange)">已结束</span></div><div class="qc-plan">1000<span style="font-size:13px;font-weight:400;color:var(--muted)">万</span></div><div class="qc-actual" style="color:var(--orange)">实际 295万 (29.5%)</div><div class="qc-prog"><div class="qc-fill" style="width:29.5%;background:var(--orange)"></div></div><div class="qc-sub">差距 705万 · 严重落后</div></div>
@@ -670,7 +708,7 @@ function logout(){ localStorage.removeItem('pdca_session'); window.location.href
                 <div class="pheno-card" onclick="showToast('现象1详情')"><div class="pheno-head"><div class="pheno-title">现象 1 · 官网 UV / 业绩转化</div><span class="tag green">正常 ✓</span></div><div class="pheno-kpi"><div><div class="pk-label">本月 UV</div><div class="pk-val">85万</div></div><div><div class="pk-label">实际业绩</div><div class="pk-val" style="color:var(--green)">78万</div></div><div><div class="pk-label">预期业绩</div><div class="pk-val">73万</div></div><div><div class="pk-label">偏差</div><div class="pk-val" style="color:var(--green)">+6.8%</div></div></div><div class="pheno-note" style="color:var(--muted)">UV 300万时按 0.3 转化率业绩增量 = 72万</div></div>
                 <div class="pheno-card" onclick="showToast('现象2详情')"><div class="pheno-head"><div class="pheno-title">现象 2 · 历史月业绩增长</div><span class="tag" style="background:#fefce8;color:#713f12;border-color:#fde68a">超预期 ⭐</span></div><div class="pheno-kpi"><div><div class="pk-label">本月历史月</div><div class="pk-val">98万</div></div><div><div class="pk-label">较上月</div><div class="pk-val" style="color:var(--green)">+8万</div></div><div><div class="pk-label">季度增量</div><div class="pk-val">18万</div></div><div><div class="pk-label">月均增长</div><div class="pk-val">+6万</div></div></div><div class="pheno-note" style="color:var(--orange)">卡点：WA 触达上限，需增加 WA 账号</div></div>
                 <div class="pheno-card warn" onclick="showToast('现象3详情')"><div class="pheno-head"><div class="pheno-title">现象 3 · 自拓万粉账号增长</div><span class="tag orange">需加速 ⚠</span></div><div class="pheno-kpi"><div><div class="pk-label">当前万粉账号</div><div class="pk-val" style="color:var(--orange)">8个</div></div><div><div class="pk-label">年度目标</div><div class="pk-val">10个</div></div><div><div class="pk-label">本月自拓业绩</div><div class="pk-val">38万</div></div><div><div class="pk-label">较25年</div><div class="pk-val" style="color:var(--green)">+13万</div></div></div><div class="pheno-note" style="color:var(--orange)">按当前节奏 12月仅达 9个，缺 2个，需立即启动孵化</div></div>
-                <div class="pheno-card alert" onclick="showToast('现象4详情')"><div class="pheno-head"><div class="pheno-title">现象 4 · 老客触达上限</div><span class="tag red">需自动化 ⚠</span></div><div class="pheno-kpi"><div><div class="pk-label">日人均触达</div><div class="pk-val" style="color:var(--red)">21人</div></div><div><div class="pk-label">人工上限</div><div class="pk-val">20人</div></div><div><div class="pk-label">本月老客业绩</div><div class="pk-val">85万</div></div><div><div class="pk-label">增长空间</div><div class="pk-val" style="color:var(--muted)">受限</div></div></div><div class="pheno-note" style="color:var(--red)">已超人工上限，必须引入自动化触达 + 智能回复</div></div>
+                <div class="pheno-card alert" onclick="showToast('现象4详情')"><div class="pheno-head"><div class="pheno-title">现象 4 · 老客触达上限</div><span class="tag red">需自动化 ⚠</span></div><div class="pheno-kpi"><div><div class="pk-label">日人均触达</div><div class="pk-val" style="color:var(--red)">21人</div></div><div><div class="pk-label">年度目标</div><div class="pk-val" style="color:var(--green)">80人</div></div><div><div class="pk-label">本月老客业绩</div><div class="pk-val">85万</div></div><div><div class="pk-label">增长空间</div><div class="pk-val" style="color:var(--muted)">受限</div></div></div><div class="pheno-note" style="color:var(--red)">当前仅 21客，达到 80客目标需引入自动化触达 + 智能回复</div></div>
               </div>
             </div>
           </div><!-- /left -->
