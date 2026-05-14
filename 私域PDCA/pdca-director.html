@@ -446,12 +446,13 @@ function logout(){ localStorage.removeItem('pdca_session'); window.location.href
           <div>
             <div class="section-label">
               <div class="step-badge" style="background:var(--green)">WA</div>
-              <div class="step-name">部门账号数据<span class="step-sub">全部门 WA · 意向客户 · 人产</span></div>
+              <div class="step-name">部门账号数据<span class="step-sub">全部门 WA · 意向客户 · 人产 · <span style="color:var(--purple)">Q2目标: 账号70 / 月新增客3000</span></span></div>
             </div>
             <div class="wa-grid" style="margin-bottom:12px">
               <div class="wa-stat ok"><div class="wa-stat-val" id="dept-wa-total">42</div><div class="wa-stat-label">WA 账号总数</div></div>
               <div class="wa-stat ok"><div class="wa-stat-val" id="dept-wa-avg">3.0</div><div class="wa-stat-label">人均账号数</div></div>
               <div class="wa-stat ok"><div class="wa-stat-val" id="dept-wa-normal">41</div><div class="wa-stat-label">正常使用</div></div>
+              <div class="wa-stat" style="background:var(--purple-bg);border-color:var(--purple-border)"><div class="wa-stat-val" style="color:var(--purple);font-size:16px">42/70</div><div class="wa-stat-label">账号进度(Q2)</div></div>
               <div class="wa-stat" id="dept-wa-banned-card"><div class="wa-stat-val" id="dept-wa-banned">1</div><div class="wa-stat-label">被封/受限</div></div>
             </div>
             <div class="card card-sm" style="margin-bottom:20px">
@@ -459,6 +460,10 @@ function logout(){ localStorage.removeItem('pdca_session'); window.location.href
                 <div><div style="font-size:24px;font-weight:700;color:var(--orange)" id="dept-intent-count">31</div><div style="font-size:11px;color:var(--muted)">部门意向客户</div></div>
                 <div><div style="font-size:18px;font-weight:700;color:var(--green)" id="dept-intent-amount">¥52.4万</div><div style="font-size:11px;color:var(--muted)">预计收款</div></div>
                 <div><div style="font-size:24px;font-weight:700" id="dept-daily-prod">0.30万</div><div style="font-size:11px;color:var(--muted)">今日人产均值</div></div>
+                <div style="grid-column:1/-1;padding-top:8px;border-top:1px solid var(--border);display:flex;gap:16px;font-size:12px">
+                  <span style="color:var(--muted)">Q2月度新增客目标:</span>
+                  <span style="font-weight:600;color:var(--blue)">3000人 <span style="font-size:10px;color:var(--muted)">(官网800 + 老客1200 + 官媒自拓1000)</span></span>
+                </div>
               </div>
               <div style="border-top:1px solid var(--border);padding-top:10px" id="dept-team-breakdown"></div>
             </div>
@@ -630,6 +635,7 @@ function logout(){ localStorage.removeItem('pdca_session'); window.location.href
     <nav class="left-nav">
       <div class="nav-lbl">年视图</div>
       <div class="nav-item active" onclick="showSec('year-target',this)"><span class="nav-icon">🎯</span>年度目标</div>
+      <div class="nav-item" onclick="showSec('year-q2',this)"><span class="nav-icon">🗓️</span>Q2 计划</div>
       <div class="nav-item" onclick="showSec('year-detail',this)"><span class="nav-icon">📅</span>月度累计</div>
       <div class="nav-divider"></div>
       <a href="https://admin.vertu.cn/odoo/sales" target="_blank" class="nav-item nav-ext"><span class="nav-icon">🔗</span>Odoo</a>
@@ -718,6 +724,228 @@ function logout(){ localStorage.removeItem('pdca_session'); window.location.href
           </div><!-- /right -->
         </div><!-- /sec-grid -->
       </div><!-- /year-target -->
+
+      <!-- ─ Q2 计划 ─ -->
+      <div id="year-q2" class="sec-panel">
+        <div style="padding:24px">
+          <!-- Q2 战略标题 -->
+          <div style="background:linear-gradient(135deg,#7c3aed,#2563eb);color:#fff;border-radius:10px;padding:16px 20px;margin-bottom:20px">
+            <div style="font-size:11px;font-weight:600;opacity:.75;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px">海外私域 Q2 计划</div>
+            <div style="font-size:18px;font-weight:700">Q2 策略及打法：踏实做好资产沉淀，完成 1010 万</div>
+            <div style="margin-top:8px;font-size:12px;opacity:.8">年度计划：围绕核心"5个力"，聚焦"3大渠道"，以AI+内容+自动化赋能，完成 4000万</div>
+          </div>
+
+          <!-- Q2 关键指标条 -->
+          <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:20px">
+            <div class="card card-sm" style="text-align:center;padding:12px 8px">
+              <div style="font-size:10px;color:var(--muted);margin-bottom:4px">季度WA总数目标</div>
+              <div style="font-size:20px;font-weight:700;color:var(--purple)">5万</div>
+              <div style="font-size:10px;color:var(--muted);margin-top:2px">月新增 3000 / 季+20账号</div>
+              <div style="margin-top:6px;height:4px;background:var(--bg2);border-radius:2px;overflow:hidden">
+                <div style="width:42%;height:100%;background:var(--purple);border-radius:2px"></div>
+              </div>
+            </div>
+            <div class="card card-sm" style="text-align:center;padding:12px 8px">
+              <div style="font-size:10px;color:var(--muted);margin-bottom:4px">WA账号总数目标</div>
+              <div style="font-size:20px;font-weight:700;color:var(--blue)">70个</div>
+              <div style="font-size:10px;color:var(--muted);margin-top:2px">当前 42 → 目标 70</div>
+              <div style="margin-top:6px;height:4px;background:var(--bg2);border-radius:2px;overflow:hidden">
+                <div style="width:60%;height:100%;background:var(--blue);border-radius:2px"></div>
+              </div>
+            </div>
+            <div class="card card-sm" style="text-align:center;padding:12px 8px">
+              <div style="font-size:10px;color:var(--muted);margin-bottom:4px">月自拓客户数</div>
+              <div style="font-size:20px;font-weight:700;color:var(--green)">400</div>
+              <div style="font-size:10px;color:var(--muted);margin-top:2px">人均 30 · 自拓 30万/月</div>
+              <div style="margin-top:6px;height:4px;background:var(--bg2);border-radius:2px;overflow:hidden">
+                <div style="width:55%;height:100%;background:var(--green);border-radius:2px"></div>
+              </div>
+            </div>
+            <div class="card card-sm" style="text-align:center;padding:12px 8px">
+              <div style="font-size:10px;color:var(--muted);margin-bottom:4px">月社媒播放量</div>
+              <div style="font-size:20px;font-weight:700;color:var(--orange)">5000万</div>
+              <div style="font-size:10px;color:var(--muted);margin-top:2px">新增1个万粉IP账号</div>
+              <div style="margin-top:6px;height:4px;background:var(--bg2);border-radius:2px;overflow:hidden">
+                <div style="width:38%;height:100%;background:var(--orange);border-radius:2px"></div>
+              </div>
+            </div>
+            <div class="card card-sm" style="text-align:center;padding:12px 8px">
+              <div style="font-size:10px;color:var(--muted);margin-bottom:4px">团队架构目标</div>
+              <div style="font-size:20px;font-weight:700;color:var(--text)">1+5</div>
+              <div style="font-size:10px;color:var(--muted);margin-top:2px">3个标准组 · 人产稳定20W</div>
+              <div style="margin-top:6px;height:4px;background:var(--bg2);border-radius:2px;overflow:hidden">
+                <div style="width:67%;height:100%;background:#111827;border-radius:2px"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Q2 OKR 主表 -->
+          <div class="card card-sm" style="padding:0;overflow:hidden">
+            <table style="width:100%;border-collapse:collapse;font-size:13px">
+              <thead>
+                <tr style="background:var(--purple-bg)">
+                  <th style="padding:11px 16px;text-align:left;font-size:11px;font-weight:600;color:var(--purple);width:12%">事项</th>
+                  <th style="padding:11px 16px;text-align:left;font-size:11px;font-weight:600;color:var(--purple);width:15%">目标</th>
+                  <th style="padding:11px 16px;text-align:left;font-size:11px;font-weight:600;color:var(--purple);width:35%">关键结果</th>
+                  <th style="padding:11px 16px;text-align:left;font-size:11px;font-weight:600;color:var(--purple)">打法</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- 龙虾主管检查 -->
+                <tr style="border-top:1px solid var(--border)">
+                  <td style="padding:14px 16px;vertical-align:top">
+                    <div style="font-weight:600">龙虾主管<br/>检查</div>
+                  </td>
+                  <td style="padding:14px 16px;vertical-align:top;color:var(--muted)">每日1份基础指标检查报告</td>
+                  <td style="padding:14px 16px;vertical-align:top">
+                    <div style="display:flex;flex-direction:column;gap:5px">
+                      <div style="display:flex;align-items:center;gap:6px;font-size:12px">
+                        <span style="width:6px;height:6px;border-radius:50%;background:var(--blue);flex-shrink:0;display:inline-block"></span>
+                        私域主管基础工作SOP整理及龙虾训练
+                      </div>
+                      <div style="display:flex;align-items:center;gap:6px;font-size:12px">
+                        <span style="width:6px;height:6px;border-radius:50%;background:var(--blue);flex-shrink:0;display:inline-block"></span>
+                        私域聊天标准定义完成
+                      </div>
+                    </div>
+                  </td>
+                  <td style="padding:14px 16px;vertical-align:top;color:var(--muted);font-size:12px">—</td>
+                </tr>
+                <!-- 自拓业绩稳定 -->
+                <tr style="border-top:1px solid var(--border);background:var(--bg)">
+                  <td style="padding:14px 16px;vertical-align:top">
+                    <div style="font-weight:600">自拓业绩<br/>稳定</div>
+                    <span class="tag orange" style="margin-top:5px;font-size:10px">进行中</span>
+                  </td>
+                  <td style="padding:14px 16px;vertical-align:top">
+                    <div style="font-weight:600;color:var(--orange)">月度30万<br/>业绩产出</div>
+                  </td>
+                  <td style="padding:14px 16px;vertical-align:top">
+                    <div style="display:flex;flex-direction:column;gap:5px">
+                      <div style="display:flex;align-items:center;gap:6px;font-size:12px">
+                        <span style="width:6px;height:6px;border-radius:50%;background:var(--orange);flex-shrink:0;display:inline-block"></span>
+                        恢复月度自拓客户新增400个水准（人均30）
+                      </div>
+                      <div style="display:flex;align-items:center;gap:6px;font-size:12px">
+                        <span style="width:6px;height:6px;border-radius:50%;background:var(--orange);flex-shrink:0;display:inline-block"></span>
+                        社媒月度 <b>5000万</b>流量
+                      </div>
+                      <div style="display:flex;align-items:center;gap:6px;font-size:12px">
+                        <span style="width:6px;height:6px;border-radius:50%;background:var(--orange);flex-shrink:0;display:inline-block"></span>
+                        新增 <b>1个万粉</b>标杆IP账号
+                      </div>
+                    </div>
+                  </td>
+                  <td style="padding:14px 16px;vertical-align:top">
+                    <div style="display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--muted)">
+                      <div>利用MTO定制工具实现IP矩阵内容高质量量产</div>
+                      <div>拆解简易拍摄爆款模板、IP账号</div>
+                      <div>账号运营基础动作拆解及执行检查</div>
+                      <div style="color:var(--orange)">每日40条精准私信截流（针对 Ins/TK 竞对粉丝）</div>
+                    </div>
+                  </td>
+                </tr>
+                <!-- 有效资产沉淀 -->
+                <tr style="border-top:1px solid var(--border)">
+                  <td style="padding:14px 16px;vertical-align:top">
+                    <div style="font-weight:600">有效资产<br/>沉淀</div>
+                    <span class="tag blue" style="margin-top:5px;font-size:10px">核心</span>
+                  </td>
+                  <td style="padding:14px 16px;vertical-align:top">
+                    <div style="font-weight:600;color:var(--blue)">单月新增<br/>客户3000</div>
+                  </td>
+                  <td style="padding:14px 16px;vertical-align:top">
+                    <div style="display:flex;flex-direction:column;gap:5px">
+                      <div style="font-size:12px;color:var(--muted);margin-bottom:4px">月度来源构成：</div>
+                      <div style="display:flex;gap:8px;flex-wrap:wrap;font-size:11px">
+                        <span style="background:var(--blue-bg);color:var(--blue);padding:2px 8px;border-radius:4px">官网 800</span>
+                        <span style="background:var(--green-bg);color:var(--green);padding:2px 8px;border-radius:4px">老客户 1200</span>
+                        <span style="background:var(--orange-bg);color:var(--orange);padding:2px 8px;border-radius:4px">官媒+自拓 1000</span>
+                      </div>
+                      <div style="display:flex;align-items:center;gap:6px;font-size:12px;margin-top:4px">
+                        <span style="width:6px;height:6px;border-radius:50%;background:var(--blue);flex-shrink:0;display:inline-block"></span>
+                        季度新增20个稳定WA账号，整体账号数到 <b>70</b>
+                      </div>
+                    </div>
+                  </td>
+                  <td style="padding:14px 16px;vertical-align:top">
+                    <div style="display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--muted)">
+                      <div>推进多账号管理（2老+2新），实现80个触达单人/每日</div>
+                      <div>做自动化触达准备及测试</div>
+                      <div style="color:var(--blue)">AI销售+账号资产+客户资产+知识资产+标准化管理=业绩</div>
+                    </div>
+                  </td>
+                </tr>
+                <!-- 人员沉淀 -->
+                <tr style="border-top:1px solid var(--border);background:var(--bg)">
+                  <td style="padding:14px 16px;vertical-align:top">
+                    <div style="font-weight:600">人员沉淀</div>
+                  </td>
+                  <td style="padding:14px 16px;vertical-align:top">
+                    <div style="font-weight:600">单个团队<br/>架构1+5</div>
+                    <div style="font-size:11px;color:var(--muted);margin-top:4px">人产稳定 20W</div>
+                  </td>
+                  <td style="padding:14px 16px;vertical-align:top">
+                    <div style="display:flex;flex-direction:column;gap:5px">
+                      <div style="display:flex;align-items:center;gap:6px;font-size:12px">
+                        <span style="width:6px;height:6px;border-radius:50%;background:var(--text);flex-shrink:0;display:inline-block"></span>
+                        新增2个合格人力
+                      </div>
+                      <div style="display:flex;align-items:center;gap:6px;font-size:12px">
+                        <span style="width:6px;height:6px;border-radius:50%;background:var(--text);flex-shrink:0;display:inline-block"></span>
+                        第3月新人人产到 <b>10万</b>
+                      </div>
+                    </div>
+                  </td>
+                  <td style="padding:14px 16px;vertical-align:top">
+                    <div style="display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--muted)">
+                      <div>利用AI招聘，把控人员画像（语言力、IP力、销售经验）</div>
+                      <div>标准培训流程，一对一带教</div>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Q2 当前进度小结 -->
+          <div style="margin-top:16px;display:grid;grid-template-columns:repeat(2,1fr);gap:12px">
+            <div class="hermes-card" style="margin:0">
+              <div class="hermes-header"><div class="hermes-icon">H</div><div class="hermes-title">Hermes · Q2 进度研判</div></div>
+              <div class="hermes-body">
+                Q2 已过 <b>45天（50%）</b>，当前业绩完成 <b style="color:var(--orange)">~32%</b>，整体落后节奏约 18%。<br><br>
+                最大风险：自拓客户月新增仅约 220（目标400），WA账号当前 42（目标70），两项均需在 Q2 后半段加速。
+              </div>
+              <div class="hermes-actions">
+                <button class="hermes-btn primary" onclick="showToast('已安排Q2复盘')">安排Q2复盘</button>
+                <button class="hermes-btn" onclick="showToast('已记录')">记录</button>
+              </div>
+            </div>
+            <div class="card card-sm" style="margin:0">
+              <div class="card-title">Q2 关键里程碑</div>
+              <div style="display:flex;flex-direction:column;gap:10px">
+                <div style="display:flex;gap:10px;align-items:flex-start">
+                  <div style="width:8px;height:8px;border-radius:50%;background:var(--orange);margin-top:4px;flex-shrink:0"></div>
+                  <div><div style="font-size:13px;font-weight:600">WA账号扩张</div><div style="font-size:11px;color:var(--muted)">42→70个，季度新增20个稳定账号</div></div>
+                </div>
+                <div style="display:flex;gap:10px;align-items:flex-start">
+                  <div style="width:8px;height:8px;border-radius:50%;background:var(--orange);margin-top:4px;flex-shrink:0"></div>
+                  <div><div style="font-size:13px;font-weight:600">自拓客户恢复</div><div style="font-size:11px;color:var(--muted)">月新增400，社媒5000万播放量</div></div>
+                </div>
+                <div style="display:flex;gap:10px;align-items:flex-start">
+                  <div style="width:8px;height:8px;border-radius:50%;background:var(--border2);margin-top:4px;flex-shrink:0"></div>
+                  <div><div style="font-size:13px;font-weight:600;color:var(--muted)">万粉IP账号孵化</div><div style="font-size:11px;color:var(--muted2)">新增1个万粉标杆账号</div></div>
+                </div>
+                <div style="display:flex;gap:10px;align-items:flex-start">
+                  <div style="width:8px;height:8px;border-radius:50%;background:var(--border2);margin-top:4px;flex-shrink:0"></div>
+                  <div><div style="font-size:13px;font-weight:600;color:var(--muted)">1+5团队架构完成</div><div style="font-size:11px;color:var(--muted2)">新增2合格人力，新人月产10万</div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div><!-- /year-q2 -->
 
       <!-- ─ 月度累计 ─ -->
       <div id="year-detail" class="sec-panel">
