@@ -668,6 +668,7 @@ function logout(){ localStorage.removeItem('pdca_session'); window.location.href
     <nav class="left-nav">
       <div class="nav-lbl">年视图</div>
       <div class="nav-item active" onclick="showSec('year-target',this)"><span class="nav-icon">🎯</span>年度目标</div>
+      <div class="nav-item" onclick="showSec('year-q2',this)"><span class="nav-icon">🗓️</span>Q2 计划</div>
       <div class="nav-item" onclick="showSec('year-members',this)"><span class="nav-icon">👥</span>成员明细</div>
       <div class="nav-divider"></div>
       <a href="https://admin.vertu.cn/odoo/sales" target="_blank" class="nav-item nav-ext"><span class="nav-icon">🔗</span>Odoo</a>
@@ -789,6 +790,161 @@ function logout(){ localStorage.removeItem('pdca_session'); window.location.href
           </div><!-- /right -->
         </div><!-- /sec-grid -->
       </div><!-- /year-target -->
+
+
+      <!-- ─ Q2 计划 ─ -->
+      <div id="year-q2" class="sec-panel">
+        <div style="padding:24px">
+
+          <!-- 策略横幅 -->
+          <div style="background:linear-gradient(135deg,#1d4ed8 0%,#2563eb 60%,#3b82f6 100%);border-radius:10px;padding:20px 24px;color:#fff;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between">
+            <div>
+              <div style="font-size:11px;opacity:.75;font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px">2026 Q2 · 4–6月 团队计划</div>
+              <div style="font-size:20px;font-weight:700;margin-bottom:6px">稳人产 · 强自拓 · 建体系</div>
+              <div style="font-size:13px;opacity:.85">本组 Q2 销售目标 410万 · 人均月产 20万稳定</div>
+            </div>
+            <div style="text-align:right;flex-shrink:0">
+              <div style="font-size:36px;font-weight:800;line-height:1">410<span style="font-size:16px;font-weight:400;opacity:.8">万</span></div>
+              <div style="font-size:11px;opacity:.7;margin-top:4px">Q2 组目标</div>
+            </div>
+          </div>
+
+          <!-- 核心指标卡 -->
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px">
+            <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px">
+              <div style="font-size:11px;color:var(--muted);font-weight:600;letter-spacing:.05em;text-transform:uppercase;margin-bottom:8px">人均月产</div>
+              <div style="font-size:26px;font-weight:700;color:var(--blue)">20<span style="font-size:13px;font-weight:400;color:var(--muted)">万</span></div>
+              <div style="font-size:11px;color:var(--muted);margin-top:4px">Q2末稳定达标</div>
+              <div style="margin-top:8px;height:4px;background:var(--bg2);border-radius:2px"><div style="height:4px;background:var(--blue);border-radius:2px;width:30%"></div></div>
+              <div style="font-size:10px;color:var(--muted2);margin-top:3px">当前均 ~6万 → 目标20万</div>
+            </div>
+            <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px">
+              <div style="font-size:11px;color:var(--muted);font-weight:600;letter-spacing:.05em;text-transform:uppercase;margin-bottom:8px">新人消化</div>
+              <div style="font-size:26px;font-weight:700;color:var(--green)">10<span style="font-size:13px;font-weight:400;color:var(--muted)">万</span></div>
+              <div style="font-size:11px;color:var(--muted);margin-top:4px">第3月新人人产目标</div>
+              <div style="margin-top:8px;font-size:11px;padding:3px 8px;background:var(--green-bg);color:var(--green);border-radius:10px;display:inline-block">标准消化体系</div>
+            </div>
+            <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px">
+              <div style="font-size:11px;color:var(--muted);font-weight:600;letter-spacing:.05em;text-transform:uppercase;margin-bottom:8px">月度自拓客</div>
+              <div style="font-size:26px;font-weight:700;color:var(--orange)">200<span style="font-size:13px;font-weight:400;color:var(--muted)">客</span></div>
+              <div style="font-size:11px;color:var(--muted);margin-top:4px">部门400 · 本组承担一半</div>
+              <div style="margin-top:8px;font-size:11px;padding:3px 8px;background:var(--orange-bg);color:var(--orange);border-radius:10px;display:inline-block">月均 40客/人</div>
+            </div>
+            <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px">
+              <div style="font-size:11px;color:var(--muted);font-weight:600;letter-spacing:.05em;text-transform:uppercase;margin-bottom:8px">自拓业绩</div>
+              <div style="font-size:26px;font-weight:700;color:var(--purple)">15<span style="font-size:13px;font-weight:400;color:var(--muted)">万</span></div>
+              <div style="font-size:11px;color:var(--muted);margin-top:4px">部门30万 · 本组目标</div>
+              <div style="margin-top:8px;font-size:11px;padding:3px 8px;background:var(--purple-bg);color:var(--purple);border-radius:10px;display:inline-block">月度考核项</div>
+            </div>
+          </div>
+
+          <!-- OKR 分解 -->
+          <div style="display:grid;grid-template-columns:1fr 320px;gap:16px">
+            <div>
+              <div class="section-label" style="margin-bottom:12px">
+                <div class="step-badge" style="background:var(--blue);color:#fff">Q2</div>
+                <div class="step-name">团队 Q2 OKR 分解<span class="step-sub">4月 → 6月关键行动</span></div>
+              </div>
+              <div class="card card-sm" style="padding:0;overflow:hidden">
+                <table class="month-table">
+                  <thead>
+                    <tr><th>目标方向</th><th>具体指标</th><th>4月</th><th>5月</th><th>6月</th><th>状态</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td style="font-weight:600">人产稳定</td>
+                      <td>全员均达20万/月</td>
+                      <td style="color:var(--orange)">12万</td>
+                      <td style="color:var(--blue)">16万</td>
+                      <td style="color:var(--muted)">20万</td>
+                      <td><span class="tag blue">进行中</span></td>
+                    </tr>
+                    <tr>
+                      <td style="font-weight:600">新人消化</td>
+                      <td>第3月人产≥10万</td>
+                      <td style="color:var(--muted2)">—</td>
+                      <td style="color:var(--muted2)">—</td>
+                      <td style="color:var(--green)">达标</td>
+                      <td><span class="tag" style="background:var(--bg2);color:var(--muted)">待验证</span></td>
+                    </tr>
+                    <tr>
+                      <td style="font-weight:600">自拓获客</td>
+                      <td>月自拓200客 · 业绩15万</td>
+                      <td style="color:var(--orange)">150客</td>
+                      <td style="color:var(--blue)">180客</td>
+                      <td style="color:var(--muted)">200客</td>
+                      <td><span class="tag blue">进行中</span></td>
+                    </tr>
+                    <tr>
+                      <td style="font-weight:600">WA 扩容</td>
+                      <td>组内月新增客 1500</td>
+                      <td style="color:var(--orange)">800</td>
+                      <td style="color:var(--blue)">1200</td>
+                      <td style="color:var(--muted)">1500</td>
+                      <td><span class="tag blue">进行中</span></td>
+                    </tr>
+                    <tr>
+                      <td style="font-weight:600">社媒引流</td>
+                      <td>组内月播放量 2500万</td>
+                      <td style="color:var(--orange)">1200万</td>
+                      <td style="color:var(--blue)">1800万</td>
+                      <td style="color:var(--muted)">2500万</td>
+                      <td><span class="tag blue">进行中</span></td>
+                    </tr>
+                    <tr>
+                      <td style="font-weight:600">异常处置</td>
+                      <td>毛涵人产归队至15万</td>
+                      <td style="color:var(--red)">4.8万</td>
+                      <td style="color:var(--orange)">8万</td>
+                      <td style="color:var(--muted)">15万</td>
+                      <td><span class="tag red">重点跟进</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- 右侧：Q2关键里程碑 + 风险提示 -->
+            <div style="display:flex;flex-direction:column;gap:14px">
+              <div class="card card-sm">
+                <div class="card-title">Q2 关键里程碑</div>
+                <div style="display:flex;flex-direction:column;gap:12px">
+                  <div style="display:flex;gap:10px;align-items:flex-start">
+                    <div style="width:8px;height:8px;border-radius:50%;background:var(--orange);margin-top:4px;flex-shrink:0"></div>
+                    <div><div style="font-size:13px;font-weight:600">4月底 · 人均12万</div><div style="font-size:11px;color:var(--muted)">全员每日触达 ≥ 50客户</div></div>
+                  </div>
+                  <div style="display:flex;gap:10px;align-items:flex-start">
+                    <div style="width:8px;height:8px;border-radius:50%;background:var(--blue);margin-top:4px;flex-shrink:0"></div>
+                    <div><div style="font-size:13px;font-weight:600">5月底 · 人均16万</div><div style="font-size:11px;color:var(--muted)">自拓体系跑通，首单率 ≥ 20%</div></div>
+                  </div>
+                  <div style="display:flex;gap:10px;align-items:flex-start">
+                    <div style="width:8px;height:8px;border-radius:50%;background:var(--green);margin-top:4px;flex-shrink:0"></div>
+                    <div><div style="font-size:13px;font-weight:600">6月底 · 人均20万稳定</div><div style="font-size:11px;color:var(--muted)">新人第3月达10万 · 完成Q2消化</div></div>
+                  </div>
+                </div>
+              </div>
+              <div class="hermes-card">
+                <div class="hermes-header"><div class="hermes-icon">!</div><div class="hermes-title">Q2 核心风险</div></div>
+                <div class="hermes-body">毛涵当前人产 <b style="color:var(--red)">0万</b>，是Q2人产目标的最大缺口。<br><br>建议本周启动 1v1 辅导，明确4月底考核节点，同步告知总监。</div>
+                <div class="hermes-actions">
+                  <button class="hermes-btn primary" onclick="showToast('已制定毛涵辅导计划')">制定辅导计划</button>
+                  <button class="hermes-btn" onclick="showToast('已上报总监')">上报总监</button>
+                </div>
+              </div>
+              <div class="card card-sm" style="border-left:3px solid var(--blue)">
+                <div class="card-title" style="color:var(--blue)">1+5 标准架构要求</div>
+                <div style="font-size:12px;color:var(--muted);line-height:1.8">
+                  <div>· 主管（1）: 统筹 + 资源分配 + 辅导</div>
+                  <div>· 成员（5）: 各自 WA 号 × 14 账号</div>
+                  <div>· 满编人产: 5 × 20万 = <b style="color:var(--blue)">100万/月</b></div>
+                  <div>· 当前进度: 约 <b style="color:var(--orange)">55%</b>（5人均未达标）</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div><!-- /year-q2 -->
 
       <!-- ─ 成员明细 ─ -->
       <div id="year-members" class="sec-panel">
