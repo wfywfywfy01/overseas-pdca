@@ -364,16 +364,16 @@ function logout() {
       <div class="sec-grid">
         <div class="sec-stack">
           <div>
+            <div class="section-label"><div class="step-badge">C</div><div class="step-name">今日完成度<span class="step-sub">实时进度</span></div></div>
+            <div class="card card-sm"><div id="check-bars"></div></div>
+          </div>
+          <div>
             <div class="section-label"><div class="step-badge">今</div><div class="step-name">今日目标<span class="step-sub">2026-05-14</span></div></div>
             <div class="kpi-strip" id="kpi-strip"></div>
           </div>
           <div>
             <div class="section-label"><div class="step-badge">D</div><div class="step-name">今日 SOP<span class="step-sub">点击切换状态</span></div></div>
             <div class="sop-timeline" id="sop-list"></div>
-          </div>
-          <div>
-            <div class="section-label"><div class="step-badge">C</div><div class="step-name">今日完成度<span class="step-sub">实时进度</span></div></div>
-            <div class="card card-sm"><div id="check-bars"></div></div>
           </div>
         </div>
         <div class="sec-stack">
@@ -387,38 +387,21 @@ function logout() {
               <div class="tab" onclick="switchTab('rank','perf',this)">业绩排行</div>
             </div>
             <div id="rank-reach" class="tab-content active">
-              <div class="rank-list">
-                <div class="rank-item"><span class="rank-num top">1</span><span class="rank-name">陈玉霞</span><span class="rank-val">58</span></div>
-                <div class="rank-item"><span class="rank-num top">2</span><span class="rank-name">肖映</span><span class="rank-val">52</span></div>
-                <div class="rank-item me"><span class="rank-num">3</span><span class="rank-name">郑丽苹（我）</span><span class="rank-val">47</span></div>
-                <div class="rank-item"><span class="rank-num">4</span><span class="rank-name">许淋玲</span><span class="rank-val">44</span></div>
-                <div class="rank-item"><span class="rank-num">5</span><span class="rank-name">陈晓霜</span><span class="rank-val">39</span></div>
-              </div>
+              <div class="rank-list" id="rank-reach-list"></div>
             </div>
             <div id="rank-perf" class="tab-content">
-              <div class="rank-list">
-                <div class="rank-item"><span class="rank-num top">1</span><span class="rank-name">肖映</span><span class="rank-val">6.0万</span></div>
-                <div class="rank-item"><span class="rank-num top">2</span><span class="rank-name">陈玉霞</span><span class="rank-val">5.98万</span></div>
-                <div class="rank-item"><span class="rank-num">3</span><span class="rank-name">许淋玲</span><span class="rank-val">3.91万</span></div>
-                <div class="rank-item me"><span class="rank-num">4</span><span class="rank-name">郑丽苹（我）</span><span class="rank-val">3.48万</span></div>
-                <div class="rank-item"><span class="rank-num">5</span><span class="rank-name">陈晓霜</span><span class="rank-val">2.97万</span></div>
-              </div>
+              <div class="rank-list" id="rank-perf-list"></div>
             </div>
           </div>
           <div class="hermes-card">
             <div class="hermes-header"><div class="hermes-icon">H</div><div class="hermes-title">Hermes AI · 今日建议</div></div>
-            <div class="hermes-body">你本周私信达成率 <b>78%</b>，主要卡在 13:15–14:15 时段，该时段平均完成 <b>6 条</b>（目标 15）。<br><br>建议参考陈玉霞 05-08 日报的<b>关键词搜索法</b>，1 小时完成 52 条。预计提升本时段效率 +40%。</div>
+            <div class="hermes-body" id="hermes-day-body"></div>
             <div class="hermes-actions">
               <button class="btn-sm" onclick="showToast('已打开参考案例')">查看案例</button>
               <button class="btn-sm" onclick="showToast('已标记已读')">已读</button>
             </div>
           </div>
-          <div class="card card-sm">
-            <div class="card-title">昨日日报评分</div>
-            <div style="display:flex;align-items:baseline;gap:6px"><div style="font-size:28px;font-weight:700">78</div><div style="font-size:13px;color:var(--muted)">/100 · 合格</div></div>
-            <div style="margin-top:6px;font-size:12px;color:var(--muted)">较前日 +4 分 · 连续 3 天达标</div>
-            <div style="margin-top:10px;height:4px;background:var(--bg2);border-radius:2px;overflow:hidden"><div style="width:78%;height:100%;background:var(--green);border-radius:2px"></div></div>
-          </div>
+          <div class="card card-sm" id="score-card"></div>
         </div>
       </div>
     </div>
@@ -430,12 +413,7 @@ function logout() {
           <div>
             <div class="section-label"><div class="step-badge" style="background:var(--green)">WA</div><div class="step-name">WA 账号 &amp; 客户<span class="step-sub">账号状态 · 客户分类</span></div></div>
             <div style="display:flex;flex-direction:column;gap:12px">
-              <div class="wa-grid" id="wa-account-stats">
-                <div class="wa-stat ok"><div class="wa-stat-val">3</div><div class="wa-stat-label">WA 账号数</div></div>
-                <div class="wa-stat ok"><div class="wa-stat-val">3</div><div class="wa-stat-label">正常使用</div></div>
-                <div class="wa-stat"><div class="wa-stat-val">0</div><div class="wa-stat-label">被封/受限</div></div>
-                <div class="wa-stat"><div class="wa-stat-val">15</div><div class="wa-stat-label">本月被拉黑</div></div>
-              </div>
+              <div class="wa-grid" id="wa-account-stats"></div>
               <div class="card card-sm">
                 <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px">
                   <div style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em">WA客户分类</div>
@@ -710,33 +688,13 @@ function logout() {
             <!-- 月度进度环 -->
             <div class="card card-sm">
               <div class="card-title">月度完成率</div>
-              <div style="text-align:center;padding:12px 0">
-                <div style="position:relative;width:100px;height:100px;margin:0 auto">
-                  <svg viewBox="0 0 36 36" style="width:100%;height:100%;transform:rotate(-90deg)">
-                    <circle cx="18" cy="18" r="15.9" fill="none" stroke="var(--bg2)" stroke-width="3"/>
-                    <circle cx="18" cy="18" r="15.9" fill="none" stroke="var(--orange)" stroke-width="3"
-                      stroke-dasharray="33.6 66.4" stroke-linecap="round"/>
-                  </svg>
-                  <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
-                    <div style="font-size:20px;font-weight:700">33.6%</div>
-                    <div style="font-size:10px;color:var(--muted)">完成率</div>
-                  </div>
-                </div>
-                <div style="margin-top:12px;font-size:12px;color:var(--muted)">8.4万 / 25万</div>
-                <div style="margin-top:4px;font-size:12px;color:var(--red)">需加速 · 落后月均节奏 12%</div>
-              </div>
+              <div id="month-donut" style="text-align:center;padding:12px 0"></div>
             </div>
 
             <!-- 月度排行 -->
             <div class="card card-sm">
               <div class="card-title">本月排行（何川组）</div>
-              <div class="rank-list" id="rank-month-list">
-                <div class="rank-item"><span class="rank-num top">1</span><span class="rank-name">陈莉</span><span class="rank-val">9.2万</span></div>
-                <div class="rank-item me"><span class="rank-num">2</span><span class="rank-name">郑丽苹（我）</span><span class="rank-val">8.4万</span></div>
-                <div class="rank-item"><span class="rank-num">3</span><span class="rank-name">陈玉霞</span><span class="rank-val">7.8万</span></div>
-                <div class="rank-item"><span class="rank-num">4</span><span class="rank-name">刘佳鑫</span><span class="rank-val">7.6万</span></div>
-                <div class="rank-item"><span class="rank-num">5</span><span class="rank-name" style="color:var(--red)">毛涵</span><span class="rank-val" style="color:var(--red)">4.8万</span></div>
-              </div>
+              <div class="rank-list" id="rank-month-list"></div>
             </div>
 
             <!-- SOP月度达标率 -->
@@ -1235,12 +1193,89 @@ function logout() {
 
 <script>
 // ===== USER REGISTRY =====
+// ── 统一数据源，与 pdca-manager.html STAFF 保持同步 ─────────────
 const ALL_USERS = {
-  12865: {name:'陈莉',   av:'陈', team:'何川组', todayDone:1.40, dayTarget:1.22, monthDone:11.2, monthTarget:25, rank:1},
-  12849: {name:'郑丽苹', av:'郑', team:'何川组', todayDone:0.48, dayTarget:1.19, monthDone:8.4,  monthTarget:25, rank:3},
-  12862: {name:'陈玉霞', av:'陈', team:'何川组', todayDone:0.56, dayTarget:1.22, monthDone:9.8,  monthTarget:22, rank:2},
-  12549: {name:'刘佳鑫', av:'刘', team:'何川组', todayDone:0.41, dayTarget:1.00, monthDone:8.3,  monthTarget:22, rank:4},
-  13431: {name:'毛涵',   av:'毛', team:'何川组', todayDone:0.00, dayTarget:0.90, monthDone:4.6,  monthTarget:20, rank:5},
+  12865:{name:'陈莉', av:'陈', team:'何川组',
+    todayDone:1.40, dayTarget:1.22, monthDone:11.2, monthTarget:25, rank:1,
+    score:88, warn:false,
+    wa:{total:3, ok:3, blocked:0, banned:0}, old_clients:45,
+    pipeline:{s:2,a:4,b:5,c:8,d:12},
+    reach_pct:95, msg_pct:92, social_pct:100,
+    year:{q1:62, target:347},
+    social:[
+      {platform:'INS',    icon:'📸', color:'var(--purple)', month_target:14, month_done:12, today_done:2, engagement:{likes:410,views:9800,comments:33}},
+      {platform:'TikTok', icon:'🎵', color:'#111827',       month_target:12, month_done:9,  today_done:2, engagement:{likes:980,views:41000,comments:72}},
+      {platform:'YouTube',icon:'▶',  color:'var(--red)',     month_target:6,  month_done:4,  today_done:1, engagement:{likes:110,views:4200,comments:18}},
+    ],
+    intents:[
+      {client:'Ahmed R.',  stage:'S', amount:'¥3.8万', due:'今日 18:00', note:'付款截止提醒，需发付款链接'},
+      {client:'Liu M.',    stage:'A', amount:'¥1.2万', due:'明日',       note:'确认发货地址后下单'},
+      {client:'Park K.',   stage:'B', amount:'¥2.1万', due:'本周内',     note:'等待客户与家人商量'},
+    ]},
+  12849:{name:'郑丽苹', av:'郑', team:'何川组',
+    todayDone:0.48, dayTarget:1.19, monthDone:8.4, monthTarget:25, rank:3,
+    score:85, warn:false,
+    wa:{total:3, ok:3, blocked:0, banned:0}, old_clients:38,
+    pipeline:{s:1,a:2,b:4,c:6,d:10},
+    reach_pct:84, msg_pct:80, social_pct:100,
+    year:{q1:54, target:347},
+    social:[
+      {platform:'INS',    icon:'📸', color:'var(--purple)', month_target:14, month_done:9,  today_done:2, engagement:{likes:320,views:7800,comments:25}},
+      {platform:'TikTok', icon:'🎵', color:'#111827',       month_target:12, month_done:7,  today_done:1, engagement:{likes:1240,views:52000,comments:89}},
+      {platform:'YouTube',icon:'▶',  color:'var(--red)',     month_target:6,  month_done:3,  today_done:0, engagement:{likes:87,views:3100,comments:12}},
+    ],
+    intents:[
+      {client:'Fatima K.', stage:'A', amount:'¥2.1万', due:'今日 20:00', note:'确认型号颜色，准备好合同'},
+      {client:'James L.',  stage:'B', amount:'¥1.5万', due:'明日',       note:'发送产品图册后跟进'},
+    ]},
+  12862:{name:'陈玉霞', av:'陈', team:'何川组',
+    todayDone:0.38, dayTarget:1.22, monthDone:9.8, monthTarget:22, rank:2,
+    score:91, warn:false,
+    wa:{total:3, ok:3, blocked:0, banned:0}, old_clients:52,
+    pipeline:{s:3,a:4,b:6,c:9,d:14},
+    reach_pct:96, msg_pct:95, social_pct:100,
+    year:{q1:58, target:347},
+    social:[
+      {platform:'INS',    icon:'📸', color:'var(--purple)', month_target:12, month_done:11, today_done:2, engagement:{likes:580,views:14200,comments:47}},
+      {platform:'TikTok', icon:'🎵', color:'#111827',       month_target:10, month_done:8,  today_done:2, engagement:{likes:1680,views:68000,comments:114}},
+      {platform:'YouTube',icon:'▶',  color:'var(--red)',     month_target:5,  month_done:4,  today_done:1, engagement:{likes:130,views:5800,comments:21}},
+    ],
+    intents:[
+      {client:'Sarah L.',  stage:'S', amount:'¥2.3万', due:'今日 15:00', note:'确认配色尺寸，立即发货'},
+      {client:'Ravi P.',   stage:'A', amount:'¥1.8万', due:'今日 17:00', note:'视频通话产品演示'},
+      {client:'Nora W.',   stage:'B', amount:'¥3.2万', due:'明日',       note:'等待转账确认'},
+    ]},
+  12549:{name:'刘佳鑫', av:'刘', team:'何川组',
+    todayDone:0.41, dayTarget:1.00, monthDone:8.3, monthTarget:22, rank:4,
+    score:82, warn:false,
+    wa:{total:3, ok:2, blocked:1, banned:0}, old_clients:31,
+    pipeline:{s:1,a:2,b:3,c:5,d:8},
+    reach_pct:86, msg_pct:83, social_pct:100,
+    year:{q1:21, target:320},
+    social:[
+      {platform:'INS',    icon:'📸', color:'var(--purple)', month_target:12, month_done:8,  today_done:1, engagement:{likes:240,views:5600,comments:19}},
+      {platform:'TikTok', icon:'🎵', color:'#111827',       month_target:8,  month_done:5,  today_done:1, engagement:{likes:760,views:29000,comments:54}},
+      {platform:'YouTube',icon:'▶',  color:'var(--red)',     month_target:4,  month_done:2,  today_done:0, engagement:{likes:64,views:2400,comments:9}},
+    ],
+    intents:[
+      {client:'Chen B.',   stage:'A', amount:'¥1.6万', due:'今日',   note:'跟进报价，等待回复'},
+      {client:'Wei T.',    stage:'C', amount:'¥0.8万', due:'本周',   note:'初步意向，需要持续跟进'},
+    ]},
+  13431:{name:'毛涵', av:'毛', team:'何川组',
+    todayDone:0.00, dayTarget:0.90, monthDone:4.6, monthTarget:20, rank:5,
+    score:61, warn:true,
+    wa:{total:3, ok:1, blocked:1, banned:1}, old_clients:18,
+    pipeline:{s:0,a:1,b:2,c:3,d:5},
+    reach_pct:51, msg_pct:42, social_pct:50,
+    year:{q1:10, target:234},
+    social:[
+      {platform:'INS',    icon:'📸', color:'var(--purple)', month_target:12, month_done:3,  today_done:1, engagement:{likes:98,views:2100,comments:8}},
+      {platform:'TikTok', icon:'🎵', color:'#111827',       month_target:8,  month_done:2,  today_done:0, engagement:{likes:310,views:11000,comments:22}},
+      {platform:'YouTube',icon:'▶',  color:'var(--red)',     month_target:4,  month_done:1,  today_done:0, engagement:{likes:28,views:890,comments:4}},
+    ],
+    intents:[
+      {client:'Ong L.',    stage:'B', amount:'¥1.1万', due:'本周',   note:'等待客户回复，需要主动跟进'},
+    ]},
 };
 const _sess = JSON.parse(localStorage.getItem('pdca_session') || 'null');
 const _urlUid = parseInt(new URLSearchParams(location.search).get('uid') || 0);
@@ -1273,19 +1308,24 @@ const SOP_DATA = [
    kpis:[]},
 ];
 
+// CHECK_DATA derived from ME (社媒发帖 per-user from STAFF data)
+const _insDone  = (ME.social||[]).find(s=>s.platform==='INS')?.today_done ?? 2;
+const _tkDone   = (ME.social||[]).find(s=>s.platform==='TikTok')?.today_done ?? 1;
+const _ytDone   = (ME.social||[]).find(s=>s.platform==='YouTube')?.today_done ?? 0;
+const _reach    = Math.round(ME.reach_pct * 0.5); // 50条基数估算
 const CHECK_DATA = [
-  {label:'三方私信', cur:32, max:40},
-  {label:'ins 发帖', cur:3, max:3},
-  {label:'TK 发帖', cur:2, max:3},
-  {label:'YT 发帖', cur:3, max:3},
-  {label:'触达总计', cur:42, max:50},
-  {label:'└ S 类', cur:10, max:10, indent:true},
-  {label:'└ AB 类', cur:8, max:10, indent:true},
-  {label:'└ 老客户', cur:18, max:20, indent:true},
-  {label:'└ 自拓', cur:6, max:10, indent:true},
-  {label:'老客添加', cur:9, max:10},
-  {label:'邮件触达', cur:170, max:200},
-  {label:'WA 动态', cur:3, max:3},
+  {label:'三方私信', cur:Math.round(ME.msg_pct * 0.4), max:40},
+  {label:'ins 发帖', cur:_insDone, max:2},
+  {label:'TK 发帖',  cur:_tkDone,  max:2},
+  {label:'YT 发帖',  cur:_ytDone,  max:1},
+  {label:'触达总计', cur:_reach, max:50},
+  {label:'└ S 类',   cur:ME.pipeline.s, max:Math.max(ME.pipeline.s,5), indent:true},
+  {label:'└ AB 类',  cur:ME.pipeline.a+ME.pipeline.b, max:Math.max(ME.pipeline.a+ME.pipeline.b,10), indent:true},
+  {label:'└ 老客户', cur:Math.round(ME.old_clients*0.4), max:Math.round(ME.old_clients*0.44), indent:true},
+  {label:'└ 自拓',   cur:_insDone+_tkDone+_ytDone, max:5, indent:true},
+  {label:'老客添加', cur:Math.round(ME.old_clients*0.2), max:10},
+  {label:'邮件触达', cur:Math.round(ME.msg_pct*2), max:200},
+  {label:'WA 动态',  cur:ME.wa.ok, max:ME.wa.total},
 ];
 
 const _dM   = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate();
@@ -1756,7 +1796,14 @@ async function loadYearData() {
 
 // ===== INTENT CUSTOMERS DATA =====
 // 实际数据应来自 Odoo CRM / VPS 意向客户系统
-const INTENT_DATA = [
+// ── SOCIAL_DATA and INTENT_DATA: per-user from ME ───────────────
+const SOCIAL_DATA = ME.social || [];
+
+// Simple intent cards (from ME) — replaces generic hardcoded list below
+const INTENT_DATA_SIMPLE = (ME.intents || []).map((t,i) => ({...t, id:i+1}));
+
+// Rich intent data (kept for default user 郑丽苹) ─────────────────
+const _RICH_INTENTS = [
   {
     id:1, name:'Sarah L.', country:'🇺🇸 美国', level:'hot',
     amount: 3200, currency:'USD', cny: 23040,
@@ -1810,73 +1857,79 @@ const INTENT_DATA = [
   },
 ];
 
-// ===== SOCIAL MEDIA DATA =====
-const SOCIAL_DATA = [
-  {
-    platform:'INS', icon:'📸',
-    month_target:12, month_done:7,
-    today_done:1,
-    engagement:{likes:342, views:8200, comments:28},
-    color:'var(--purple)',
-  },
-  {
-    platform:'TikTok', icon:'🎵',
-    month_target:20, month_done:11,
-    today_done:1,
-    engagement:{likes:1240, views:52000, comments:89},
-    color:'#111827',
-  },
-  {
-    platform:'YouTube', icon:'▶',
-    month_target:4, month_done:2,
-    today_done:0,
-    engagement:{likes:87, views:3100, comments:12},
-    color:'var(--red)',
-  },
-];
+// INTENT_DATA: use per-user simplified intents; fallback to rich data for default user
+const INTENT_DATA = INTENT_DATA_SIMPLE.length ? INTENT_DATA_SIMPLE : _RICH_INTENTS;
 
 // ===== RENDER INTENT CUSTOMERS =====
 function renderIntentList() {
   const el = document.getElementById('intent-list');
   if (!el) return;
-  const totalCNY = INTENT_DATA.reduce((s,i)=>s+i.cny,0);
-  const ta = document.getElementById('intent-total-amount');
-  if (ta) ta.textContent = '¥' + totalCNY.toLocaleString();
   const tt = document.getElementById('intent-total');
   if (tt) tt.textContent = INTENT_DATA.length;
 
-  el.innerHTML = INTENT_DATA.map(c => {
-    const levelLabel = c.level==='hot'?'🔴 热意向':c.level==='warm'?'🟡 温意向':'🔵 冷意向';
-    return `<div class="intent-item ${c.level}" onclick="openChat(${c.id})">
-      <div class="intent-head">
-        <div class="intent-name">${c.name} <span style="font-size:11px;color:var(--muted)">${c.country}</span></div>
-        <div class="intent-amount">${c.currency} ${c.amount.toLocaleString()}</div>
-        <span class="tag" style="font-size:10px">${levelLabel}</span>
-      </div>
-      <div class="intent-meta">
-        <span>预计成交 ${c.predict_date}</span>
-        <span>WA ${c.wa}</span>
-      </div>
-      <div class="intent-last">${c.last_note}</div>
-      <div class="intent-remind">⏰ 下次跟进：${c.next_followup}</div>
-    </div>`;
-  }).join('');
+  // Support both rich format (cny) and simple format (amount string, due, note)
+  if (INTENT_DATA[0] && INTENT_DATA[0].cny !== undefined) {
+    // Rich format (default user 郑丽苹)
+    const totalCNY = INTENT_DATA.reduce((s,i)=>s+i.cny,0);
+    const ta = document.getElementById('intent-total-amount');
+    if (ta) ta.textContent = '¥' + totalCNY.toLocaleString();
+    el.innerHTML = INTENT_DATA.map(c => {
+      const levelLabel = c.level==='hot'?'🔴 热意向':c.level==='warm'?'🟡 温意向':'🔵 冷意向';
+      return `<div class="intent-item ${c.level}" onclick="openChat(${c.id})" style="cursor:pointer">
+        <div class="intent-head">
+          <div class="intent-name">${c.name} <span style="font-size:11px;color:var(--muted)">${c.country}</span></div>
+          <div class="intent-amount">${c.currency} ${c.amount.toLocaleString()}</div>
+          <span class="tag" style="font-size:10px">${levelLabel}</span>
+        </div>
+        <div class="intent-meta"><span>预计成交 ${c.predict_date}</span><span>WA ${c.wa}</span></div>
+        <div class="intent-last">${c.last_note}</div>
+        <div class="intent-remind">⏰ 下次跟进：${c.next_followup}</div>
+      </div>`;
+    }).join('');
+  } else {
+    // Simple format (per-user from ME.intents)
+    const stageColor = {S:'var(--red)',A:'var(--blue)',B:'var(--text)',C:'var(--muted)',D:'var(--muted2)'};
+    const stageCls   = {S:'red',A:'blue',B:'',C:'',D:''};
+    el.innerHTML = INTENT_DATA.map(c => {
+      return `<div class="intent-item" style="cursor:pointer;padding:12px;border-radius:var(--radius);border:1px solid var(--border);background:var(--card)">
+        <div class="intent-head">
+          <div class="intent-name" style="font-weight:600">${c.client}</div>
+          <div class="intent-amount" style="font-weight:700;color:${stageColor[c.stage]||'var(--text)'}">${c.amount}</div>
+          <span class="tag ${stageCls[c.stage]||''}" style="font-size:10px;font-weight:700">${c.stage}类</span>
+        </div>
+        <div class="intent-meta" style="margin-top:6px">
+          <span style="color:var(--muted);font-size:12px">⏰ ${c.due}</span>
+        </div>
+        <div class="intent-last" style="font-size:12px;color:var(--muted);margin-top:4px">${c.note}</div>
+      </div>`;
+    }).join('');
+    const ta = document.getElementById('intent-total-amount');
+    if (ta) ta.textContent = INTENT_DATA.length + ' 个';
+  }
 }
 
 // ===== RENDER INTENT REMINDERS (right sidebar) =====
 function renderIntentReminders() {
   const el = document.getElementById('intent-reminders');
   if (!el) return;
-  const today = INTENT_DATA.filter(c => c.next_followup.includes('今日') || c.next_followup.includes('明日'));
+  // Handle both rich format (next_followup) and simple format (due)
+  const today = INTENT_DATA.filter(c =>
+    (c.next_followup||c.due||'').includes('今日') || (c.next_followup||c.due||'').includes('明日')
+  );
   if (!today.length) { el.innerHTML = '<div style="font-size:12px;color:var(--muted)">今日无待跟进意向客户 ✓</div>'; return; }
-  el.innerHTML = today.map(c => `
-    <div style="padding:9px 10px;border:1px solid var(--${c.level==='hot'?'red':'orange'}-border);border-radius:var(--radius);background:var(--${c.level==='hot'?'red':'orange'}-bg);cursor:pointer" onclick="openChat(${c.id})">
+  el.innerHTML = today.map(c => {
+    const isHot = c.stage === 'S' || c.level === 'hot';
+    const nameStr = c.name || c.client;
+    const amtStr  = c.cny ? `¥${(c.cny/10000).toFixed(1)}万` : (c.amount||'');
+    const dueStr  = c.next_followup || c.due;
+    return `<div style="padding:9px 10px;border:1px solid var(--${isHot?'red':'orange'}-border);border-radius:var(--radius);background:var(--${isHot?'red':'orange'}-bg)">
       <div style="display:flex;justify-content:space-between;margin-bottom:2px">
-        <span style="font-size:13px;font-weight:600">${c.name}</span>
-        <span style="font-size:12px;font-weight:600;color:var(--green)">${c.currency} ${c.amount.toLocaleString()}</span>
+        <span style="font-size:13px;font-weight:600">${nameStr}</span>
+        <span style="font-size:12px;font-weight:600;color:var(--green)">${amtStr}</span>
       </div>
-      <div style="font-size:11px;color:var(--muted)">⏰ ${c.next_followup}</div>
-    </div>`).join('');
+      <div style="font-size:11px;color:var(--muted)">⏰ ${dueStr}</div>
+    </div>`;
+  }).join('');
 }
 
 // ===== RENDER SOCIAL MEDIA =====
@@ -1970,6 +2023,121 @@ function closeChat() { document.getElementById('chat-modal').classList.remove('o
       <div class="kc-sub">共 5 人 · 本月实时</div>
       <div class="kc-prog"><div class="kc-fill" style="width:${Math.round((6-ME.rank)/5*100)}%;background:var(--green)"></div></div>
     </div>`;
+})();
+
+// ── Per-user month rank list ─────────────────────────────────────
+(function(){
+  const el = document.getElementById('rank-month-list');
+  if (!el) return;
+  const sorted = Object.entries(ALL_USERS)
+    .map(([uid, u]) => ({...u, uid:+uid}))
+    .sort((a, b) => b.monthDone - a.monthDone);
+  const medals = ['🥇','🥈','🥉'];
+  el.innerHTML = sorted.map((u, i) => {
+    const isMe = u.uid === CURRENT_USER_ID;
+    const isLast = u.monthDone < 5;
+    return `<div class="rank-item${isMe?' me':''}">
+      <span class="rank-num${i<2?' top':''}">${medals[i]||i+1}</span>
+      <span class="rank-name" style="${isLast?'color:var(--red)':''}">${u.name}${isMe?' (我)':''}</span>
+      <span class="rank-val" style="${isLast?'color:var(--red)':''}">${u.monthDone}万</span>
+    </div>`;
+  }).join('');
+})();
+
+// ── Month donut (computed from ME) ───────────────────────────────
+(function(){
+  const el = document.getElementById('month-donut');
+  if (!el) return;
+  const pct  = _mPct;
+  const now  = new Date();
+  const daysIn = new Date(now.getFullYear(), now.getMonth()+1, 0).getDate();
+  const pace = Math.round(now.getDate()/daysIn*100);
+  const lag  = pace - pct;
+  el.innerHTML = `
+    <div style="position:relative;width:100px;height:100px;margin:0 auto">
+      <svg viewBox="0 0 36 36" style="width:100%;height:100%;transform:rotate(-90deg)">
+        <circle cx="18" cy="18" r="15.9" fill="none" stroke="var(--bg2)" stroke-width="3"/>
+        <circle cx="18" cy="18" r="15.9" fill="none" stroke="var(--orange)" stroke-width="3"
+          stroke-dasharray="${pct} ${100-pct}" stroke-linecap="round"/>
+      </svg>
+      <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
+        <div style="font-size:20px;font-weight:700">${pct}%</div>
+        <div style="font-size:10px;color:var(--muted)">完成率</div>
+      </div>
+    </div>
+    <div style="margin-top:12px;font-size:12px;color:var(--muted)">${ME.monthDone}万 / ${ME.monthTarget}万</div>
+    <div style="margin-top:4px;font-size:12px;color:var(--red)">需加速 · 落后月均节奏 ${lag}%</div>`;
+})();
+
+// ── Day rank lists (touch/reach + perf) ─────────────────────────
+(function(){
+  const allUsers = Object.entries(ALL_USERS).map(([uid, u]) => ({...u, uid:+uid}));
+
+  // 触达排行: sort by reach_pct desc
+  const byReach = [...allUsers].sort((a,b) => b.reach_pct - a.reach_pct);
+  const reachEl = document.getElementById('rank-reach-list');
+  if (reachEl) reachEl.innerHTML = byReach.map((u,i) => {
+    const isMe = u.uid === CURRENT_USER_ID;
+    return `<div class="rank-item${isMe?' me':''}">
+      <span class="rank-num${i<2?' top':''}">${i+1}</span>
+      <span class="rank-name">${u.name}${isMe?' (我)':''}</span>
+      <span class="rank-val">${u.reach_pct}</span>
+    </div>`;
+  }).join('');
+
+  // 业绩排行: sort by todayDone desc
+  const byPerf = [...allUsers].sort((a,b) => b.todayDone - a.todayDone);
+  const perfEl = document.getElementById('rank-perf-list');
+  if (perfEl) perfEl.innerHTML = byPerf.map((u,i) => {
+    const isMe = u.uid === CURRENT_USER_ID;
+    return `<div class="rank-item${isMe?' me':''}">
+      <span class="rank-num${i<2?' top':''}">${i+1}</span>
+      <span class="rank-name">${u.name}${isMe?' (我)':''}</span>
+      <span class="rank-val">${u.todayDone}万</span>
+    </div>`;
+  }).join('');
+})();
+
+// ── Hermes AI day advice (per-user) ─────────────────────────────
+(function(){
+  const el = document.getElementById('hermes-day-body');
+  if (!el) return;
+  const msgPct = ME.msg_pct;
+  const scoreLabel = ME.score >= 85 ? '优秀' : ME.score >= 70 ? '良好' : '需改进';
+  el.innerHTML = `你本周私信达成率 <b>${msgPct}%</b>，昨日日报评分 <b>${ME.score} 分</b>（${scoreLabel}）。<br><br>当前触达进度 ${ME.reach_pct}%，S/A 类意向 <b>${ME.pipeline.s + ME.pipeline.a} 个</b>，建议今日优先推进高意向客户确认付款节点。`;
+})();
+
+// ── 昨日日报评分 (per-user) ──────────────────────────────────────
+(function(){
+  const el = document.getElementById('score-card');
+  if (!el) return;
+  const sc = ME.score;
+  const label = sc >= 85 ? '优秀' : sc >= 70 ? '良好' : '需改进';
+  const color = sc >= 85 ? 'var(--green)' : sc >= 70 ? 'var(--orange)' : 'var(--red)';
+  el.innerHTML = `
+    <div class="card-title">昨日日报评分</div>
+    <div style="display:flex;align-items:baseline;gap:6px">
+      <div style="font-size:28px;font-weight:700;color:${color}">${sc}</div>
+      <div style="font-size:13px;color:var(--muted)">/100 · ${label}</div>
+    </div>
+    <div style="margin-top:10px;height:4px;background:var(--bg2);border-radius:2px;overflow:hidden">
+      <div style="width:${sc}%;height:100%;background:${color};border-radius:2px"></div>
+    </div>`;
+})();
+
+// ── WA 账号状态 KPI (per-user) ───────────────────────────────────
+(function(){
+  const el = document.getElementById('wa-account-stats');
+  if (!el) return;
+  const wa = ME.wa;
+  const restricted = wa.blocked + wa.banned;
+  const okCls  = wa.ok === wa.total ? 'ok' : 'warn';
+  const badCls = restricted > 0 ? 'bad' : '';
+  el.innerHTML = `
+    <div class="wa-stat ${okCls}"><div class="wa-stat-val">${wa.total}</div><div class="wa-stat-label">WA 账号数</div></div>
+    <div class="wa-stat ${okCls}"><div class="wa-stat-val">${wa.ok}</div><div class="wa-stat-label">正常使用</div></div>
+    <div class="wa-stat ${badCls}"><div class="wa-stat-val">${restricted}</div><div class="wa-stat-label">被封/受限</div></div>
+    <div class="wa-stat"><div class="wa-stat-val">${Math.round(ME.old_clients * 0.08)}</div><div class="wa-stat-label">本月被拉黑</div></div>`;
 })();
 
 renderKPI();

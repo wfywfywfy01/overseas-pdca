@@ -310,7 +310,6 @@ function logout(){ localStorage.removeItem('pdca_session'); window.location.href
       <div class="nav-lbl">日视图</div>
       <div class="nav-item active" onclick="showSec('day-snap',this)"><span class="nav-icon">📊</span>日快照</div>
       <div class="nav-item" onclick="showSec('day-intent',this)"><span class="nav-icon">🎯</span>意向 &amp; WA</div>
-      <div class="nav-item" onclick="showSec('day-anomaly',this)"><span class="nav-icon">⚠️</span>异常监控</div>
       <div class="nav-divider"></div>
       <a href="https://admin.vertu.cn/odoo/sales" target="_blank" class="nav-item nav-ext"><span class="nav-icon">🔗</span>Odoo</a>
     </nav>
@@ -320,6 +319,76 @@ function logout(){ localStorage.removeItem('pdca_session'); window.location.href
       <div id="day-snap" class="sec-panel active">
         <div class="sec-grid">
           <div class="sec-stack">
+            <!-- 昨日情况 / 今日待办 / 临时事项 -->
+            <div class="g3" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px">
+              <div class="card card-sm">
+                <div class="card-title" style="color:var(--muted)">📋 昨日情况</div>
+                <div style="display:flex;flex-direction:column;gap:7px;margin-top:4px">
+                  <div style="font-size:12px;padding:7px 9px;background:var(--orange-bg);border-radius:6px;border-left:3px solid var(--orange)">部门昨日完成 <b>3.8万</b>，节奏 39%，落后月均 6%</div>
+                  <div style="font-size:12px;padding:7px 9px;background:var(--bg2);border-radius:6px">向俞金组昨日 0.4万，已与主管沟通原因</div>
+                  <div style="font-size:12px;padding:7px 9px;background:var(--green-bg);border-radius:6px;border-left:3px solid var(--green)">夏欢组日报均分 81 · 优秀 ✓</div>
+                </div>
+              </div>
+              <div class="card card-sm">
+                <div class="card-title" style="color:var(--red)">🔴 今日待办</div>
+                <div style="display:flex;flex-direction:column;gap:7px;margin-top:4px">
+                  <div style="display:flex;align-items:flex-start;gap:8px;font-size:12px">
+                    <input type="checkbox" style="margin-top:2px;flex-shrink:0">
+                    <span>联系向俞金核实全组零业绩原因</span>
+                  </div>
+                  <div style="display:flex;align-items:flex-start;gap:8px;font-size:12px">
+                    <input type="checkbox" style="margin-top:2px;flex-shrink:0">
+                    <span>决策自动化触达升级方案（现象4）</span>
+                  </div>
+                  <div style="display:flex;align-items:flex-start;gap:8px;font-size:12px">
+                    <input type="checkbox" style="margin-top:2px;flex-shrink:0">
+                    <span>确认毛涵约谈结果 · 跟何川对齐</span>
+                  </div>
+                  <div style="display:flex;align-items:flex-start;gap:8px;font-size:12px">
+                    <input type="checkbox" style="margin-top:2px;flex-shrink:0">
+                    <span>审批本周 Q2 OKR 拆解文档</span>
+                  </div>
+                </div>
+              </div>
+              <div class="card card-sm">
+                <div class="card-title">🔵 临时事项</div>
+                <div style="display:flex;flex-direction:column;gap:7px;margin-top:4px">
+                  <div style="display:flex;align-items:flex-start;gap:8px;font-size:12px">
+                    <input type="checkbox" style="margin-top:2px;flex-shrink:0">
+                    <span>14:30 与品牌部确认新品发布节点</span>
+                  </div>
+                  <div style="display:flex;align-items:flex-start;gap:8px;font-size:12px">
+                    <input type="checkbox" style="margin-top:2px;flex-shrink:0">
+                    <span>回复运营总监关于 H2 预算拆解</span>
+                  </div>
+                  <div style="display:flex;align-items:flex-start;gap:8px;font-size:12px">
+                    <input type="checkbox" style="margin-top:2px;flex-shrink:0">
+                    <span>整理本月最佳案例发部门共享</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- 今日异常 -->
+            <div>
+              <div class="section-label">
+                <div class="step-badge warn">!</div>
+                <div class="step-name">今日部门异常<span class="step-sub">按优先级排序</span></div>
+              </div>
+              <div class="anomaly-list">
+                <div class="anomaly-item critical">
+                  <div class="an-title">🔴 向俞金组 · 今日全组业绩为零</div>
+                  <div class="an-desc">截至下午 14:00 全组 0 成单，触达严重低于基线（68/目标230），需总监直接联系向俞金介入</div>
+                </div>
+                <div class="anomaly-item critical">
+                  <div class="an-title">🔴 现象4 · 老客触达已超人工上限</div>
+                  <div class="an-desc">日人均触达 21人（上限 20），增长空间受限，自动化升级方案需本周决策</div>
+                </div>
+                <div class="anomaly-item">
+                  <div class="an-title">🟠 何川组 · 毛涵连续 4 天低分</div>
+                  <div class="an-desc">日报评分连续 &lt;70，私信量低于标准 40%，何川已安排约谈，请关注明日数据</div>
+                </div>
+              </div>
+            </div>
             <!-- 今日部门 KPI -->
             <div>
               <div class="section-label">
@@ -481,30 +550,6 @@ function logout(){ localStorage.removeItem('pdca_session'); window.location.href
         </div>
       </div><!-- /day-intent -->
 
-      <!-- ─ 异常监控 ─ -->
-      <div id="day-anomaly" class="sec-panel">
-        <div style="padding:24px;max-width:700px">
-          <div class="section-label">
-            <div class="step-badge warn">!</div>
-            <div class="step-name">今日部门异常<span class="step-sub">按优先级排序</span></div>
-          </div>
-          <div class="anomaly-list">
-            <div class="anomaly-item critical">
-              <div class="an-title">🔴 向俞金组 · 今日全组业绩为零</div>
-              <div class="an-desc">截至下午 14:00 全组 0 成单，触达严重低于基线（68/目标230），需总监直接联系向俞金介入</div>
-            </div>
-            <div class="anomaly-item critical">
-              <div class="an-title">🔴 现象4 · 老客触达已超人工上限</div>
-              <div class="an-desc">日人均触达 21人（上限 20），增长空间受限，自动化升级方案需本周决策</div>
-            </div>
-            <div class="anomaly-item">
-              <div class="an-title">🟠 何川组 · 毛涵连续 4 天低分</div>
-              <div class="an-desc">日报评分连续 &lt;70，私信量低于标准 40%，何川已安排约谈，请关注明日数据</div>
-            </div>
-          </div>
-        </div>
-      </div><!-- /day-anomaly -->
-
     </div><!-- /panels-area -->
   </div><!-- /outer-layout -->
 </div>
@@ -516,7 +561,6 @@ function logout(){ localStorage.removeItem('pdca_session'); window.location.href
       <div class="nav-lbl">月视图</div>
       <div class="nav-item active" onclick="showSec('month-kpi',this)"><span class="nav-icon">📊</span>月度 KPI</div>
       <div class="nav-item" onclick="showSec('month-wa',this)"><span class="nav-icon">📱</span>WA & 人产</div>
-      <div class="nav-item" onclick="showSec('month-source',this)"><span class="nav-icon">💰</span>来源&跨组</div>
       <div class="nav-divider"></div>
       <a href="https://admin.vertu.cn/odoo/sales" target="_blank" class="nav-item nav-ext"><span class="nav-icon">🔗</span>Odoo</a>
     </nav>
@@ -559,6 +603,68 @@ function logout(){ localStorage.removeItem('pdca_session'); window.location.href
                   <div class="gc-prog-track"><div class="gc-prog-fill" style="width:29%;background:var(--red)"></div></div>
                   <div style="font-size:12px;color:var(--red)">29.2% · 垫底 · 需重点介入</div>
                 </div>
+              </div>
+            </div>
+            <!-- 年度大节点本月拆解 -->
+            <div>
+              <div class="section-label"><div class="step-badge" style="background:#111827">节</div><div class="step-name">年度大节点本月进度<span class="step-sub">年度里程碑 → 月度拆解</span></div></div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+                <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:13px 14px;border-top:3px solid #0ea5e9">
+                  <div style="font-size:10px;font-weight:700;color:#0ea5e9;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">WA 私域总量</div>
+                  <div style="display:flex;align-items:baseline;gap:4px;margin-bottom:2px"><span style="font-size:20px;font-weight:700">+2,340</span><span style="font-size:11px;color:var(--muted)">人/月</span></div>
+                  <div style="font-size:11px;color:var(--muted);margin-bottom:6px">月新增目标 3,000人 · 年度终态 8万</div>
+                  <div style="height:4px;background:var(--bg2);border-radius:2px;margin-bottom:4px"><div style="height:4px;background:#0ea5e9;border-radius:2px;width:78%"></div></div>
+                  <div style="display:flex;justify-content:space-between;font-size:11px"><span style="color:var(--muted)">总量 ~5.8万</span><span style="color:#0ea5e9;font-weight:600">78% 月达成</span></div>
+                </div>
+                <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:13px 14px;border-top:3px solid var(--green)">
+                  <div style="font-size:10px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">日人均触达</div>
+                  <div style="display:flex;align-items:baseline;gap:4px;margin-bottom:2px"><span style="font-size:20px;font-weight:700">43.5</span><span style="font-size:11px;color:var(--muted)">客/天</span></div>
+                  <div style="font-size:11px;color:var(--muted);margin-bottom:6px">月均目标 80客/人/天 · 年度终态</div>
+                  <div style="height:4px;background:var(--bg2);border-radius:2px;margin-bottom:4px"><div style="height:4px;background:var(--orange);border-radius:2px;width:54%"></div></div>
+                  <div style="display:flex;justify-content:space-between;font-size:11px"><span style="color:var(--muted)">目标 80/天</span><span style="color:var(--orange);font-weight:600">54% 月达成</span></div>
+                </div>
+                <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:13px 14px;border-top:3px solid var(--blue)">
+                  <div style="font-size:10px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">私域人产</div>
+                  <div style="display:flex;align-items:baseline;gap:4px;margin-bottom:2px"><span style="font-size:20px;font-weight:700">7.04</span><span style="font-size:11px;color:var(--muted)">万/人</span></div>
+                  <div style="font-size:11px;color:var(--muted);margin-bottom:6px">月人产目标 20万 · 年度终态稳定</div>
+                  <div style="height:4px;background:var(--bg2);border-radius:2px;margin-bottom:4px"><div style="height:4px;background:var(--blue);border-radius:2px;width:35%"></div></div>
+                  <div style="display:flex;justify-content:space-between;font-size:11px"><span style="color:var(--muted)">目标 20万</span><span style="color:var(--orange);font-weight:600">35% 月达成</span></div>
+                </div>
+                <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:13px 14px;border-top:3px solid var(--orange)">
+                  <div style="font-size:10px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">自拓体系</div>
+                  <div style="display:flex;align-items:baseline;gap:4px;margin-bottom:2px"><span style="font-size:20px;font-weight:700">8</span><span style="font-size:11px;color:var(--muted)">个账号</span></div>
+                  <div style="font-size:11px;color:var(--muted);margin-bottom:6px">本月新增 +1 · 年度目标 10个</div>
+                  <div style="height:4px;background:var(--bg2);border-radius:2px;margin-bottom:4px"><div style="height:4px;background:var(--orange);border-radius:2px;width:80%"></div></div>
+                  <div style="display:flex;justify-content:space-between;font-size:11px"><span style="color:var(--muted)">目标 10个</span><span style="color:var(--orange);font-weight:600">80% 年达成</span></div>
+                </div>
+              </div>
+            </div>
+            <!-- 业绩来源 (from month-source) -->
+            <div>
+              <div class="section-label"><div class="step-badge dark">$</div><div class="step-name">部门业绩来源<span class="step-sub">守正 vs 增量</span></div></div>
+              <div class="card card-sm">
+                <div style="font-size:12px;color:var(--muted);margin-bottom:16px">本月已完成 <b style="color:var(--text)">98.6万</b> / 目标 305万 · <span style="color:var(--blue)">■ 守正</span> <span style="color:var(--purple);margin-left:6px">■ 增量</span></div>
+                <div class="source-row"><div class="source-label">官网当月询盘</div><div class="source-bar-wrap"><div class="source-track"><div style="display:flex;height:100%"><div class="source-fill-zz" style="width:50%"></div><div class="source-fill-zl" style="width:20%"></div></div></div><div class="source-nums"><span>守正 15.8万 + 增量 6.4万</span><span style="font-weight:600">27.2万 (28%)</span></div></div></div>
+                <div class="source-row"><div class="source-label">历史月线索</div><div class="source-bar-wrap"><div class="source-track"><div style="display:flex;height:100%"><div class="source-fill-zz" style="width:62%"></div><div class="source-fill-zl" style="width:18%"></div></div></div><div class="source-nums"><span>守正 22.1万 + 增量 9.3万</span><span style="font-weight:600">31.4万 (32%)</span></div></div></div>
+                <div class="source-row"><div class="source-label">自拓流量</div><div class="source-bar-wrap"><div class="source-track"><div style="display:flex;height:100%"><div class="source-fill-zz" style="width:30%"></div><div class="source-fill-zl" style="width:12%"></div></div></div><div class="source-nums"><span>守正 8.0万 + 增量 3.3万</span><span style="font-weight:600">11.3万 (11%)</span></div></div></div>
+                <div class="source-row"><div class="source-label">老客户复购</div><div class="source-bar-wrap"><div class="source-track"><div style="display:flex;height:100%"><div class="source-fill-zz" style="width:55%"></div><div class="source-fill-zl" style="width:16%"></div></div></div><div class="source-nums"><span>守正 20.2万 + 增量 8.5万</span><span style="font-weight:600">28.7万 (29%)</span></div></div></div>
+              </div>
+            </div>
+            <!-- 跨组月度对比 (from month-source) -->
+            <div>
+              <div class="section-label"><div class="step-badge dark">≈</div><div class="step-name">跨组月度对比<span class="step-sub">各组核心指标横向</span></div></div>
+              <div class="card card-sm" style="padding:0;overflow:hidden">
+                <table class="cross-table">
+                  <thead><tr><th>指标</th><th>何川组</th><th>夏欢组</th><th>向俞金组</th><th>部门均值</th></tr></thead>
+                  <tbody>
+                    <tr><td>5月业绩进度</td><td style="color:var(--orange)">42.3万 34.7%</td><td>38.5万 31.6%</td><td style="color:var(--red)">17.8万 29.2%</td><td>32.3%</td></tr>
+                    <tr><td>日均私信（人）</td><td style="color:var(--green)">38.4条</td><td>35.1条</td><td style="color:var(--red)">28.7条</td><td>34.1条</td></tr>
+                    <tr><td>日均触达客户</td><td style="color:var(--green)">48.2人</td><td>44.5人</td><td style="color:var(--red)">37.8人</td><td>43.5人</td></tr>
+                    <tr><td>社媒发帖/人/日</td><td>7.2条</td><td style="color:var(--green)">8.1条</td><td style="color:var(--red)">5.4条</td><td>6.9条</td></tr>
+                    <tr><td>日报均分</td><td style="color:var(--green)">83</td><td>74</td><td>76</td><td>77.7</td></tr>
+                    <tr><td>官网询盘转化率</td><td style="color:var(--green)">9.8%</td><td>9.1%</td><td style="color:var(--red)">8.9%</td><td>9.2% <span class="tag orange" style="font-size:10px">基线9.5%</span></td></tr>
+                  </tbody>
+                </table>
               </div>
             </div>
           </div><!-- /left -->
@@ -673,34 +779,6 @@ function logout(){ localStorage.removeItem('pdca_session'); window.location.href
           </div>
         </div>
       </div><!-- /month-wa -->
-
-      <!-- ─ 来源&跨组 ─ -->
-      <div id="month-source" class="sec-panel">
-        <div style="padding:24px;max-width:900px">
-          <div class="section-label"><div class="step-badge dark">$</div><div class="step-name">部门业绩来源<span class="step-sub">守正 vs 增量</span></div></div>
-          <div class="card card-sm" style="margin-bottom:20px">
-            <div style="font-size:12px;color:var(--muted);margin-bottom:16px">本月已完成 <b style="color:var(--text)">98.6万</b> / 目标 305万 · <span style="color:var(--blue)">■ 守正</span> <span style="color:var(--purple);margin-left:6px">■ 增量</span></div>
-            <div class="source-row"><div class="source-label">官网当月询盘</div><div class="source-bar-wrap"><div class="source-track"><div style="display:flex;height:100%"><div class="source-fill-zz" style="width:50%"></div><div class="source-fill-zl" style="width:20%"></div></div></div><div class="source-nums"><span>守正 15.8万 + 增量 6.4万</span><span style="font-weight:600">27.2万 (28%)</span></div></div></div>
-            <div class="source-row"><div class="source-label">历史月线索</div><div class="source-bar-wrap"><div class="source-track"><div style="display:flex;height:100%"><div class="source-fill-zz" style="width:62%"></div><div class="source-fill-zl" style="width:18%"></div></div></div><div class="source-nums"><span>守正 22.1万 + 增量 9.3万</span><span style="font-weight:600">31.4万 (32%)</span></div></div></div>
-            <div class="source-row"><div class="source-label">自拓流量</div><div class="source-bar-wrap"><div class="source-track"><div style="display:flex;height:100%"><div class="source-fill-zz" style="width:30%"></div><div class="source-fill-zl" style="width:12%"></div></div></div><div class="source-nums"><span>守正 8.0万 + 增量 3.3万</span><span style="font-weight:600">11.3万 (11%)</span></div></div></div>
-            <div class="source-row"><div class="source-label">老客户复购</div><div class="source-bar-wrap"><div class="source-track"><div style="display:flex;height:100%"><div class="source-fill-zz" style="width:55%"></div><div class="source-fill-zl" style="width:16%"></div></div></div><div class="source-nums"><span>守正 20.2万 + 增量 8.5万</span><span style="font-weight:600">28.7万 (29%)</span></div></div></div>
-          </div>
-          <div class="section-label"><div class="step-badge dark">≈</div><div class="step-name">跨组月度对比</div></div>
-          <div class="card card-sm" style="padding:0;overflow:hidden">
-            <table class="cross-table">
-              <thead><tr><th>指标</th><th>何川组</th><th>夏欢组</th><th>向俞金组</th><th>部门均值</th></tr></thead>
-              <tbody>
-                <tr><td>5月业绩进度</td><td style="color:var(--orange)">42.3万 34.7%</td><td>38.5万 31.6%</td><td style="color:var(--red)">17.8万 29.2%</td><td>32.3%</td></tr>
-                <tr><td>日均私信（人）</td><td style="color:var(--green)">38.4条</td><td>35.1条</td><td style="color:var(--red)">28.7条</td><td>34.1条</td></tr>
-                <tr><td>日均触达客户</td><td style="color:var(--green)">48.2人</td><td>44.5人</td><td style="color:var(--red)">37.8人</td><td>43.5人</td></tr>
-                <tr><td>社媒发帖/人/日</td><td>7.2条</td><td style="color:var(--green)">8.1条</td><td style="color:var(--red)">5.4条</td><td>6.9条</td></tr>
-                <tr><td>日报均分</td><td style="color:var(--green)">83</td><td>74</td><td>76</td><td>77.7</td></tr>
-                <tr><td>官网询盘转化率</td><td style="color:var(--green)">9.8%</td><td>9.1%</td><td style="color:var(--red)">8.9%</td><td>9.2% <span class="tag orange" style="font-size:10px">基线9.5%</span></td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div><!-- /month-source -->
 
     </div><!-- /panels-area -->
   </div><!-- /outer-layout -->

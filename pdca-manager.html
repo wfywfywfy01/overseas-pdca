@@ -281,6 +281,31 @@ body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSy
 /* TOAST */
 .toast{position:fixed;bottom:24px;right:24px;background:#111827;color:#fff;padding:11px 18px;border-radius:var(--radius);font-size:13px;box-shadow:var(--shadow2);z-index:999;opacity:0;transform:translateY(8px);transition:all .25s;pointer-events:none}
 .toast.show{opacity:1;transform:translateY(0)}
+/* HERMES FLOAT */
+.hermes-fab{position:fixed;bottom:28px;right:28px;width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,#2563eb,#7c3aed);color:#fff;font-size:15px;font-weight:800;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 16px rgba(37,99,235,.45);z-index:400;border:none;transition:transform .2s,box-shadow .2s;letter-spacing:-.5px}
+.hermes-fab:hover{transform:scale(1.1);box-shadow:0 6px 24px rgba(37,99,235,.55)}
+.hermes-fab::after{content:'';position:absolute;inset:-4px;border-radius:50%;border:2px solid rgba(37,99,235,.3);animation:hermPulse 2.4s ease infinite}
+@keyframes hermPulse{0%,100%{transform:scale(1);opacity:.6}50%{transform:scale(1.18);opacity:0}}
+/* HERMES MODAL */
+.hmodal-mask{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:450;display:none;align-items:center;justify-content:center;padding:20px}
+.hmodal-mask.open{display:flex;animation:hmFadeIn .18s ease}
+@keyframes hmFadeIn{from{opacity:0}to{opacity:1}}
+.hmodal{background:var(--card);border-radius:16px;width:100%;max-width:400px;box-shadow:0 12px 48px rgba(0,0,0,.22);overflow:hidden;animation:hmSlideUp .22s cubic-bezier(.34,1.36,.64,1)}
+@keyframes hmSlideUp{from{transform:translateY(24px) scale(.96);opacity:0}to{transform:none;opacity:1}}
+.hmodal-hdr{padding:16px 18px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.hmodal-icon{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#2563eb,#7c3aed);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex-shrink:0}
+.hmodal-title{flex:1;font-size:14px;font-weight:700}
+.hmodal-close{width:28px;height:28px;border-radius:50%;border:1px solid var(--border2);background:var(--bg);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--muted);transition:background .15s}
+.hmodal-close:hover{background:var(--bg2)}
+.hmodal-body{padding:14px 18px;font-size:13px;color:var(--muted);line-height:1.8}
+.hmodal-body b{color:var(--text)}
+.hmodal-body .hm-highlight{background:var(--blue-bg);border-radius:8px;padding:10px 12px;margin:10px 0;font-size:12px;border-left:3px solid var(--blue)}
+.hmodal-body .hm-warn{background:var(--red-bg);border-radius:8px;padding:10px 12px;margin:10px 0;font-size:12px;border-left:3px solid var(--red)}
+.hmodal-actions{padding:12px 18px 16px;display:flex;flex-direction:column;gap:8px}
+.hmodal-btn{padding:9px 14px;border-radius:10px;border:1px solid var(--border2);background:var(--card);font-size:13px;font-weight:500;cursor:pointer;text-align:left;transition:background .15s;font-family:inherit}
+.hmodal-btn:hover{background:var(--bg2)}
+.hmodal-btn.primary{background:linear-gradient(90deg,#2563eb,#4f46e5);color:#fff;border:none;font-weight:600}
+.hmodal-btn.primary:hover{opacity:.88}
 </style>
 </head>
 <body>
@@ -340,7 +365,6 @@ function logout(){ localStorage.removeItem('pdca_session'); window.location.href
       <div class="nav-item" onclick="showSec('day-members',this)"><span class="nav-icon">👥</span>成员看板</div>
       <div class="nav-item" onclick="showSec('day-intent',this)"><span class="nav-icon">🎯</span>意向 &amp; WA</div>
       <div class="nav-item" onclick="showSec('day-social',this)"><span class="nav-icon">📱</span>社媒动态</div>
-      <div class="nav-item" onclick="showSec('day-anomaly',this)"><span class="nav-icon">⚠️</span>异常监控</div>
       <div class="nav-divider"></div>
       <a href="https://admin.vertu.cn/odoo/sales" target="_blank" class="nav-item nav-ext"><span class="nav-icon">🔗</span>Odoo</a>
     </nav>
@@ -363,6 +387,31 @@ function logout(){ localStorage.removeItem('pdca_session'); window.location.href
             <div class="card card-sm">
               <div class="card-title">🔵 临时任务</div>
               <div id="todo-adhoc"></div>
+            </div>
+          </div>
+
+          <!-- 异常警告 -->
+          <div class="anomaly-list">
+            <div class="anomaly-item critical" style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
+              <div>
+                <div class="an-title">⚠️ 停滞订单 · 毛涵 #VT-2026-0302</div>
+                <div class="an-desc">问题订单超 10 天未处理，客户催款，需立即介入协助跟进</div>
+              </div>
+              <button class="btn-sm" style="flex-shrink:0;font-size:11px" onclick="showToast('已标记跟进')">立即处理</button>
+            </div>
+            <div class="anomaly-item" style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
+              <div>
+                <div class="an-title">连续低分 · 毛涵</div>
+                <div class="an-desc">连续 4 天日报评分 &lt;70，私信量持续低于标准 40%，建议今日约谈</div>
+              </div>
+              <button class="btn-sm" style="flex-shrink:0;font-size:11px" onclick="showToast('已安排约谈')">安排约谈</button>
+            </div>
+            <div class="anomaly-item" style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
+              <div>
+                <div class="an-title">跨部门协同 · 物流延迟</div>
+                <div class="an-desc">陈玉霞 / 刘佳鑫 各 1 个订单超预计到达日期，需与物流核实</div>
+              </div>
+              <button class="btn-sm" style="flex-shrink:0;font-size:11px" onclick="showToast('已提交物流核查')">联系物流</button>
             </div>
           </div>
 
@@ -509,6 +558,8 @@ function logout(){ localStorage.removeItem('pdca_session'); window.location.href
                     <th style="color:var(--muted)">TK本月</th>
                     <th style="color:var(--red)">YT今日</th>
                     <th style="color:var(--muted)">YT本月</th>
+                    <th style="color:var(--green)">转私今日</th>
+                    <th style="color:var(--muted)">转私本月</th>
                     <th>今日状态</th>
                   </tr>
                 </thead>
@@ -518,33 +569,6 @@ function logout(){ localStorage.removeItem('pdca_session'); window.location.href
           </div>
         </div>
       </div><!-- /day-social -->
-
-      <!-- ─ 异常监控 ─ -->
-      <div id="day-anomaly" class="sec-panel">
-        <div style="padding:24px;max-width:700px">
-          <div class="section-label">
-            <div class="step-badge warn">!</div>
-            <div class="step-name">异常与待办<span class="step-sub">需主管介入</span></div>
-          </div>
-          <div class="anomaly-list">
-            <div class="anomaly-item critical">
-              <div class="an-title">停滞订单 · 毛涵 #VT-2026-0302</div>
-              <div class="an-desc">问题订单超 10 天未处理，客户催款，需立即介入协助跟进</div>
-              <div class="an-action"><button class="btn-sm" style="font-size:11px" onclick="showToast('已标记跟进')">立即处理</button></div>
-            </div>
-            <div class="anomaly-item">
-              <div class="an-title">连续低分 · 毛涵</div>
-              <div class="an-desc">连续 4 天日报评分 &lt;70，私信量持续低于标准 40%，建议今日约谈</div>
-              <div class="an-action"><button class="btn-sm" style="font-size:11px" onclick="showToast('已安排约谈')">安排约谈</button></div>
-            </div>
-            <div class="anomaly-item">
-              <div class="an-title">跨部门协同 · 物流延迟</div>
-              <div class="an-desc">陈玉霞 / 刘佳鑫 各 1 个发货中订单超预计到达日期，需与物流核实</div>
-              <div class="an-action"><button class="btn-sm" style="font-size:11px" onclick="showToast('已提交物流核查')">联系物流</button></div>
-            </div>
-          </div>
-        </div>
-      </div><!-- /day-anomaly -->
 
     </div><!-- /panels-area -->
   </div><!-- /outer-layout -->
@@ -559,7 +583,6 @@ function logout(){ localStorage.removeItem('pdca_session'); window.location.href
       <div class="nav-item" onclick="showSec('month-tasks',this)"><span class="nav-icon">📋</span>月度任务</div>
       <div class="nav-item" onclick="showSec('month-members',this)"><span class="nav-icon">👥</span>成员进度</div>
       <div class="nav-item" onclick="showSec('month-wa',this)"><span class="nav-icon">🎯</span>意向 &amp; WA</div>
-      <div class="nav-item" onclick="showSec('month-source',this)"><span class="nav-icon">💰</span>来源分析</div>
       <div class="nav-divider"></div>
       <a href="https://admin.vertu.cn/odoo/sales" target="_blank" class="nav-item nav-ext"><span class="nav-icon">🔗</span>Odoo</a>
     </nav>
@@ -577,27 +600,27 @@ function logout(){ localStorage.removeItem('pdca_session'); window.location.href
               <div class="kpi-strip" id="mgr-month-kpi-strip">
                 <div class="kpi-card neutral">
                   <div class="kc-label">组月度目标</div>
-                  <div class="kc-value">122<span style="font-size:13px;font-weight:400;color:var(--muted)">万</span></div>
+                  <div class="kc-value">114<span style="font-size:13px;font-weight:400;color:var(--muted)">万</span></div>
                   <div class="kc-sub">5 人 · 年度1595万</div>
                   <div class="kc-prog"><div class="kc-fill" style="width:100%;background:#2563eb"></div></div>
                 </div>
                 <div class="kpi-card warn">
                   <div class="kc-label">组已完成</div>
                   <div class="kc-value">42.3<span style="font-size:13px;font-weight:400;color:var(--muted)">万</span></div>
-                  <div class="kc-sub">34.7% · 剩余 85.7 万</div>
-                  <div class="kc-prog"><div class="kc-fill" style="width:34.7%;background:var(--orange)"></div></div>
+                  <div class="kc-sub">37.1% · 剩余 71.7 万</div>
+                  <div class="kc-prog"><div class="kc-fill" style="width:37.1%;background:var(--orange)"></div></div>
                 </div>
                 <div class="kpi-card behind">
                   <div class="kc-label">剩余天数</div>
                   <div class="kc-value">17<span style="font-size:13px;font-weight:400;color:var(--muted)">天</span></div>
-                  <div class="kc-sub">需日均 5.04 万</div>
+                  <div class="kc-sub">需日均 4.22 万</div>
                   <div class="kc-prog"><div class="kc-fill" style="width:55%;background:var(--red)"></div></div>
                 </div>
                 <div class="kpi-card ok">
                   <div class="kc-label">组平均评分</div>
-                  <div class="kc-value">83<span style="font-size:13px;font-weight:400;color:var(--muted)">/100</span></div>
+                  <div class="kc-value">81<span style="font-size:13px;font-weight:400;color:var(--muted)">/100</span></div>
                   <div class="kc-sub">连续 5 天达标</div>
-                  <div class="kc-prog"><div class="kc-fill" style="width:83%;background:var(--green)"></div></div>
+                  <div class="kc-prog"><div class="kc-fill" style="width:81%;background:var(--green)"></div></div>
                 </div>
               </div>
             </div>
@@ -609,27 +632,84 @@ function logout(){ localStorage.removeItem('pdca_session'); window.location.href
               <div class="week-grid">
                 <div class="week-card wk-done">
                   <div class="wk-label"><span>W1 · 5/1–7</span><span class="tag green" style="font-size:10px">已完成</span></div>
-                  <div class="wk-plan">30.5<span class="wk-unit">万</span></div>
-                  <div class="wk-actual" style="color:var(--orange)">实际 18.2万 (60%)</div>
-                  <div class="wk-prog"><div class="wk-fill" style="width:60%;background:var(--orange)"></div></div>
+                  <div class="wk-plan">28.5<span class="wk-unit">万</span></div>
+                  <div class="wk-actual" style="color:var(--orange)">实际 18.2万 (64%)</div>
+                  <div class="wk-prog"><div class="wk-fill" style="width:64%;background:var(--orange)"></div></div>
                 </div>
                 <div class="week-card wk-current">
                   <div class="wk-label"><span>W2 · 5/8–14</span><span class="tag blue" style="font-size:10px">进行中</span></div>
-                  <div class="wk-plan">30.5<span class="wk-unit">万</span></div>
-                  <div class="wk-actual" style="color:var(--blue)">已完成 24.1万 (79%)</div>
-                  <div class="wk-prog"><div class="wk-fill" style="width:79%;background:var(--blue)"></div></div>
+                  <div class="wk-plan">28.5<span class="wk-unit">万</span></div>
+                  <div class="wk-actual" style="color:var(--blue)">已完成 24.1万 (85%)</div>
+                  <div class="wk-prog"><div class="wk-fill" style="width:85%;background:var(--blue)"></div></div>
                 </div>
                 <div class="week-card wk-future">
                   <div class="wk-label"><span>W3 · 5/15–21</span><span style="font-size:10px;color:var(--muted2)">待开始</span></div>
-                  <div class="wk-plan">30.5<span class="wk-unit">万</span></div>
+                  <div class="wk-plan">28.5<span class="wk-unit">万</span></div>
                   <div class="wk-actual" style="color:var(--muted2)">需加速</div>
                   <div class="wk-prog"><div class="wk-fill" style="width:0%"></div></div>
                 </div>
                 <div class="week-card wk-future">
                   <div class="wk-label"><span>W4 · 5/22–31</span><span style="font-size:10px;color:var(--muted2)">待开始</span></div>
-                  <div class="wk-plan">30.5<span class="wk-unit">万</span></div>
+                  <div class="wk-plan">28.5<span class="wk-unit">万</span></div>
                   <div class="wk-actual" style="color:var(--muted2)">冲刺周</div>
                   <div class="wk-prog"><div class="wk-fill" style="width:0%"></div></div>
+                </div>
+              </div>
+            </div>
+            <!-- 年度大节点本月拆解 -->
+            <div>
+              <div class="section-label">
+                <div class="step-badge" style="background:#111827">节</div>
+                <div class="step-name">年度大节点本月进度<span class="step-sub">年度里程碑 → 月度拆解</span></div>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px" id="month-milestone-grid">
+                <!-- WA私域总量 -->
+                <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:13px 14px;border-top:3px solid #0ea5e9">
+                  <div style="font-size:10px;font-weight:700;color:#0ea5e9;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">WA 私域总量</div>
+                  <div style="display:flex;align-items:baseline;gap:4px;margin-bottom:2px">
+                    <span style="font-size:20px;font-weight:700">+980</span><span style="font-size:11px;color:var(--muted)">人/月</span>
+                  </div>
+                  <div style="font-size:11px;color:var(--muted);margin-bottom:6px">月均目标 +1,000人 · 年度终态 8万</div>
+                  <div style="height:4px;background:var(--bg2);border-radius:2px;margin-bottom:4px"><div style="height:4px;background:#0ea5e9;border-radius:2px;width:98%"></div></div>
+                  <div style="display:flex;justify-content:space-between;font-size:11px">
+                    <span style="color:var(--muted)">总量 ~4.2万</span><span style="color:#0ea5e9;font-weight:600">98% 月达成</span>
+                  </div>
+                </div>
+                <!-- 日人均触达 -->
+                <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:13px 14px;border-top:3px solid var(--green)">
+                  <div style="font-size:10px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">日人均触达</div>
+                  <div style="display:flex;align-items:baseline;gap:4px;margin-bottom:2px">
+                    <span style="font-size:20px;font-weight:700">48.2</span><span style="font-size:11px;color:var(--muted)">客/天</span>
+                  </div>
+                  <div style="font-size:11px;color:var(--muted);margin-bottom:6px">月均目标 80客/人/天 · 年度终态</div>
+                  <div style="height:4px;background:var(--bg2);border-radius:2px;margin-bottom:4px"><div style="height:4px;background:var(--orange);border-radius:2px;width:60%"></div></div>
+                  <div style="display:flex;justify-content:space-between;font-size:11px">
+                    <span style="color:var(--muted)">目标 80/天</span><span style="color:var(--orange);font-weight:600">60% 月达成</span>
+                  </div>
+                </div>
+                <!-- 私域人产 -->
+                <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:13px 14px;border-top:3px solid var(--blue)">
+                  <div style="font-size:10px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">私域人产</div>
+                  <div style="display:flex;align-items:baseline;gap:4px;margin-bottom:2px">
+                    <span style="font-size:20px;font-weight:700">8.46</span><span style="font-size:11px;color:var(--muted)">万/人</span>
+                  </div>
+                  <div style="font-size:11px;color:var(--muted);margin-bottom:6px">月人产目标 20万 · 年度终态稳定</div>
+                  <div style="height:4px;background:var(--bg2);border-radius:2px;margin-bottom:4px"><div style="height:4px;background:var(--blue);border-radius:2px;width:42%"></div></div>
+                  <div style="display:flex;justify-content:space-between;font-size:11px">
+                    <span style="color:var(--muted)">目标 20万</span><span style="color:var(--orange);font-weight:600">42% 月达成</span>
+                  </div>
+                </div>
+                <!-- 自拓体系 -->
+                <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:13px 14px;border-top:3px solid var(--orange)">
+                  <div style="font-size:10px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">自拓体系</div>
+                  <div style="display:flex;align-items:baseline;gap:4px;margin-bottom:2px">
+                    <span style="font-size:20px;font-weight:700">8</span><span style="font-size:11px;color:var(--muted)">个账号</span>
+                  </div>
+                  <div style="font-size:11px;color:var(--muted);margin-bottom:6px">本月新增 +1账号 · 年度目标 10个</div>
+                  <div style="height:4px;background:var(--bg2);border-radius:2px;margin-bottom:4px"><div style="height:4px;background:var(--orange);border-radius:2px;width:80%"></div></div>
+                  <div style="display:flex;justify-content:space-between;font-size:11px">
+                    <span style="color:var(--muted)">目标 10个</span><span style="color:var(--orange);font-weight:600">80% 年达成</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -637,13 +717,13 @@ function logout(){ localStorage.removeItem('pdca_session'); window.location.href
             <div>
               <div class="section-label">
                 <div class="step-badge" style="background:#0ea5e9;color:#fff">WA</div>
-                <div class="step-name">组WA月度概览<span class="step-sub">存量 · 新增 · 触达</span></div>
+                <div class="step-name">组WA月度概览<span class="step-sub">存量 · 新增 · 触达 · 转化</span></div>
               </div>
               <div class="kpi-strip">
                 <div class="kpi-card ok">
                   <div class="kc-label">组WA总客户</div>
                   <div class="kc-value">2.4<span style="font-size:13px;font-weight:400;color:var(--muted)">万</span></div>
-                  <div class="kc-sub">12账号 · 月新增980人</div>
+                  <div class="kc-sub">12账号 · 月新增 980人</div>
                   <div class="kc-prog"><div class="kc-fill" style="width:30%;background:#0ea5e9"></div></div>
                 </div>
                 <div class="kpi-card warn">
@@ -658,24 +738,47 @@ function logout(){ localStorage.removeItem('pdca_session'); window.location.href
                   <div class="kc-sub">目标20万 · 42.3%</div>
                   <div class="kc-prog"><div class="kc-fill" style="width:42.3%;background:#2563eb"></div></div>
                 </div>
+                <div class="kpi-card ok">
+                  <div class="kc-label">社媒转私线索</div>
+                  <div class="kc-value">98<span style="font-size:13px;font-weight:400;color:var(--muted)">条</span></div>
+                  <div class="kc-sub">目标120条 · 81.7%</div>
+                  <div class="kc-prog"><div class="kc-fill" style="width:81.7%;background:var(--green)"></div></div>
+                </div>
               </div>
             </div>
+          <!-- 来源分析 (在左列末尾，紧接WA概览) -->
+          <div>
+            <div class="section-label">
+              <div class="step-badge dark">$</div>
+              <div class="step-name">组业绩来源<span class="step-sub">守正 vs 增量</span></div>
+            </div>
+            <div class="card card-sm">
+              <div id="source-summary" style="font-size:12px;color:var(--muted);margin-bottom:16px">
+                组本月 <b style="color:var(--text)">42.3万</b> / 目标 114万 ·
+                <span style="color:var(--blue)">■ 守正</span> <span style="color:var(--purple);margin-left:6px">■ 增量</span>
+              </div>
+              <div class="source-row"><div class="source-label">官网当月询盘</div><div class="source-bar-wrap"><div class="source-track"><div style="display:flex;height:100%"><div class="source-fill-zz" style="width:48%"></div><div class="source-fill-zl" style="width:18%"></div></div></div><div class="source-nums"><span>守正 7.2万 + 增量 2.4万</span><span style="font-weight:600">9.6万 (23%)</span></div></div></div>
+              <div class="source-row"><div class="source-label">历史月线索</div><div class="source-bar-wrap"><div class="source-track"><div style="display:flex;height:100%"><div class="source-fill-zz" style="width:60%"></div><div class="source-fill-zl" style="width:22%"></div></div></div><div class="source-nums"><span>守正 9.8万 + 增量 4.1万</span><span style="font-weight:600">13.9万 (33%)</span></div></div></div>
+              <div class="source-row"><div class="source-label">自拓流量</div><div class="source-bar-wrap"><div class="source-track"><div style="display:flex;height:100%"><div class="source-fill-zz" style="width:25%"></div><div class="source-fill-zl" style="width:12%"></div></div></div><div class="source-nums"><span>守正 4.2万 + 增量 1.9万</span><span style="font-weight:600">6.1万 (14%)</span></div></div></div>
+              <div class="source-row"><div class="source-label">老客户复购</div><div class="source-bar-wrap"><div class="source-track"><div style="display:flex;height:100%"><div class="source-fill-zz" style="width:58%"></div><div class="source-fill-zl" style="width:16%"></div></div></div><div class="source-nums"><span>守正 10.1万 + 增量 2.6万</span><span style="font-weight:600">12.7万 (30%)</span></div></div></div>
+            </div>
+          </div>
           </div><!-- /left -->
           <div class="sec-stack">
             <div class="card card-sm">
               <div class="card-title">组月度完成率</div>
-              <div style="text-align:center;padding:10px 0">
+              <div id="month-completion-donut" style="text-align:center;padding:10px 0">
                 <div style="position:relative;width:100px;height:100px;margin:0 auto">
                   <svg viewBox="0 0 36 36" style="width:100%;height:100%;transform:rotate(-90deg)">
                     <circle cx="18" cy="18" r="15.9" fill="none" stroke="var(--bg2)" stroke-width="3"/>
-                    <circle cx="18" cy="18" r="15.9" fill="none" stroke="var(--orange)" stroke-width="3" stroke-dasharray="34.7 65.3" stroke-linecap="round"/>
+                    <circle cx="18" cy="18" r="15.9" fill="none" stroke="var(--orange)" stroke-width="3" stroke-dasharray="37.1 62.9" stroke-linecap="round"/>
                   </svg>
                   <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
-                    <div style="font-size:20px;font-weight:700">34.7%</div>
+                    <div style="font-size:20px;font-weight:700">37.1%</div>
                     <div style="font-size:10px;color:var(--muted)">完成率</div>
                   </div>
                 </div>
-                <div style="margin-top:10px;font-size:12px;color:var(--muted)">42.3万 / 122万</div>
+                <div style="margin-top:10px;font-size:12px;color:var(--muted)">42.3万 / 114万</div>
                 <div style="margin-top:4px;font-size:11px;padding:3px 10px;background:var(--orange-bg);color:var(--orange);border-radius:12px;display:inline-block">落后节奏 11%</div>
               </div>
             </div>
@@ -741,12 +844,30 @@ function logout(){ localStorage.removeItem('pdca_session'); window.location.href
 
       <!-- ─ 成员进度 ─ -->
       <div id="month-members" class="sec-panel">
-        <div style="padding:24px;max-width:780px">
-          <div class="section-label">
-            <div class="step-badge dark">人</div>
-            <div class="step-name">成员月度进度<span class="step-sub">各成员本月目标 vs 实际 · 点击进入员工页</span></div>
+        <div class="sec-grid">
+          <!-- 左：详细进度卡片 -->
+          <div class="sec-stack">
+            <div class="section-label">
+              <div class="step-badge dark">人</div>
+              <div class="step-name">成员月度进度<span class="step-sub">目标 vs 实际 · 点击进入员工页</span></div>
+            </div>
+            <div id="month-member-bars" style="display:flex;flex-direction:column;gap:12px"></div>
           </div>
-          <div class="card card-sm" id="month-member-bars"></div>
+          <!-- 右：排行 + 达标摘要 -->
+          <div class="sec-stack">
+            <div class="card card-sm">
+              <div class="card-title">本月排行</div>
+              <div class="rank-list" id="month-rank-list-members"></div>
+            </div>
+            <div class="card card-sm">
+              <div class="card-title">月度达标概况</div>
+              <div id="month-ontrack-summary" style="display:flex;flex-direction:column;gap:10px;margin-top:4px"></div>
+            </div>
+            <div class="card card-sm">
+              <div class="card-title">预测完成</div>
+              <div id="month-forecast" style="display:flex;flex-direction:column;gap:8px;margin-top:4px"></div>
+            </div>
+          </div>
         </div>
       </div><!-- /month-members -->
 
@@ -818,26 +939,6 @@ function logout(){ localStorage.removeItem('pdca_session'); window.location.href
         </div>
       </div><!-- /month-wa -->
 
-      <!-- ─ 来源分析 ─ -->
-      <div id="month-source" class="sec-panel">
-        <div style="padding:24px;max-width:780px">
-          <div class="section-label">
-            <div class="step-badge dark">$</div>
-            <div class="step-name">组业绩来源<span class="step-sub">守正 vs 增量</span></div>
-          </div>
-          <div class="card card-sm">
-            <div style="font-size:12px;color:var(--muted);margin-bottom:16px">
-              组本月 <b style="color:var(--text)">42.3万</b> / 目标 122万 ·
-              <span style="color:var(--blue)">■ 守正</span> <span style="color:var(--purple);margin-left:6px">■ 增量</span>
-            </div>
-            <div class="source-row"><div class="source-label">官网当月询盘</div><div class="source-bar-wrap"><div class="source-track"><div style="display:flex;height:100%"><div class="source-fill-zz" style="width:48%"></div><div class="source-fill-zl" style="width:18%"></div></div></div><div class="source-nums"><span>守正 7.2万 + 增量 2.4万</span><span style="font-weight:600">9.6万 (23%)</span></div></div></div>
-            <div class="source-row"><div class="source-label">历史月线索</div><div class="source-bar-wrap"><div class="source-track"><div style="display:flex;height:100%"><div class="source-fill-zz" style="width:60%"></div><div class="source-fill-zl" style="width:22%"></div></div></div><div class="source-nums"><span>守正 9.8万 + 增量 4.1万</span><span style="font-weight:600">13.9万 (33%)</span></div></div></div>
-            <div class="source-row"><div class="source-label">自拓流量</div><div class="source-bar-wrap"><div class="source-track"><div style="display:flex;height:100%"><div class="source-fill-zz" style="width:25%"></div><div class="source-fill-zl" style="width:12%"></div></div></div><div class="source-nums"><span>守正 4.2万 + 增量 1.9万</span><span style="font-weight:600">6.1万 (14%)</span></div></div></div>
-            <div class="source-row"><div class="source-label">老客户复购</div><div class="source-bar-wrap"><div class="source-track"><div style="display:flex;height:100%"><div class="source-fill-zz" style="width:58%"></div><div class="source-fill-zl" style="width:16%"></div></div></div><div class="source-nums"><span>守正 10.1万 + 增量 2.6万</span><span style="font-weight:600">12.7万 (30%)</span></div></div></div>
-          </div>
-        </div>
-      </div><!-- /month-source -->
-
     </div><!-- /panels-area -->
   </div><!-- /outer-layout -->
 </div>
@@ -857,152 +958,132 @@ function logout(){ localStorage.removeItem('pdca_session'); window.location.href
 
       <!-- ─ 年度目标 ─ -->
       <div id="year-target" class="sec-panel active">
-        <div class="sec-grid">
-          <div class="sec-stack">
+        <div style="padding:24px;display:flex;flex-direction:column;gap:20px">
+
+          <!-- Row 1: 年度总览横幅 (KPI数字 + 环图合一) -->
+          <div class="card card-sm" style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:24px;align-items:center">
             <div>
-              <div class="section-label">
-                <div class="step-badge dark">年</div>
-                <div class="step-name">2026 组年度目标<span class="step-sub">年初向下拆解</span></div>
-              </div>
-              <div class="card card-sm" id="mgr-year-kpi" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;align-items:center">
-                <div>
-                  <div style="font-size:12px;color:var(--muted);margin-bottom:6px">年度目标</div>
-                  <div style="font-size:32px;font-weight:700">1595<span style="font-size:15px;font-weight:400;color:var(--muted)">万</span></div>
-                  <div style="font-size:12px;color:var(--muted);margin-top:4px">守正1100 + 增量495</div>
-                </div>
-                <div>
-                  <div style="font-size:12px;color:var(--muted);margin-bottom:6px">YTD 已完成</div>
-                  <div style="font-size:32px;font-weight:700;color:var(--orange)">247<span style="font-size:15px;font-weight:400;color:var(--muted)">万</span></div>
-                  <div style="font-size:12px;color:var(--muted);margin-top:4px">缺口 1348 万</div>
-                </div>
-                <div>
-                  <div style="font-size:12px;color:var(--muted);margin-bottom:6px">年度进度</div>
-                  <div style="font-size:32px;font-weight:700;color:var(--red)">15.5%</div>
-                  <div style="font-size:12px;color:var(--red);margin-top:4px">落后预期（应 37%）</div>
-                </div>
-              </div>
+              <div style="font-size:11px;color:var(--muted);font-weight:500;margin-bottom:6px">年度目标</div>
+              <div style="font-size:30px;font-weight:700;letter-spacing:-.02em">1595<span style="font-size:14px;font-weight:400;color:var(--muted)"> 万</span></div>
+              <div style="font-size:12px;color:var(--muted);margin-top:4px">守正1100 + 增量495</div>
             </div>
             <div>
-              <div class="section-label"><div class="step-badge" style="background:#111827;color:#fff">节</div><div class="step-name">年度大节点<span class="step-sub">四大核心里程碑 · 2026全年</span></div></div>
-              <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px">
-
-                <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;border-top:3px solid #0ea5e9">
-                  <div style="font-size:10px;font-weight:700;color:#0ea5e9;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">WA 私域总量</div>
-                  <div style="font-size:22px;font-weight:700;line-height:1.1">8<span style="font-size:12px;font-weight:400;color:var(--muted)">万客户</span></div>
-                  <div style="margin:8px 0 4px;height:5px;background:var(--bg2);border-radius:3px"><div style="height:5px;background:#0ea5e9;border-radius:3px;width:52%"></div></div>
-                  <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted)"><span>~4.2万</span><span style="color:#0ea5e9;font-weight:600">52%</span></div>
-                </div>
-
-                <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;border-top:3px solid var(--green)">
-                  <div style="font-size:10px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">日人均触达</div>
-                  <div style="font-size:22px;font-weight:700;line-height:1.1">80<span style="font-size:12px;font-weight:400;color:var(--muted)">客/天</span></div>
-                  <div style="margin:8px 0 4px;height:5px;background:var(--bg2);border-radius:3px"><div style="height:5px;background:var(--green);border-radius:3px;width:26%"></div></div>
-                  <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted)"><span>~21客</span><span style="color:var(--red);font-weight:600">26%</span></div>
-                </div>
-
-                <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;border-top:3px solid var(--blue)">
-                  <div style="font-size:10px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">私域人产</div>
-                  <div style="font-size:22px;font-weight:700;line-height:1.1">20<span style="font-size:12px;font-weight:400;color:var(--muted)">万稳定</span></div>
-                  <div style="margin:8px 0 4px;height:5px;background:var(--bg2);border-radius:3px"><div style="height:5px;background:var(--blue);border-radius:3px;width:38%"></div></div>
-                  <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted)"><span>~7.6万</span><span style="color:var(--orange);font-weight:600">38%</span></div>
-                </div>
-
-                <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;border-top:3px solid var(--orange)">
-                  <div style="font-size:10px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">自拓体系</div>
-                  <div style="font-size:22px;font-weight:700;line-height:1.1">10<span style="font-size:12px;font-weight:400;color:var(--muted)">万粉号</span></div>
-                  <div style="margin:8px 0 4px;height:5px;background:var(--bg2);border-radius:3px"><div style="height:5px;background:var(--orange);border-radius:3px;width:80%"></div></div>
-                  <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted)"><span>当前 8个</span><span style="color:var(--orange);font-weight:600">80%</span></div>
-                </div>
-
-              </div>
+              <div style="font-size:11px;color:var(--muted);font-weight:500;margin-bottom:6px">YTD 已完成</div>
+              <div style="font-size:30px;font-weight:700;color:var(--orange);letter-spacing:-.02em">247<span style="font-size:14px;font-weight:400;color:var(--muted)"> 万</span></div>
+              <div style="font-size:12px;color:var(--muted);margin-top:4px">缺口 1348万</div>
             </div>
             <div>
-              <div class="section-label">
-                <div class="step-badge dark">Q</div>
-                <div class="step-name">季度拆解<span class="step-sub">1595万 → 4 季</span></div>
+              <div style="font-size:11px;color:var(--muted);font-weight:500;margin-bottom:6px">各季进度</div>
+              <div style="display:flex;flex-direction:column;gap:5px">
+                <div style="display:flex;align-items:center;gap:8px;font-size:12px">
+                  <span style="width:20px;color:var(--muted)">Q1</span>
+                  <div style="flex:1;height:5px;background:var(--bg2);border-radius:3px;overflow:hidden"><div style="height:100%;width:51.3%;background:var(--orange);border-radius:3px"></div></div>
+                  <span style="color:var(--orange);font-weight:600;width:38px">51.3%</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;font-size:12px">
+                  <span style="width:20px;color:var(--muted)">Q2</span>
+                  <div style="flex:1;height:5px;background:var(--bg2);border-radius:3px;overflow:hidden"><div style="height:100%;width:10.2%;background:var(--blue);border-radius:3px"></div></div>
+                  <span style="color:var(--blue);font-weight:600;width:38px">10.2%</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;font-size:12px">
+                  <span style="width:20px;color:var(--muted2)">Q3</span>
+                  <div style="flex:1;height:5px;background:var(--bg2);border-radius:3px"></div>
+                  <span style="color:var(--muted2);width:38px">—</span>
+                </div>
               </div>
-              <div class="quarter-grid">
-                <div class="quarter-card q-done">
-                  <div class="qc-label">Q1 · 1–3月 <span class="qc-badge" style="background:var(--orange-bg);color:var(--orange)">已结束</span></div>
-                  <div class="qc-plan">400<span style="font-size:13px;font-weight:400;color:var(--muted)">万</span></div>
-                  <div class="qc-actual" style="color:var(--orange)">实际 205万 (51.3%)</div>
-                  <div class="qc-prog"><div class="qc-fill" style="width:51.3%;background:var(--orange)"></div></div>
-                  <div class="qc-sub">差距 195万 · 严重落后</div>
+              <div style="margin-top:6px;font-size:11px;color:var(--muted)">预计全年 <span style="color:var(--red);font-weight:600">~770万</span></div>
+            </div>
+            <!-- 环图 -->
+            <div style="text-align:center;padding:0 8px">
+              <div style="position:relative;width:90px;height:90px;margin:0 auto">
+                <svg viewBox="0 0 36 36" style="width:100%;height:100%;transform:rotate(-90deg)">
+                  <circle cx="18" cy="18" r="15.9" fill="none" stroke="var(--bg2)" stroke-width="3.2"/>
+                  <circle cx="18" cy="18" r="15.9" fill="none" stroke="var(--red)" stroke-width="3.2" stroke-dasharray="15.5 84.5" stroke-linecap="round"/>
+                  <circle cx="18" cy="18" r="15.9" fill="none" stroke="var(--orange)" stroke-width="3.2" stroke-dasharray="10.8 89.2" stroke-dashoffset="-15.5" stroke-linecap="round"/>
+                </svg>
+                <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
+                  <div style="font-size:18px;font-weight:700;color:var(--red)">15.5%</div>
+                  <div style="font-size:9px;color:var(--muted)">YTD</div>
                 </div>
-                <div class="quarter-card q-current">
-                  <div class="qc-label">Q2 · 4–6月 <span class="qc-badge" style="background:var(--blue-bg);color:var(--blue)">进行中</span></div>
-                  <div class="qc-plan">410<span style="font-size:13px;font-weight:400;color:var(--muted)">万</span></div>
-                  <div class="qc-actual" style="color:var(--blue)">已完成 42万 (10.2%)</div>
-                  <div class="qc-prog"><div class="qc-fill" style="width:10.2%;background:var(--blue)"></div></div>
-                  <div class="qc-sub">含 4月 + 5月进行中</div>
-                </div>
-                <div class="quarter-card">
-                  <div class="qc-label">Q3 · 7–9月 <span class="qc-badge" style="background:var(--bg2);color:var(--muted)">待开始</span></div>
-                  <div class="qc-plan">420<span style="font-size:13px;font-weight:400;color:var(--muted)">万</span></div>
-                  <div class="qc-actual" style="color:var(--muted2)">未开始</div>
-                  <div class="qc-prog"><div class="qc-fill" style="width:0%"></div></div>
-                  <div class="qc-sub">H2 冲刺重点季</div>
-                </div>
-                <div class="quarter-card">
-                  <div class="qc-label">Q4 · 10–12月 <span class="qc-badge" style="background:var(--bg2);color:var(--muted)">待开始</span></div>
-                  <div class="qc-plan">365<span style="font-size:13px;font-weight:400;color:var(--muted)">万</span></div>
-                  <div class="qc-actual" style="color:var(--muted2)">未开始</div>
-                  <div class="qc-prog"><div class="qc-fill" style="width:0%"></div></div>
-                  <div class="qc-sub">年末大促 · 含双11</div>
-                </div>
+              </div>
+              <div style="font-size:10px;color:var(--muted);margin-top:4px">应达 37%</div>
+              <span style="font-size:10px;padding:2px 8px;background:var(--red-bg);color:var(--red);border-radius:10px;display:inline-block;margin-top:2px">落后 21.5%</span>
+            </div>
+          </div>
+
+          <!-- Row 2: 四大年度里程碑 -->
+          <div>
+            <div class="section-label">
+              <div class="step-badge" style="background:#111827">节</div>
+              <div class="step-name">年度大节点<span class="step-sub">四大核心里程碑 · 2026全年</span></div>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px">
+              <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;border-top:3px solid #0ea5e9">
+                <div style="font-size:10px;font-weight:700;color:#0ea5e9;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">WA 私域总量</div>
+                <div style="font-size:22px;font-weight:700;line-height:1.1">8<span style="font-size:12px;font-weight:400;color:var(--muted)">万客户</span></div>
+                <div style="margin:8px 0 4px;height:5px;background:var(--bg2);border-radius:3px"><div style="height:5px;background:#0ea5e9;border-radius:3px;width:52%"></div></div>
+                <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted)"><span>~4.2万</span><span style="color:#0ea5e9;font-weight:600">52%</span></div>
+              </div>
+              <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;border-top:3px solid var(--green)">
+                <div style="font-size:10px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">日人均触达</div>
+                <div style="font-size:22px;font-weight:700;line-height:1.1">80<span style="font-size:12px;font-weight:400;color:var(--muted)">客/天</span></div>
+                <div style="margin:8px 0 4px;height:5px;background:var(--bg2);border-radius:3px"><div style="height:5px;background:var(--green);border-radius:3px;width:26%"></div></div>
+                <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted)"><span>~21客</span><span style="color:var(--red);font-weight:600">26%</span></div>
+              </div>
+              <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;border-top:3px solid var(--blue)">
+                <div style="font-size:10px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">私域人产</div>
+                <div style="font-size:22px;font-weight:700;line-height:1.1">20<span style="font-size:12px;font-weight:400;color:var(--muted)">万稳定</span></div>
+                <div style="margin:8px 0 4px;height:5px;background:var(--bg2);border-radius:3px"><div style="height:5px;background:var(--blue);border-radius:3px;width:38%"></div></div>
+                <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted)"><span>~7.6万</span><span style="color:var(--orange);font-weight:600">38%</span></div>
+              </div>
+              <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;border-top:3px solid var(--orange)">
+                <div style="font-size:10px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">自拓体系</div>
+                <div style="font-size:22px;font-weight:700;line-height:1.1">10<span style="font-size:12px;font-weight:400;color:var(--muted)">万粉号</span></div>
+                <div style="margin:8px 0 4px;height:5px;background:var(--bg2);border-radius:3px"><div style="height:5px;background:var(--orange);border-radius:3px;width:80%"></div></div>
+                <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted)"><span>当前 8个</span><span style="color:var(--orange);font-weight:600">80%</span></div>
               </div>
             </div>
-          </div><!-- /left -->
-          <div class="sec-stack">
-            <div class="card card-sm">
-              <div class="card-title">组年度完成率</div>
-              <div style="text-align:center;padding:10px 0">
-                <div style="position:relative;width:110px;height:110px;margin:0 auto">
-                  <svg viewBox="0 0 36 36" style="width:100%;height:100%;transform:rotate(-90deg)">
-                    <circle cx="18" cy="18" r="15.9" fill="none" stroke="var(--bg2)" stroke-width="3"/>
-                    <circle cx="18" cy="18" r="15.9" fill="none" stroke="var(--red)" stroke-width="3" stroke-dasharray="15.5 84.5" stroke-linecap="round"/>
-                  </svg>
-                  <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
-                    <div style="font-size:22px;font-weight:700;color:var(--red)">15.5%</div>
-                    <div style="font-size:10px;color:var(--muted)">实际完成</div>
-                  </div>
-                </div>
-                <div style="margin-top:8px;font-size:12px;color:var(--muted)">247万 / 1595万</div>
-                <div style="margin-top:4px;font-size:11px;padding:3px 10px;background:var(--red-bg);color:var(--red);border-radius:12px;display:inline-block">落后 21.5%</div>
+          </div>
+
+          <!-- Row 3: 季度拆解 -->
+          <div>
+            <div class="section-label">
+              <div class="step-badge dark">Q</div>
+              <div class="step-name">季度拆解<span class="step-sub">1595万 → 4 季</span></div>
+            </div>
+            <div class="quarter-grid">
+              <div class="quarter-card q-done">
+                <div class="qc-label">Q1 · 1–3月 <span class="qc-badge" style="background:var(--orange-bg);color:var(--orange)">已结束</span></div>
+                <div class="qc-plan">400<span style="font-size:13px;font-weight:400;color:var(--muted)">万</span></div>
+                <div class="qc-actual" style="color:var(--orange)">实际 205万 (51.3%)</div>
+                <div class="qc-prog"><div class="qc-fill" style="width:51.3%;background:var(--orange)"></div></div>
+                <div class="qc-sub">差距 195万 · 严重落后</div>
               </div>
-              <div style="border-top:1px solid var(--border);padding-top:10px;margin-top:4px;display:flex;flex-direction:column;gap:6px">
-                <div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--muted)">Q1 完成率</span><span style="color:var(--orange);font-weight:600">51.3%</span></div>
-                <div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--muted)">Q2 完成率</span><span style="color:var(--blue);font-weight:600">10.2%+</span></div>
-                <div style="display:flex;justify-content:space-between;font-size:12px"><span style="color:var(--muted)">预计全年</span><span style="color:var(--red);font-weight:600">~770万</span></div>
+              <div class="quarter-card q-current">
+                <div class="qc-label">Q2 · 4–6月 <span class="qc-badge" style="background:var(--blue-bg);color:var(--blue)">进行中</span></div>
+                <div class="qc-plan">410<span style="font-size:13px;font-weight:400;color:var(--muted)">万</span></div>
+                <div class="qc-actual" style="color:var(--blue)">已完成 42万 (10.2%)</div>
+                <div class="qc-prog"><div class="qc-fill" style="width:10.2%;background:var(--blue)"></div></div>
+                <div class="qc-sub">含 4月 + 5月进行中</div>
+              </div>
+              <div class="quarter-card">
+                <div class="qc-label">Q3 · 7–9月 <span class="qc-badge" style="background:var(--bg2);color:var(--muted)">待开始</span></div>
+                <div class="qc-plan">420<span style="font-size:13px;font-weight:400;color:var(--muted)">万</span></div>
+                <div class="qc-actual" style="color:var(--muted2)">未开始</div>
+                <div class="qc-prog"><div class="qc-fill" style="width:0%"></div></div>
+                <div class="qc-sub">H2 冲刺重点季</div>
+              </div>
+              <div class="quarter-card">
+                <div class="qc-label">Q4 · 10–12月 <span class="qc-badge" style="background:var(--bg2);color:var(--muted)">待开始</span></div>
+                <div class="qc-plan">365<span style="font-size:13px;font-weight:400;color:var(--muted)">万</span></div>
+                <div class="qc-actual" style="color:var(--muted2)">未开始</div>
+                <div class="qc-prog"><div class="qc-fill" style="width:0%"></div></div>
+                <div class="qc-sub">年末大促 · 含双11</div>
               </div>
             </div>
-            <div class="hermes-card">
-              <div class="hermes-header"><div class="hermes-icon">H</div><div class="hermes-title">Hermes · 年度预警</div></div>
-              <div class="hermes-body">按当前节奏组全年预计 <b style="color:var(--red)">~770万</b>，距目标 1595万差 <b>825万</b>。<br><br>最大风险：毛涵全年预计仅 40万（目标234万）。建议评估是否启动人员调整。</div>
-              <div class="hermes-actions">
-                <button class="hermes-btn primary" onclick="showToast('已上报总监')">上报总监</button>
-                <button class="hermes-btn" onclick="showToast('已制定改进计划')">制定改进计划</button>
-              </div>
-            </div>
-            <div class="card card-sm">
-              <div class="card-title">组年度里程碑</div>
-              <div style="display:flex;flex-direction:column;gap:10px">
-                <div style="display:flex;gap:10px;align-items:flex-start">
-                  <div style="width:8px;height:8px;border-radius:50%;background:var(--red);margin-top:4px;flex-shrink:0"></div>
-                  <div><div style="font-size:13px;font-weight:600">Q1 严重落后</div><div style="font-size:11px;color:var(--muted)">目标400万，实际205万 (51%)</div></div>
-                </div>
-                <div style="display:flex;gap:10px;align-items:flex-start">
-                  <div style="width:8px;height:8px;border-radius:50%;background:var(--blue);margin-top:4px;flex-shrink:0"></div>
-                  <div><div style="font-size:13px;font-weight:600">Q2 加速冲刺中</div><div style="font-size:11px;color:var(--muted)">目标410万，需5月全力补差</div></div>
-                </div>
-                <div style="display:flex;gap:10px;align-items:flex-start">
-                  <div style="width:8px;height:8px;border-radius:50%;background:var(--border2);margin-top:4px;flex-shrink:0"></div>
-                  <div><div style="font-size:13px;font-weight:600;color:var(--muted)">H2 大促布局</div><div style="font-size:11px;color:var(--muted2)">双11/双12 专项策略待制定</div></div>
-                </div>
-              </div>
-            </div>
-          </div><!-- /right -->
-        </div><!-- /sec-grid -->
+          </div>
+
+        </div>
       </div><!-- /year-target -->
 
 
@@ -1053,76 +1134,32 @@ function logout(){ localStorage.removeItem('pdca_session'); window.location.href
           </div>
 
           <!-- OKR 分解 -->
-          <div style="display:grid;grid-template-columns:1fr 320px;gap:16px">
-            <div>
-              <div class="section-label" style="margin-bottom:12px">
-                <div class="step-badge" style="background:var(--blue);color:#fff">Q2</div>
-                <div class="step-name">团队 Q2 OKR 分解<span class="step-sub">4月 → 6月关键行动</span></div>
-              </div>
-              <div class="card card-sm" style="padding:0;overflow:hidden">
-                <table class="month-table">
-                  <thead>
-                    <tr><th>目标方向</th><th>具体指标</th><th>4月</th><th>5月</th><th>6月</th><th>状态</th></tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td style="font-weight:600">人产稳定</td>
-                      <td>全员均达20万/月</td>
-                      <td style="color:var(--orange)">12万</td>
-                      <td style="color:var(--blue)">16万</td>
-                      <td style="color:var(--muted)">20万</td>
-                      <td><span class="tag blue">进行中</span></td>
-                    </tr>
-                    <tr>
-                      <td style="font-weight:600">新人消化</td>
-                      <td>第3月人产≥10万</td>
-                      <td style="color:var(--muted2)">—</td>
-                      <td style="color:var(--muted2)">—</td>
-                      <td style="color:var(--green)">达标</td>
-                      <td><span class="tag" style="background:var(--bg2);color:var(--muted)">待验证</span></td>
-                    </tr>
-                    <tr>
-                      <td style="font-weight:600">自拓获客</td>
-                      <td>月自拓200客 · 业绩15万</td>
-                      <td style="color:var(--orange)">150客</td>
-                      <td style="color:var(--blue)">180客</td>
-                      <td style="color:var(--muted)">200客</td>
-                      <td><span class="tag blue">进行中</span></td>
-                    </tr>
-                    <tr>
-                      <td style="font-weight:600">WA 扩容</td>
-                      <td>组内月新增客 1500</td>
-                      <td style="color:var(--orange)">800</td>
-                      <td style="color:var(--blue)">1200</td>
-                      <td style="color:var(--muted)">1500</td>
-                      <td><span class="tag blue">进行中</span></td>
-                    </tr>
-                    <tr>
-                      <td style="font-weight:600">社媒引流</td>
-                      <td>组内月播放量 2500万</td>
-                      <td style="color:var(--orange)">1200万</td>
-                      <td style="color:var(--blue)">1800万</td>
-                      <td style="color:var(--muted)">2500万</td>
-                      <td><span class="tag blue">进行中</span></td>
-                    </tr>
-                    <tr>
-                      <td style="font-weight:600">异常处置</td>
-                      <td>毛涵人产归队至15万</td>
-                      <td style="color:var(--red)">4.8万</td>
-                      <td style="color:var(--orange)">8万</td>
-                      <td style="color:var(--muted)">15万</td>
-                      <td><span class="tag red">重点跟进</span></td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
+          <div>
+            <div class="section-label" style="margin-bottom:12px">
+              <div class="step-badge" style="background:var(--blue);color:#fff">Q2</div>
+              <div class="step-name">团队 Q2 OKR 分解<span class="step-sub">4月 → 6月关键行动</span></div>
+            </div>
+            <div class="card card-sm" style="padding:0;overflow:hidden;margin-bottom:16px">
+              <table class="month-table">
+                <thead>
+                  <tr><th>目标方向</th><th>具体指标</th><th>4月</th><th>5月</th><th>6月</th><th>状态</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td style="font-weight:600">人产稳定</td><td>全员均达20万/月</td><td style="color:var(--orange)">12万</td><td style="color:var(--blue)">16万</td><td style="color:var(--muted)">20万</td><td><span class="tag blue">进行中</span></td></tr>
+                  <tr><td style="font-weight:600">新人消化</td><td>第3月人产≥10万</td><td style="color:var(--muted2)">—</td><td style="color:var(--muted2)">—</td><td style="color:var(--green)">达标</td><td><span class="tag" style="background:var(--bg2);color:var(--muted)">待验证</span></td></tr>
+                  <tr><td style="font-weight:600">自拓获客</td><td>月自拓200客 · 业绩15万</td><td style="color:var(--orange)">150客</td><td style="color:var(--blue)">180客</td><td style="color:var(--muted)">200客</td><td><span class="tag blue">进行中</span></td></tr>
+                  <tr><td style="font-weight:600">WA 扩容</td><td>组内月新增客 1500</td><td style="color:var(--orange)">800</td><td style="color:var(--blue)">1200</td><td style="color:var(--muted)">1500</td><td><span class="tag blue">进行中</span></td></tr>
+                  <tr><td style="font-weight:600">社媒引流</td><td>组内月播放量 2500万</td><td style="color:var(--orange)">1200万</td><td style="color:var(--blue)">1800万</td><td style="color:var(--muted)">2500万</td><td><span class="tag blue">进行中</span></td></tr>
+                  <tr><td style="font-weight:600">异常处置</td><td>毛涵人产归队至15万</td><td style="color:var(--red)">4.8万</td><td style="color:var(--orange)">8万</td><td style="color:var(--muted)">15万</td><td><span class="tag red">重点跟进</span></td></tr>
+                </tbody>
+              </table>
             </div>
 
-            <!-- 右侧：Q2关键里程碑 + 风险提示 -->
-            <div style="display:flex;flex-direction:column;gap:14px">
+            <!-- 里程碑 + 架构说明 并排 -->
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
               <div class="card card-sm">
                 <div class="card-title">Q2 关键里程碑</div>
-                <div style="display:flex;flex-direction:column;gap:12px">
+                <div style="display:flex;flex-direction:column;gap:10px">
                   <div style="display:flex;gap:10px;align-items:flex-start">
                     <div style="width:8px;height:8px;border-radius:50%;background:var(--orange);margin-top:4px;flex-shrink:0"></div>
                     <div><div style="font-size:13px;font-weight:600">4月底 · 人均12万</div><div style="font-size:11px;color:var(--muted)">全员每日触达 ≥ 50客户</div></div>
@@ -1137,21 +1174,14 @@ function logout(){ localStorage.removeItem('pdca_session'); window.location.href
                   </div>
                 </div>
               </div>
-              <div class="hermes-card">
-                <div class="hermes-header"><div class="hermes-icon">!</div><div class="hermes-title">Q2 核心风险</div></div>
-                <div class="hermes-body">毛涵当前人产 <b style="color:var(--red)">0万</b>，是Q2人产目标的最大缺口。<br><br>建议本周启动 1v1 辅导，明确4月底考核节点，同步告知总监。</div>
-                <div class="hermes-actions">
-                  <button class="hermes-btn primary" onclick="showToast('已制定毛涵辅导计划')">制定辅导计划</button>
-                  <button class="hermes-btn" onclick="showToast('已上报总监')">上报总监</button>
-                </div>
-              </div>
               <div class="card card-sm" style="border-left:3px solid var(--blue)">
                 <div class="card-title" style="color:var(--blue)">1+5 标准架构要求</div>
-                <div style="font-size:12px;color:var(--muted);line-height:1.8">
+                <div style="font-size:12px;color:var(--muted);line-height:1.9">
                   <div>· 主管（1）: 统筹 + 资源分配 + 辅导</div>
                   <div>· 成员（5）: 各自 WA 号 × 14 账号</div>
                   <div>· 满编人产: 5 × 20万 = <b style="color:var(--blue)">100万/月</b></div>
                   <div>· 当前进度: 约 <b style="color:var(--orange)">55%</b>（5人均未达标）</div>
+                  <div style="margin-top:8px;padding:6px 10px;background:var(--red-bg);border-radius:6px;color:var(--red);font-size:11px">⚠️ 毛涵人产 0万，是Q2最大缺口，本周启动1v1辅导</div>
                 </div>
               </div>
             </div>
@@ -1199,6 +1229,31 @@ function logout(){ localStorage.removeItem('pdca_session'); window.location.href
 </div>
 <div class="toast" id="toast"></div>
 
+<!-- Hermes 悬浮按钮 -->
+<button class="hermes-fab" onclick="openHermes()" title="Hermes AI 分析">H</button>
+
+<!-- Hermes 弹窗 -->
+<div class="hmodal-mask" id="hmodal-mask" onclick="closeHermes(event)">
+  <div class="hmodal">
+    <div class="hmodal-hdr">
+      <div class="hmodal-icon">H</div>
+      <div class="hmodal-title">Hermes · 今日运营分析</div>
+      <button class="hmodal-close" onclick="closeHermes()">×</button>
+    </div>
+    <div class="hmodal-body">
+      今日团队整体节奏 <b>正常</b>，4 人完成率 ≥80%，毛涵异常需介入。
+      <div class="hm-highlight">📈 陈莉今日已完成 <b>1.4万</b>，超日均目标 15%，节奏领先。</div>
+      <div class="hm-warn">⚠️ 毛涵今日 <b>0单</b>，私信量低于标准 40%，连续 4 天低分——建议 <b>14:00 前</b> 约谈介入。</div>
+      按当前节奏，月末组合计预计完成 <b>~94万</b>，距目标缺口 <b>28万</b>，主要来自毛涵拖累。
+    </div>
+    <div class="hmodal-actions">
+      <button class="hmodal-btn primary" onclick="showToast('已制定毛涵辅导计划');closeHermes()">立即制定辅导计划</button>
+      <button class="hmodal-btn" onclick="showToast('已上报总监');closeHermes()">上报总监</button>
+      <button class="hmodal-btn" onclick="closeHermes()">稍后处理</button>
+    </div>
+  </div>
+</div>
+
 <script>
 // ===== DATA =====
 const MGR_SOP = [
@@ -1212,21 +1267,95 @@ const MGR_SOP = [
   {time:'17:00–18:00', module:'复盘与计划', desc:'当日完成情况汇总，明日任务分配', status:'todo'},
 ];
 
-const MEMBERS = [
-  {uid:12865, name:'陈莉',   av:'陈', stage:'D90+', level:'300W', score:88, warn:false, bars:{私信:92,触达:95,社媒:100}, today:1.4, target:1.22},
-  {uid:12849, name:'郑丽苹', av:'郑', stage:'D90+', level:'300W', score:85, warn:false, bars:{私信:80,触达:84,社媒:100}, today:0.48, target:1.19},
-  {uid:12862, name:'陈玉霞', av:'陈', stage:'D90+', level:'300W', score:91, warn:false, bars:{私信:95,触达:96,社媒:100}, today:0.38, target:1.22},
-  {uid:12549, name:'刘佳鑫', av:'刘', stage:'D90+', level:'200W', score:82, warn:false, bars:{私信:83,触达:86,社媒:100}, today:0.41, target:1.00},
-  {uid:13431, name:'毛涵',   av:'毛', stage:'D90+', level:'200W', score:61, warn:true,  bars:{私信:42,触达:51,社媒:50},  today:0, target:0.9},
+// ═══════════════════════════════════════════════════════════════
+// STAFF — single source of truth for all views (日/月/年)
+// day.*   = 今日实际  |  month.* = 本月累计  |  year.* = 年度
+// ═══════════════════════════════════════════════════════════════
+const STAFF = [
+  {uid:12865, name:'陈莉', av:'陈', level:'300W', stage:'D90+',
+   day:{score:88, warn:false, sales:1.4, target:1.22,
+        wa:3, wa_ok:3, wa_blocked:0, wa_banned:0,
+        msg_pct:92, reach_pct:95, social_pct:100,
+        pipeline:{s:2,a:4,b:5,c:8,d:12}, old_clients:45,
+        ins:2, tiktok:2, youtube:1, leads:3,
+        intents:[
+          {client:'Ahmed R.', stage:'S', amount:3.8, due:'今日 18:00', note:'付款截止提醒'},
+          {client:'Liu M.',   stage:'A', amount:1.2, due:'明日',       note:'确认发货地址'},
+          {client:'Park K.',  stage:'B', amount:2.1, due:'本周内',     note:'等待客户决策'},
+        ]},
+   month:{sales:11.2, target:25, ins:12, tiktok:9, youtube:4, leads:28,
+          intents_total:18, intents_closed:12, intents_open:6, pipeline_wan:6.4, closed_wan:21.4},
+   year:{q1:62, target:347}},
+
+  {uid:12849, name:'郑丽苹', av:'郑', level:'300W', stage:'D90+',
+   day:{score:85, warn:false, sales:0.48, target:1.19,
+        wa:3, wa_ok:3, wa_blocked:0, wa_banned:0,
+        msg_pct:80, reach_pct:84, social_pct:100,
+        pipeline:{s:1,a:2,b:4,c:6,d:10}, old_clients:38,
+        ins:2, tiktok:1, youtube:0, leads:2,
+        intents:[
+          {client:'Fatima K.', stage:'A', amount:2.1, due:'今日 20:00', note:'确认型号颜色'},
+          {client:'James L.',  stage:'B', amount:1.5, due:'明日',       note:'发送产品图册'},
+        ]},
+   month:{sales:8.4, target:25, ins:9, tiktok:7, youtube:3, leads:19,
+          intents_total:14, intents_closed:9, intents_open:5, pipeline_wan:5.2, closed_wan:16.2},
+   year:{q1:54, target:347}},
+
+  {uid:12862, name:'陈玉霞', av:'陈', level:'300W', stage:'D90+',
+   day:{score:91, warn:false, sales:0.38, target:1.22,
+        wa:3, wa_ok:3, wa_blocked:0, wa_banned:0,
+        msg_pct:95, reach_pct:96, social_pct:100,
+        pipeline:{s:3,a:4,b:6,c:9,d:14}, old_clients:52,
+        ins:2, tiktok:2, youtube:1, leads:4,
+        intents:[
+          {client:'Sarah L.', stage:'S', amount:2.3, due:'今日 15:00', note:'确认配色尺寸'},
+          {client:'Ravi P.',  stage:'A', amount:1.8, due:'今日 17:00', note:'视频通话介绍'},
+          {client:'Nora W.',  stage:'B', amount:3.2, due:'明日',       note:'等待转账'},
+        ]},
+   month:{sales:9.8, target:22, ins:11, tiktok:8, youtube:4, leads:33,
+          intents_total:21, intents_closed:15, intents_open:6, pipeline_wan:8.6, closed_wan:28.6},
+   year:{q1:58, target:347}},
+
+  {uid:12549, name:'刘佳鑫', av:'刘', level:'200W', stage:'D90+',
+   day:{score:82, warn:false, sales:0.41, target:1.00,
+        wa:3, wa_ok:2, wa_blocked:1, wa_banned:0,
+        msg_pct:83, reach_pct:86, social_pct:100,
+        pipeline:{s:1,a:2,b:3,c:5,d:8}, old_clients:31,
+        ins:1, tiktok:1, youtube:0, leads:1,
+        intents:[
+          {client:'Chen B.', stage:'A', amount:1.6, due:'今日', note:'跟进报价'},
+          {client:'Wei T.',  stage:'C', amount:0.8, due:'本周', note:'初步意向'},
+        ]},
+   month:{sales:8.3, target:22, ins:8, tiktok:5, youtube:2, leads:14,
+          intents_total:12, intents_closed:7, intents_open:5, pipeline_wan:4.8, closed_wan:13.8},
+   year:{q1:21, target:320}},
+
+  {uid:13431, name:'毛涵', av:'毛', level:'200W', stage:'D90+',
+   day:{score:61, warn:true, sales:0, target:0.90,
+        wa:3, wa_ok:1, wa_blocked:1, wa_banned:1,
+        msg_pct:42, reach_pct:51, social_pct:50,
+        pipeline:{s:0,a:1,b:2,c:3,d:5}, old_clients:18,
+        ins:1, tiktok:0, youtube:0, leads:0,
+        intents:[
+          {client:'Ong L.', stage:'B', amount:1.1, due:'本周', note:'等待客户回复'},
+        ]},
+   month:{sales:4.6, target:20, ins:3, tiktok:2, youtube:1, leads:4,
+          intents_total:8, intents_closed:3, intents_open:5, pipeline_wan:2.2, closed_wan:7.2},
+   year:{q1:10, target:234}},
 ];
 
-const MONTH_MEMBERS = [
-  {uid:12865, name:'陈莉',   done:11.2, target:25, level:'300W'},
-  {uid:12849, name:'郑丽苹', done:8.4,  target:25, level:'300W'},
-  {uid:12862, name:'陈玉霞', done:9.8,  target:22, level:'300W'},
-  {uid:12549, name:'刘佳鑫', done:8.3,  target:22, level:'200W'},
-  {uid:13431, name:'毛涵',   done:4.6,  target:20, level:'200W'},
-];
+// ── Computed views (all derived from STAFF) ─────────────────────
+const MEMBERS = STAFF.map(s => ({
+  uid:s.uid, name:s.name, av:s.av, stage:s.stage, level:s.level,
+  score:s.day.score, warn:s.day.warn,
+  bars:{私信:s.day.msg_pct, 触达:s.day.reach_pct, 社媒:s.day.social_pct},
+  today:s.day.sales, target:s.day.target,
+}));
+
+const MONTH_MEMBERS = STAFF.map(s => ({
+  uid:s.uid, name:s.name, level:s.level,
+  done:s.month.sales, target:s.month.target,
+}));
 
 // ===== RENDER =====
 function renderMgrSOP() {
@@ -1262,7 +1391,7 @@ function renderMemberGrid() {
         <div class="mini-track"><div class="mini-fill ${v>=90?'ok':v<60?'ng':'warn'}" style="width:${v}%"></div></div>
         <div style="font-size:11px;color:var(--muted);width:28px;text-align:right">${v}%</div>
       </div>`).join('');
-    return `<div class="member-card ${m.warn?'alert':''}" onclick="openDrill('pdca-day.html?uid='+m.uid,'${m.name}')" style="cursor:pointer">
+    return `<div class="member-card ${m.warn?'alert':''}" onclick="openDrill('pdca-day.html?uid=${m.uid}','${m.name}')" style="cursor:pointer">
       ${m.warn?'<div class="warn-badge">!</div>':''}
       <div class="mc-head">
         <div class="mc-av">${m.av}</div>
@@ -1291,21 +1420,7 @@ function renderMemberBars() {
   }).join('');
 }
 
-function renderMonthMemberBars() {
-  const el = document.getElementById('month-member-bars');
-  el.innerHTML = MONTH_MEMBERS.map(m => {
-    const pct = Math.min(Math.round(m.done/m.target*100),100);
-    const c = pct>=70?'ok':pct<40?'bad':'warn';
-    const tagCls = pct>=70?'green':pct<40?'red':'orange';
-    const levelCls = m.level==='300W'?'gold':'silver';
-    return `<div class="prog-row" onclick="openDrill('pdca-day.html?uid=${m.uid}','${m.name}')" style="cursor:pointer">
-      <div class="prog-label">${m.name} <span class="tag ${levelCls}" style="font-size:10px;vertical-align:middle">${m.level}</span></div>
-      <div class="prog-track"><div class="prog-fill ${c}" style="width:${pct}%"></div></div>
-      <div class="prog-num">${m.done}/${m.target}万</div>
-      <span class="tag ${tagCls}" style="font-size:10px;flex-shrink:0">${pct}%</span>
-    </div>`;
-  }).join('');
-}
+// renderMonthMemberBars — full version defined later (after MONTH_INTENTS data)
 
 // ===== TABS =====
 function switchTab(g, id, el) {
@@ -1511,39 +1626,16 @@ const YESTERDAY = {
   ],
 };
 
-// ===== WA PER EMPLOYEE =====
-const WA_MEMBERS = [
-  {uid:12865, name:'陈莉',   wa:3, normal:3, blocked:0, banned:0, s:2, a:4, b:5, c:8,  d:12, old:45},
-  {uid:12849, name:'郑丽苹', wa:3, normal:3, blocked:0, banned:0, s:1, a:2, b:4, c:6,  d:10, old:38},
-  {uid:12862, name:'陈玉霞', wa:3, normal:3, blocked:0, banned:0, s:3, a:4, b:6, c:9,  d:14, old:52},
-  {uid:12549, name:'刘佳鑫', wa:3, normal:2, blocked:1, banned:0, s:1, a:2, b:3, c:5,  d:8,  old:31},
-  {uid:13431, name:'毛涵',   wa:3, normal:1, blocked:1, banned:1, s:0, a:1, b:2, c:3,  d:5,  old:18},
-];
+// ===== WA PER EMPLOYEE (derived from STAFF) =====
+const WA_MEMBERS = STAFF.map(s => ({
+  uid:s.uid, name:s.name,
+  wa:s.day.wa, normal:s.day.wa_ok, blocked:s.day.wa_blocked, banned:s.day.wa_banned,
+  s:s.day.pipeline.s, a:s.day.pipeline.a, b:s.day.pipeline.b,
+  c:s.day.pipeline.c, d:s.day.pipeline.d, old:s.day.old_clients,
+}));
 
-// ===== INTENT PER EMPLOYEE =====
-const MEMBER_INTENTS = [
-  {uid:12865, name:'陈莉', intents:[
-    {client:'Ahmed R.',  stage:'S', amount:3.8, due:'今日 18:00', note:'付款截止提醒'},
-    {client:'Liu M.',    stage:'A', amount:1.2, due:'明日',       note:'确认发货地址'},
-    {client:'Park K.',   stage:'B', amount:2.1, due:'本周内',     note:'等待客户决策'},
-  ]},
-  {uid:12849, name:'郑丽苹', intents:[
-    {client:'Fatima K.', stage:'A', amount:2.1, due:'今日 20:00', note:'确认型号颜色'},
-    {client:'James L.',  stage:'B', amount:1.5, due:'明日',       note:'发送产品图册'},
-  ]},
-  {uid:12862, name:'陈玉霞', intents:[
-    {client:'Sarah L.',  stage:'S', amount:2.3, due:'今日 15:00', note:'确认配色尺寸'},
-    {client:'Ravi P.',   stage:'A', amount:1.8, due:'今日 17:00', note:'视频通话介绍'},
-    {client:'Nora W.',   stage:'B', amount:3.2, due:'明日',       note:'等待转账'},
-  ]},
-  {uid:12549, name:'刘佳鑫', intents:[
-    {client:'Chen B.',   stage:'A', amount:1.6, due:'今日',       note:'跟进报价'},
-    {client:'Wei T.',    stage:'C', amount:0.8, due:'本周',       note:'初步意向'},
-  ]},
-  {uid:13431, name:'毛涵', intents:[
-    {client:'Ong L.',    stage:'B', amount:1.1, due:'本周',       note:'等待客户回复'},
-  ]},
-];
+// ===== INTENT PER EMPLOYEE (derived from STAFF) =====
+const MEMBER_INTENTS = STAFF.map(s => ({uid:s.uid, name:s.name, intents:s.day.intents}));
 
 // ===== RENDER TODO =====
 function renderTodoList(elId, items) {
@@ -1715,28 +1807,79 @@ const LAST_MONTH = {
   ],
 };
 
-// ===== MONTH INTENTS =====
-const MONTH_INTENTS = [
-  {uid:12865, name:'陈莉',   total:18, closed:12, open:6,  pipeline_wan:6.4, closed_wan:21.4},
-  {uid:12849, name:'郑丽苹', total:14, closed:9,  open:5,  pipeline_wan:5.2, closed_wan:16.2},
-  {uid:12862, name:'陈玉霞', total:21, closed:15, open:6,  pipeline_wan:8.6, closed_wan:28.6},
-  {uid:12549, name:'刘佳鑫', total:12, closed:7,  open:5,  pipeline_wan:4.8, closed_wan:13.8},
-  {uid:13431, name:'毛涵',   total:8,  closed:3,  open:5,  pipeline_wan:2.2, closed_wan:7.2},
-];
+// ===== MONTH INTENTS (derived from STAFF) =====
+const MONTH_INTENTS = STAFF.map(s => ({
+  uid:s.uid, name:s.name,
+  total:s.month.intents_total, closed:s.month.intents_closed, open:s.month.intents_open,
+  pipeline_wan:s.month.pipeline_wan, closed_wan:s.month.closed_wan,
+}));
 
 // ===== RENDER MONTH RANKING =====
-function renderMonthRanking() {
-  const el = document.getElementById('month-rank-list');
+function _renderRankInto(elId) {
+  const el = document.getElementById(elId);
   if (!el) return;
   const sorted = [...MONTH_MEMBERS].sort((a, b) => b.done - a.done);
   el.innerHTML = sorted.map((m, i) => {
-    const isAlert = m.done / m.target < 0.4;
+    const pct = Math.round(m.done / m.target * 100);
+    const isAlert = pct < 40;
     const tagCls = m.level === '300W' ? 'gold' : 'silver';
-    return `<div class="rank-item${isAlert?' style="background:var(--red-bg)"':''}" style="${isAlert?'background:var(--red-bg)':''}"
-      onclick="openDrill('pdca-day.html?uid=${m.uid}','${m.name}')" style="cursor:pointer">
-      <span class="rank-num${i<2?' top':''}">${i+1}</span>
-      <span class="rank-name${isAlert?' style=""':''}" style="${isAlert?'color:var(--red)':''}">${m.name} <span class="tag ${tagCls}" style="font-size:10px">${m.level}</span></span>
-      <span class="rank-val" style="${isAlert?'color:var(--red)':''}">${m.done}万</span>
+    const medals = ['🥇','🥈','🥉'];
+    return `<div class="rank-item" style="cursor:pointer;${isAlert?'background:var(--red-bg)':''}"
+      onclick="openDrill('pdca-day.html?uid=${m.uid}','${m.name}')">
+      <span class="rank-num" style="font-size:15px">${medals[i]||i+1}</span>
+      <span class="rank-name" style="${isAlert?'color:var(--red)':''}">
+        ${m.name} <span class="tag ${tagCls}" style="font-size:10px">${m.level}</span>
+      </span>
+      <span class="rank-val" style="${isAlert?'color:var(--red)':''}">
+        ${m.done}万 <span style="font-size:10px;color:var(--muted);font-weight:400">${pct}%</span>
+      </span>
+    </div>`;
+  }).join('');
+}
+function renderMonthRanking() {
+  _renderRankInto('month-rank-list');
+  _renderRankInto('month-rank-list-members');
+}
+
+// ===== RENDER MONTH ONTRACK SUMMARY =====
+function renderMonthOntrack() {
+  const daysIn = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate();
+  const daysPassed = new Date().getDate();
+  const pace = daysPassed / daysIn;
+
+  const el = document.getElementById('month-ontrack-summary');
+  if (!el) return;
+  const rows = MONTH_MEMBERS.map(m => {
+    const pct = m.done / m.target;
+    const onTrack = pct >= pace * 0.85;
+    const cls = pct >= 0.7 ? 'ok' : pct >= 0.4 ? 'warn' : 'behind';
+    const label = pct >= 0.7 ? '✓ 达标' : pct >= 0.4 ? '偏慢' : '落后';
+    return `<div style="display:flex;align-items:center;gap:8px">
+      <span style="font-size:13px;font-weight:600;width:52px">${m.name}</span>
+      <div style="flex:1;height:5px;background:var(--bg2);border-radius:3px;overflow:hidden">
+        <div style="height:100%;width:${Math.min(pct*100,100).toFixed(1)}%;background:${pct>=0.7?'var(--green)':pct>=0.4?'var(--orange)':'var(--red)'};border-radius:3px"></div>
+      </div>
+      <span class="tag ${cls}" style="font-size:10px;flex-shrink:0">${label}</span>
+    </div>`;
+  });
+  el.innerHTML = rows.join('');
+}
+
+// ===== RENDER MONTH FORECAST =====
+function renderMonthForecast() {
+  const el = document.getElementById('month-forecast');
+  if (!el) return;
+  const daysIn = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate();
+  const daysPassed = Math.max(new Date().getDate(), 1);
+  el.innerHTML = MONTH_MEMBERS.map(m => {
+    const dailyRate = m.done / daysPassed;
+    const forecast = +(dailyRate * daysIn).toFixed(1);
+    const fPct = Math.round(forecast / m.target * 100);
+    const cls = fPct >= 80 ? 'green' : fPct >= 50 ? 'orange' : 'red';
+    return `<div style="display:flex;align-items:center;justify-content:space-between;font-size:12px">
+      <span style="color:var(--muted)">${m.name}</span>
+      <span style="font-weight:600;color:var(--${cls})">${forecast}万</span>
+      <span class="tag ${fPct>=80?'green':fPct>=50?'orange':'red'}" style="font-size:10px">${fPct}%</span>
     </div>`;
   }).join('');
 }
@@ -1915,19 +2058,26 @@ function renderMonthIntents() {
 }
 
 // ===== SOCIAL MEDIA DATA =====
+// ── Social data computed from STAFF ─────────────────────────────
 const TEAM_SOCIAL_DATA = [
-  {platform:'INS',     icon:'📸', color:'var(--purple)', target:50, done:43, today:8,  engagement:'4.2%'},
-  {platform:'TikTok',  icon:'🎵', color:'var(--red)',    target:40, done:31, today:6,  engagement:'6.8%'},
-  {platform:'YouTube', icon:'▶️', color:'var(--red)',    target:20, done:14, today:2,  engagement:'3.1%'},
+  {platform:'INS',    icon:'📸', color:'var(--purple)', target:50,
+   done:STAFF.reduce((t,s)=>t+s.month.ins,0),
+   today:STAFF.reduce((t,s)=>t+s.day.ins,0), engagement:'4.2%'},
+  {platform:'TikTok', icon:'🎵', color:'var(--red)',    target:40,
+   done:STAFF.reduce((t,s)=>t+s.month.tiktok,0),
+   today:STAFF.reduce((t,s)=>t+s.day.tiktok,0), engagement:'6.8%'},
+  {platform:'YouTube',icon:'▶️', color:'var(--red)',    target:20,
+   done:STAFF.reduce((t,s)=>t+s.month.youtube,0),
+   today:STAFF.reduce((t,s)=>t+s.day.youtube,0), engagement:'3.1%'},
 ];
 
-const MEMBER_SOCIAL = [
-  {uid:12865, name:'陈莉',   ins_today:2, ins_month:12, tk_today:2, tk_month:9,  yt_today:1, yt_month:4},
-  {uid:12849, name:'郑丽苹', ins_today:2, ins_month:9,  tk_today:1, tk_month:7,  yt_today:0, yt_month:3},
-  {uid:12862, name:'陈玉霞', ins_today:2, ins_month:11, tk_today:2, tk_month:8,  yt_today:1, yt_month:4},
-  {uid:12549, name:'刘佳鑫', ins_today:1, ins_month:8,  tk_today:1, tk_month:5,  yt_today:0, yt_month:2},
-  {uid:13431, name:'毛涵',   ins_today:1, ins_month:3,  tk_today:0, tk_month:2,  yt_today:0, yt_month:1},
-];
+const MEMBER_SOCIAL = STAFF.map(s => ({
+  uid:s.uid, name:s.name,
+  ins_today:s.day.ins,    ins_month:s.month.ins,
+  tk_today:s.day.tiktok,  tk_month:s.month.tiktok,
+  yt_today:s.day.youtube, yt_month:s.month.youtube,
+  leads_today:s.day.leads, leads_month:s.month.leads,
+}));
 
 // ===== RENDER TEAM SOCIAL =====
 function renderTeamSocial() {
@@ -1973,9 +2123,122 @@ function renderMemberSocial() {
       <td style="color:var(--muted)">${m.tk_month}</td>
       <td style="color:var(--red)">${m.yt_today}</td>
       <td style="color:var(--muted)">${m.yt_month}</td>
+      <td style="color:var(--green);font-weight:600">${m.leads_today}</td>
+      <td style="color:var(--muted)">${m.leads_month}</td>
       <td><span class="tag ${cls}">${label} ${totalToday}/${dayTarget}</span></td>
     </tr>`;
   }).join('');
+}
+
+// ===== HERMES MODAL =====
+function openHermes() {
+  document.getElementById('hmodal-mask').classList.add('open');
+}
+function closeHermes(e) {
+  if (e && e.target !== document.getElementById('hmodal-mask')) return;
+  document.getElementById('hmodal-mask').classList.remove('open');
+}
+
+// ===== RENDER YEAR MEMBER TABLE (computed from STAFF) =====
+function renderYearMembers() {
+  const tbody = document.getElementById('mgr-year-member-body');
+  if (!tbody) return;
+  const teamQ1  = STAFF.reduce((t,s)=>t+s.year.q1, 0);
+  const teamQ2  = parseFloat(STAFF.reduce((t,s)=>t+s.month.sales, 0).toFixed(1));
+  const teamYTD = parseFloat((teamQ1+teamQ2).toFixed(1));
+  const teamTgt = STAFF.reduce((t,s)=>t+s.year.target, 0);
+  const teamPct = (teamYTD/teamTgt*100).toFixed(1);
+  tbody.innerHTML = STAFF.map(s => {
+    const q2    = s.month.sales;
+    const ytd   = parseFloat((s.year.q1+q2).toFixed(1));
+    const pct   = (ytd/s.year.target*100).toFixed(1);
+    const isWarn = parseFloat(pct) < 15;
+    const lvlCls = s.level==='300W'?'gold':'silver';
+    const wBg   = isWarn?'var(--red-bg)':'';
+    const hBg   = isWarn?'var(--red-bg)':'var(--bg2)';
+    return `<tr onclick="openDrill('pdca-day.html?uid=${s.uid}','${s.name}')"
+      style="cursor:pointer;transition:background .1s;background:${wBg}"
+      onmouseover="this.style.background='${hBg}'"
+      onmouseout="this.style.background='${wBg}'">
+      <td style="${isWarn?'color:var(--red)':''}">${s.name}</td>
+      <td><span class="tag ${lvlCls}">${s.level}</span></td>
+      <td>${s.year.target}万</td>
+      <td style="color:var(--orange)">${s.year.q1}万</td>
+      <td style="color:${isWarn?'var(--red)':'var(--blue)'}">${q2}万+</td>
+      <td style="${isWarn?'color:var(--red)':''}">${ytd}万</td>
+      <td><span style="color:${isWarn?'var(--red)':'var(--orange)'};${isWarn?'font-weight:700':''}">${pct}%</span></td>
+    </tr>`;
+  }).join('') + `<tr class="m-subtotal">
+      <td colspan="2">组合计</td><td>${teamTgt}万</td>
+      <td style="color:var(--orange)">${teamQ1}万</td>
+      <td style="color:var(--blue)">${teamQ2}万+</td>
+      <td>${teamYTD}万</td>
+      <td style="color:var(--orange)">${teamPct}%</td>
+    </tr>`;
+}
+
+// ===== RENDER MONTH KPI (computed from STAFF, updates donut + source summary) =====
+function renderTeamMonthKPI() {
+  const done   = parseFloat(STAFF.reduce((t,s)=>t+s.month.sales, 0).toFixed(1));
+  const target = STAFF.reduce((t,s)=>t+s.month.target, 0);
+  const pct    = parseFloat((done/target*100).toFixed(1));
+  const remain = parseFloat((target-done).toFixed(1));
+  const now    = new Date();
+  const daysIn = new Date(now.getFullYear(), now.getMonth()+1, 0).getDate();
+  const daysPassed = now.getDate();
+  const daysLeft   = daysIn - daysPassed;
+  const dailyNeeded = daysLeft>0 ? parseFloat((remain/daysLeft).toFixed(2)) : 0;
+  const pace   = parseFloat((daysPassed/daysIn*100).toFixed(1));
+  const lag    = parseFloat((pace-pct).toFixed(1));
+  const avgScore = Math.round(STAFF.reduce((t,s)=>t+s.day.score, 0)/STAFF.length);
+  const yearTgt  = STAFF.reduce((t,s)=>t+s.year.target, 0);
+
+  const strip = document.getElementById('mgr-month-kpi-strip');
+  if (strip) strip.innerHTML = `
+    <div class="kpi-card neutral">
+      <div class="kc-label">组月度目标</div>
+      <div class="kc-value">${target}<span style="font-size:13px;font-weight:400;color:var(--muted)">万</span></div>
+      <div class="kc-sub">${STAFF.length} 人 · 年度${yearTgt}万</div>
+      <div class="kc-prog"><div class="kc-fill" style="width:100%;background:#2563eb"></div></div>
+    </div>
+    <div class="kpi-card ${pct>=70?'ok':pct>=40?'warn':'behind'}">
+      <div class="kc-label">组已完成</div>
+      <div class="kc-value">${done}<span style="font-size:13px;font-weight:400;color:var(--muted)">万</span></div>
+      <div class="kc-sub">${pct}% · 剩余 ${remain} 万</div>
+      <div class="kc-prog"><div class="kc-fill" style="width:${pct}%;background:var(--orange)"></div></div>
+    </div>
+    <div class="kpi-card ${daysLeft<=7?'behind':'neutral'}">
+      <div class="kc-label">剩余天数</div>
+      <div class="kc-value">${daysLeft}<span style="font-size:13px;font-weight:400;color:var(--muted)">天</span></div>
+      <div class="kc-sub">需日均 ${dailyNeeded} 万</div>
+      <div class="kc-prog"><div class="kc-fill" style="width:${Math.round(daysLeft/daysIn*100)}%;background:var(--red)"></div></div>
+    </div>
+    <div class="kpi-card ok">
+      <div class="kc-label">组平均评分</div>
+      <div class="kc-value">${avgScore}<span style="font-size:13px;font-weight:400;color:var(--muted)">/100</span></div>
+      <div class="kc-sub">连续 5 天达标</div>
+      <div class="kc-prog"><div class="kc-fill" style="width:${avgScore}%;background:var(--green)"></div></div>
+    </div>`;
+
+  const donut = document.getElementById('month-completion-donut');
+  if (donut) donut.innerHTML = `
+    <div style="position:relative;width:100px;height:100px;margin:0 auto">
+      <svg viewBox="0 0 36 36" style="width:100%;height:100%;transform:rotate(-90deg)">
+        <circle cx="18" cy="18" r="15.9" fill="none" stroke="var(--bg2)" stroke-width="3"/>
+        <circle cx="18" cy="18" r="15.9" fill="none" stroke="var(--orange)" stroke-width="3"
+          stroke-dasharray="${pct} ${100-pct}" stroke-linecap="round"/>
+      </svg>
+      <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
+        <div style="font-size:20px;font-weight:700">${pct}%</div>
+        <div style="font-size:10px;color:var(--muted)">完成率</div>
+      </div>
+    </div>
+    <div style="margin-top:10px;font-size:12px;color:var(--muted)">${done}万 / ${target}万</div>
+    <div style="margin-top:4px;font-size:11px;padding:3px 10px;background:var(--orange-bg);color:var(--orange);border-radius:12px;display:inline-block">落后节奏 ${lag}%</div>`;
+
+  const src = document.getElementById('source-summary');
+  if (src) src.innerHTML = `组本月 <b style="color:var(--text)">${done}万</b> / 目标 ${target}万 ·
+    <span style="color:var(--blue)">■ 守正</span> <span style="color:var(--purple);margin-left:6px">■ 增量</span>`;
 }
 
 // ===== INIT =====
@@ -1984,6 +2247,8 @@ renderMemberGrid();
 renderMemberBars();
 renderMonthMemberBars();
 renderMonthRanking();
+renderMonthOntrack();
+renderMonthForecast();
 renderMonthTargetProgress();
 renderLastMonth();
 renderMonthWATable();
@@ -2002,6 +2267,9 @@ renderWATable();
 renderIntentList();
 renderTeamSocial();
 renderMemberSocial();
+
+renderTeamMonthKPI();
+renderYearMembers();
 
 loadMgrDayData();
 loadMgrMonthData();
